@@ -15,9 +15,10 @@ from sklearn import svm
 from sklearn.feature_selection import f_classif,SelectPercentile
 import time
 import dill
-
+from datetime import date
 #import function py file
-from meteo_iso_functions import grouping_data,pcafun,rfmethod,importing_preprocess,print_to_file,iso_prediction,f_reg_mutual,predict_points
+from meteo_iso_functions import regional_mensual_plot,grouping_data,pcafun,rfmethod,importing_preprocess,print_to_file,iso_prediction,f_reg_mutual,predict_points
+from sklearn.linear_model import LinearRegression
 
 
 def warn(*args, **kwargs):
@@ -149,90 +150,14 @@ def model_coup():
     column_name="predicted_iso2h"
     monthly_iso2h_output=predict_points(used_features_iso2h,x_y_z_,no_needed_month,temp_bests,rain_bests,hum_bests,x_scaler_iso2h,y_scaler_iso2h,didlog_iso2h,best_estimator_all_iso2h,column_name)
     ############################################################
+    #regional_mensual_plot
+    regional_mensual_plot(x_y_z_,monthly_iso18_output,monthly_iso2h_output)
+
+    #time
     t_total_end=time.time()
-    print ("total run time:", t_total_end-t_total_start)
-    dill.dump_session(r"C:\Users\Ash kan\Desktop\sonia\dill_dump_adjusted_r_fixed_3_september.pk1")
-
+    print ("#################################\n######Total run time:\n", t_total_end-t_total_start)
     
-    from sklearn.linear_model import LinearRegression
-    for feat in ["CooY"]:
-
-        ymax=x_y_z_[feat].max()
-        ymin=x_y_z_[feat].min()
-        ydis=ymax-ymin
-        m=["x","o","*","s","v","^"]
-        coll=['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
-        mon_name=["Jan","Feb","Mar","Apr","Nov","Dec"]
-        regmean=0
-        regcnt=0
-        regcept=0
-        for mon in range(0,len(monthly_iso18_output)):
-
- 
-            region1_iso18=monthly_iso18_output[mon][monthly_iso18_output[mon][feat]<ymin+(ydis/3)]
-            region1_iso2h=monthly_iso2h_output[mon][monthly_iso2h_output[mon][feat]<ymin+(ydis/3)]
-            reg1 = LinearRegression().fit(np.array(region1_iso18["predicted_iso18"]).reshape(-1, 1), np.array(region1_iso2h["predicted_iso2h"]).reshape(-1, 1))
-            reg1_slope=reg1.coef_
-            regmean +=reg1_slope
-            regcept +=reg1.intercept_
-            regcnt +=1
-            print (reg1_slope)
-            print (reg1.intercept_)
-            reg1.score(np.array(region1_iso18["predicted_iso18"]).reshape(-1, 1), np.array(region1_iso2h["predicted_iso2h"]).reshape(-1, 1))
-            plt.scatter(region1_iso18["predicted_iso18"].mean(), region1_iso2h["predicted_iso2h"].mean(),marker=m[mon],c=coll[mon],label=mon_name[mon])
-            '''a = np.linspace(-10,0)
-            b=7.54*a+8
-            plt.plot(a,b)
-            plt.show()
-            for mon in range(0,len(monthly_iso18_output)):'''
-            region2_iso18=monthly_iso18_output[mon][(monthly_iso18_output[mon][feat]>ymin+(ydis/3) ) & (monthly_iso18_output[mon]["CooY"]<ymin+(ydis*2/3))]
-            region2_iso2h=monthly_iso2h_output[mon][(monthly_iso2h_output[mon][feat]>ymin+(ydis/3) ) & (monthly_iso2h_output[mon]["CooY"]<ymin+(ydis*2/3))]
-            reg2 = LinearRegression().fit(np.array(region2_iso18["predicted_iso18"]).reshape(-1, 1), np.array(region2_iso2h["predicted_iso2h"]).reshape(-1, 1))
-            reg2_slope = reg2.coef_
-            regmean +=reg2_slope
-            regcept +=reg2.intercept_
-            regcnt +=1
-            print (reg2_slope)
-            print (reg2.intercept_)
-            reg2.score(np.array(region2_iso18["predicted_iso18"]).reshape(-1, 1), np.array(region2_iso2h["predicted_iso2h"]).reshape(-1, 1))
-            plt.scatter(region2_iso18["predicted_iso18"].mean(), region2_iso2h["predicted_iso2h"].mean(),marker=m[mon],c=coll[mon])
-            '''a = np.linspace(-10,0)
-            b=7.54*a+8
-            plt.plot(a,b)
-            plt.show()
-            plt.show()
-            for mon in range(0,len(monthly_iso18_output)):'''
-            region3_iso18=monthly_iso18_output[mon][monthly_iso18_output[mon][feat]>ymin+(ydis*2/3)]
-            region3_iso2h=monthly_iso2h_output[mon][monthly_iso2h_output[mon][feat]>ymin+(ydis*2/3)]
-            reg3 = LinearRegression().fit(np.array(region3_iso18["predicted_iso18"]).reshape(-1, 1), np.array(region3_iso2h["predicted_iso2h"]).reshape(-1, 1))
-            reg3_slope=reg3.coef_
-            regmean +=reg3_slope
-            regcept +=reg3.intercept_
-            regcnt +=1
-            print (reg3_slope)
-            print (reg3.intercept_)
-            reg3.score(np.array(region3_iso18["predicted_iso18"]).reshape(-1, 1), np.array(region3_iso2h["predicted_iso2h"]).reshape(-1, 1))
-            plt.scatter(region3_iso18["predicted_iso18"].mean(), region3_iso2h["predicted_iso2h"].mean(),marker=m[mon],c=coll[mon])
-        a = np.linspace(-10,0)
-        print ((regmean/regcnt)[0],(regcept/regcnt)[0])
-        
-        b2=8*a+10
-        print (b2)
-        b1=(regmean/regcnt)[0]*a+(regcept/regcnt)[0]
-        print (b1)
-        
-        plt.plot(a,b1)
-        plt.plot(a,b2)
-        plt.legend()
-        plt.savefig('C:\\Users\\Ash kan\\Desktop\\sonia\\model_plots\\Iso_monthly_graph.pdf',dpi=300)
-        plt.close()
-            #if abs(reg1_slope-reg2_slope)>0.1 or abs(reg1_slope-reg3_slope)>0.1 or abs(reg3_slope-reg2_slope)>0.1:
-            #print ("month: ", mon)
-            #print (reg1_slope)
-            #print (reg2_slope)
-            #print (reg3_slope)
-
-    return temp_bests,rain_bests,hum_bests,monthly_iso2h_output,monthly_iso18_output,x_scaler_iso18,y_scaler_iso18,didlog_iso18,used_features_iso18,rsquared_iso18,best_estimator_all_iso18,best_score_all_iso18,x_scaler_iso2h,y_scaler_iso2h,didlog_iso2h,used_features_iso2h,rsquared_iso2h,best_estimator_all_iso2h,best_score_all_iso2h,predictions_monthly_list, all_preds
+    return temp_bests,rain_bests,hum_bests,monthly_iso2h_output,monthly_iso18_output,x_scaler_iso18,y_scaler_iso18,didlog_iso18,used_features_iso18,rsquared_iso18,best_estimator_all_iso18,best_score_all_iso18,x_scaler_iso2h,y_scaler_iso2h,didlog_iso2h,used_features_iso2h,rsquared_iso2h,best_estimator_all_iso2h,best_score_all_iso2h,predictions_monthly_list, all_preds,month_grouped_list_with_zeros_iso_18,month_grouped_list_without_zeros_iso_18,month_grouped_list_with_zeros_iso_2h,month_grouped_list_without_zeros_iso_2h,month_grouped_list_with_zeros_iso_3h,month_grouped_list_without_zeros_iso_3h,month_grouped_list_with_zeros_hum,month_grouped_list_without_zeros_hum,month_grouped_list_with_zeros_rain,month_grouped_list_without_zeros_rain,month_grouped_list_with_zeros_temp,month_grouped_list_without_zeros_temp,rain,temper,elnino,lanina,iso_18,iso_2h,iso_3h
 
     ############################################################
     #some tests
@@ -382,8 +307,12 @@ def model_coup():
     #############################################################
 
 
- #to make the 
 
 
 if __name__ == "__main__":
-    temp_bests,rain_bests,hum_bests,monthly_iso2h_output,monthly_iso18_output,x_scaler_iso18,y_scaler_iso18,didlog_iso18,used_features_iso18,rsquared_iso18,best_estimator_all_iso18,best_score_all_iso18,x_scaler_iso2h,y_scaler_iso2h,didlog_iso2h,used_features_iso2h,rsquared_iso2h,best_estimator_all_iso2h,best_score_all_iso2h,predictions_monthly_list, all_preds=model_coup()    
+    temp_bests,rain_bests,hum_bests,monthly_iso2h_output,monthly_iso18_output,x_scaler_iso18,y_scaler_iso18,didlog_iso18,used_features_iso18,rsquared_iso18,best_estimator_all_iso18,best_score_all_iso18,x_scaler_iso2h,y_scaler_iso2h,didlog_iso2h,used_features_iso2h,rsquared_iso2h,best_estimator_all_iso2h,best_score_all_iso2h,predictions_monthly_list, all_preds,month_grouped_list_with_zeros_iso_18,month_grouped_list_without_zeros_iso_18,month_grouped_list_with_zeros_iso_2h,month_grouped_list_without_zeros_iso_2h,month_grouped_list_with_zeros_iso_3h,month_grouped_list_without_zeros_iso_3h,month_grouped_list_with_zeros_hum,month_grouped_list_without_zeros_hum,month_grouped_list_with_zeros_rain,month_grouped_list_without_zeros_rain,month_grouped_list_with_zeros_temp,month_grouped_list_without_zeros_temp,rain,temper,elnino,lanina,iso_18,iso_2h,iso_3h=model_coup() 
+    #dill dump session
+    today = date.today()
+    dump_session_name="dill_dump_"+str(date.today())
+    dill.dump_session("C:\\Users\\Ash kan\\Documents\\meteo_iso_model\\meteo_iso_model_input_code_and_results\\code\\"+dump_session_name+".pkl")
+    ############################################################   

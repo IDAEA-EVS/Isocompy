@@ -6,24 +6,24 @@
 ['CooY', 'CooZ']
 
  BEST SCORE adjusted R squared 
-0.829381100907868
+0.825098032582237
 
  BEST SCORE R squared 
-0.8367993139118738
+0.8327024659482267
 
  F REGRESSION 
 [  0.53394185  45.29189931 149.92391182]
 [4.67464601e-01 4.33356923e-09 7.33620873e-19]
 
  MUTUAL INFORMATION REGRESSION 
-[0.37453838 0.40383085 1.        ]
+[0.37434053 0.40361752 1.        ]
 
  BEST ESTIMATOR 
 MLPRegressor(activation='relu', alpha=0.0003, batch_size='auto', beta_1=0.9,
              beta_2=0.999, early_stopping=False, epsilon=1e-08,
-             hidden_layer_sizes=(50, 50), learning_rate='adaptive',
+             hidden_layer_sizes=(75, 75), learning_rate='adaptive',
              learning_rate_init=0.001, max_iter=200, momentum=0.9,
-             n_iter_no_change=15, nesterovs_momentum=True, power_t=0.5,
+             n_iter_no_change=10, nesterovs_momentum=True, power_t=0.5,
              random_state=None, shuffle=True, solver='lbfgs', tol=0.0001,
              validation_fraction=0.1, verbose=False, warm_start=False)
 
@@ -37,24 +37,24 @@ False
 ['CooY', 'CooZ']
 
  BEST SCORE adjusted R squared 
-0.8882277113881147
+0.8638394759439308
 
  BEST SCORE R squared 
-0.8931588417680508
+0.8698465578875809
 
  F REGRESSION 
 [  0.74969775  45.44545504 208.37371725]
 [3.89661909e-01 4.38649596e-09 3.03335381e-22]
 
  MUTUAL INFORMATION REGRESSION 
-[0.31616315 0.38908907 1.        ]
+[0.31553662 0.38831802 1.        ]
 
  BEST ESTIMATOR 
-MLPRegressor(activation='relu', alpha=0.0003, batch_size='auto', beta_1=0.9,
+MLPRegressor(activation='relu', alpha=0.0005, batch_size='auto', beta_1=0.9,
              beta_2=0.999, early_stopping=False, epsilon=1e-08,
              hidden_layer_sizes=(25, 25), learning_rate='adaptive',
              learning_rate_init=0.001, max_iter=200, momentum=0.9,
-             n_iter_no_change=5, nesterovs_momentum=True, power_t=0.5,
+             n_iter_no_change=10, nesterovs_momentum=True, power_t=0.5,
              random_state=None, shuffle=True, solver='lbfgs', tol=0.0001,
              validation_fraction=0.1, verbose=False, warm_start=False)
 
@@ -68,30 +68,26 @@ False
 ['CooY', 'CooZ']
 
  BEST SCORE adjusted R squared 
-0.8594412326628071
+0.8663676632389976
 
  BEST SCORE R squared 
-0.8658302675417705
+0.8724418603644977
 
  F REGRESSION 
 [  0.88586011  37.50267103 223.90645476]
 [3.50086537e-01 5.92017688e-08 9.82583790e-23]
 
  MUTUAL INFORMATION REGRESSION 
-[0.30057763 0.40744133 1.        ]
+[0.29960795 0.4061269  1.        ]
 
  BEST ESTIMATOR 
-GridSearchCV(cv=10, error_score='raise-deprecating',
-             estimator=SVR(C=1.0, cache_size=200, coef0=0.0, degree=3,
-                           epsilon=0.1, gamma='auto_deprecated', kernel='rbf',
-                           max_iter=-1, shrinking=True, tol=0.001,
-                           verbose=False),
-             iid='warn', n_jobs=-1,
-             param_grid={'C': [1, 0.95, 0.9, 0.8],
-                         'epsilon': [0.1, 0.05, 0.15, 0.2, 0.5],
-                         'kernel': ['linear', 'poly', 'rbf', 'sigmoid']},
-             pre_dispatch='2*n_jobs', refit=True, return_train_score=False,
-             scoring=None, verbose=0)
+MLPRegressor(activation='relu', alpha=0.0005, batch_size='auto', beta_1=0.9,
+             beta_2=0.999, early_stopping=False, epsilon=1e-08,
+             hidden_layer_sizes=(10, 10), learning_rate='adaptive',
+             learning_rate_init=0.001, max_iter=50, momentum=0.9,
+             n_iter_no_change=15, nesterovs_momentum=True, power_t=0.5,
+             random_state=None, shuffle=True, solver='lbfgs', tol=0.0001,
+             validation_fraction=0.1, verbose=False, warm_start=False)
 
 log(1 + x)? 
 False
@@ -113,7 +109,7 @@ False
 [7.33528333e-01 7.05725990e-08 6.38115571e-23]
 
  MUTUAL INFORMATION REGRESSION 
-[0.12507687 0.3173884  1.        ]
+[0.12483478 0.31677408 1.        ]
 
  BEST ESTIMATOR 
 GridSearchCV(cv=10, error_score='raise-deprecating',
@@ -145,7 +141,7 @@ False
 [5.31492793e-01 7.72974873e-06 9.57264879e-23]
 
  MUTUAL INFORMATION REGRESSION 
-[0.27067657 0.25374691 1.        ]
+[0.27341497 0.25631404 1.        ]
 
  BEST ESTIMATOR 
 GridSearchCV(cv=10, error_score='raise-deprecating',
@@ -180,7 +176,7 @@ False
 [3.36042924e-02 2.66614488e-03 2.41587195e-20]
 
  MUTUAL INFORMATION REGRESSION 
-[0.44726776 0.25745464 1.        ]
+[0.44910451 0.25851191 1.        ]
 
  BEST ESTIMATOR 
 MultiTaskElasticNetCV(alphas=None, copy_X=True, cv=10, eps=0.001,
@@ -211,7 +207,7 @@ False
 [1.34434860e-01 6.66029502e-04 4.84592261e-19]
 
  MUTUAL INFORMATION REGRESSION 
-[0.35615021 0.22711031 1.        ]
+[0.3548619  0.22628878 1.        ]
 
  BEST ESTIMATOR 
 OrthogonalMatchingPursuitCV(copy=True, cv=10, fit_intercept=True, max_iter=None,
@@ -237,7 +233,7 @@ False
 [3.19738096e-01 2.49816221e-04 2.02885823e-21]
 
  MUTUAL INFORMATION REGRESSION 
-[0.28119085 0.20021834 1.        ]
+[0.28035804 0.19962535 1.        ]
 
  BEST ESTIMATOR 
 GridSearchCV(cv=10, error_score='raise-deprecating',
@@ -269,7 +265,7 @@ False
 [6.60250119e-01 2.82420651e-06 8.63177559e-23]
 
  MUTUAL INFORMATION REGRESSION 
-[0.15517394 0.25167926 1.        ]
+[0.15507847 0.25152442 1.        ]
 
  BEST ESTIMATOR 
 GridSearchCV(cv=10, error_score='raise-deprecating',
@@ -301,7 +297,7 @@ False
 [8.42098874e-01 9.22848199e-07 2.47925024e-22]
 
  MUTUAL INFORMATION REGRESSION 
-[0.10767599 0.30071627 1.        ]
+[0.10772737 0.30085977 1.        ]
 
  BEST ESTIMATOR 
 GridSearchCV(cv=10, error_score='raise-deprecating',
@@ -336,7 +332,7 @@ False
 [8.91220396e-01 6.48818835e-08 1.54755246e-22]
 
  MUTUAL INFORMATION REGRESSION 
-[0.19570327 0.42802818 1.        ]
+[0.19626331 0.42925308 1.        ]
 
  BEST ESTIMATOR 
 GridSearchCV(cv=10, error_score='raise-deprecating',
@@ -371,7 +367,7 @@ False
 [4.06753070e-01 7.87993710e-09 7.55789681e-21]
 
  MUTUAL INFORMATION REGRESSION 
-[0.37988788 0.47484357 1.        ]
+[0.38035369 0.47542581 1.        ]
 
  BEST ESTIMATOR 
 GridSearchCV(cv=10, error_score='raise-deprecating',
@@ -428,7 +424,7 @@ HUMIDITY month 2
 [4.39358771e-04 4.86676861e-07 1.67900887e-01]
 
  MUTUAL INFORMATION REGRESSION
-[1.         0.57827557 0.38231505]
+[1.         0.57827557 0.38872751]
 
  BEST ESTIMATOR 
 OrthogonalMatchingPursuitCV(copy=True, cv=10, fit_intercept=True, max_iter=None,
@@ -475,7 +471,7 @@ HUMIDITY month 4
 [4.83396602e-08 4.72999063e-11 3.06618607e-03]
 
  MUTUAL INFORMATION REGRESSION
-[1.         0.54632691 0.21650494]
+[1.         0.5493523  0.21650494]
 
  BEST ESTIMATOR 
 OrthogonalMatchingPursuitCV(copy=True, cv=10, fit_intercept=True, max_iter=None,
@@ -494,7 +490,7 @@ HUMIDITY month 5
 [0.04412748 0.0003615  0.0006651 ]
 
  MUTUAL INFORMATION REGRESSION
-[1.         0.57320015 0.63123035]
+[1.         0.56911521 0.62481116]
 
  BEST ESTIMATOR 
 LarsCV(copy_X=True, cv=10, eps=2.220446049250313e-16, fit_intercept=True,
@@ -514,7 +510,7 @@ HUMIDITY month 6
 [1.31985985e-01 1.46738149e-03 6.22254632e-06]
 
  MUTUAL INFORMATION REGRESSION
-[0.904726   0.10085289 1.        ]
+[0.88411511 0.10213211 1.        ]
 
  BEST ESTIMATOR 
 LarsCV(copy_X=True, cv=10, eps=2.220446049250313e-16, fit_intercept=True,
@@ -554,7 +550,7 @@ HUMIDITY month 8
 [3.05306694e-03 3.03296620e-05 2.56608028e-03]
 
  MUTUAL INFORMATION REGRESSION
-[0.8720916  0.74347296 1.        ]
+[0.88022756 0.75040902 1.        ]
 
  BEST ESTIMATOR 
 GridSearchCV(cv=10, error_score='raise-deprecating',
@@ -582,7 +578,7 @@ HUMIDITY month 9
 [5.66462064e-04 7.95051837e-07 2.33031513e-03]
 
  MUTUAL INFORMATION REGRESSION
-[1.         0.97399494 0.95473484]
+[1.         0.97399494 0.9659401 ]
 
  BEST ESTIMATOR 
 OrthogonalMatchingPursuitCV(copy=True, cv=10, fit_intercept=True, max_iter=None,
@@ -601,7 +597,7 @@ HUMIDITY month 10
 [7.92633807e-06 4.69980614e-09 1.04238483e-02]
 
  MUTUAL INFORMATION REGRESSION
-[0.7690203  1.         0.41154977]
+[0.76598061 1.         0.41154977]
 
  BEST ESTIMATOR 
 MultiTaskElasticNetCV(alphas=None, copy_X=True, cv=10, eps=0.001,
@@ -625,7 +621,7 @@ HUMIDITY month 11
 [5.91726070e-05 1.14510265e-07 6.69784791e-03]
 
  MUTUAL INFORMATION REGRESSION
-[1.         0.63928677 0.15552612]
+[1.         0.63928677 0.16718615]
 
  BEST ESTIMATOR 
 GridSearchCV(cv=10, error_score='raise-deprecating',
@@ -682,7 +678,7 @@ BEST SCORE
 [5.31077240e-01 4.83806776e-23 2.41625766e-21]
 
   MUTUAL INFORMATION REGRESSION 
-[0.65758407 0.54406841 1.        ]
+[0.65006845 0.54281881 1.        ]
 
 BEST ESTIMATOR 
 GridSearchCV(cv=10, error_score='raise-deprecating',
@@ -700,21 +696,21 @@ False
  PRECIPITATION month 2
 
 BEST SCORE 
-0.49741619905586265
+0.49589369604452027
 
  F REGRESSION
 [ 2.87324827 53.17084755 86.73091875]
 [9.23854898e-02 2.39447897e-11 3.25692732e-16]
 
   MUTUAL INFORMATION REGRESSION 
-[0.85258476 0.42499851 1.        ]
+[0.84705522 0.41813016 1.        ]
 
 BEST ESTIMATOR 
-MLPRegressor(activation='tanh', alpha=0.0003, batch_size='auto', beta_1=0.9,
+MLPRegressor(activation='tanh', alpha=0.0005, batch_size='auto', beta_1=0.9,
              beta_2=0.999, early_stopping=False, epsilon=1e-08,
-             hidden_layer_sizes=(50, 50, 50, 50), learning_rate='adaptive',
-             learning_rate_init=0.001, max_iter=100, momentum=0.9,
-             n_iter_no_change=10, nesterovs_momentum=True, power_t=0.5,
+             hidden_layer_sizes=(50, 50, 50), learning_rate='adaptive',
+             learning_rate_init=0.001, max_iter=200, momentum=0.9,
+             n_iter_no_change=5, nesterovs_momentum=True, power_t=0.5,
              random_state=None, shuffle=True, solver='lbfgs', tol=0.0001,
              validation_fraction=0.1, verbose=False, warm_start=False)
 
@@ -724,21 +720,21 @@ False
  PRECIPITATION month 3
 
 BEST SCORE 
-0.7250080132258439
+0.73427316812652
 
  F REGRESSION
 [  1.49610128 123.65005773  95.3553457 ]
 [2.23403049e-01 8.55583914e-21 2.28433978e-17]
 
   MUTUAL INFORMATION REGRESSION 
-[0.49995167 0.61070754 1.        ]
+[0.49067841 0.59747695 1.        ]
 
 BEST ESTIMATOR 
-MLPRegressor(activation='relu', alpha=0.0005, batch_size='auto', beta_1=0.9,
+MLPRegressor(activation='tanh', alpha=0.0005, batch_size='auto', beta_1=0.9,
              beta_2=0.999, early_stopping=False, epsilon=1e-08,
-             hidden_layer_sizes=(50, 50, 50), learning_rate='adaptive',
+             hidden_layer_sizes=(10, 10), learning_rate='adaptive',
              learning_rate_init=0.001, max_iter=100, momentum=0.9,
-             n_iter_no_change=10, nesterovs_momentum=True, power_t=0.5,
+             n_iter_no_change=5, nesterovs_momentum=True, power_t=0.5,
              random_state=None, shuffle=True, solver='lbfgs', tol=0.0001,
              validation_fraction=0.1, verbose=False, warm_start=False)
 
@@ -755,7 +751,7 @@ BEST SCORE
 [3.56776166e-01 7.20468539e-12 4.80502314e-11]
 
   MUTUAL INFORMATION REGRESSION 
-[0.8854931  0.49322935 1.        ]
+[0.84173157 0.49843379 1.        ]
 
 BEST ESTIMATOR 
 GridSearchCV(cv=10, error_score='raise-deprecating',
@@ -780,7 +776,7 @@ BEST SCORE
 [0.00760342 0.1614373  0.00036744]
 
   MUTUAL INFORMATION REGRESSION 
-[0.60165074 0.56840257 1.        ]
+[0.61107647 0.65576697 1.        ]
 
 BEST ESTIMATOR 
 GridSearchCV(cv=10, error_score='raise-deprecating',
@@ -805,7 +801,7 @@ BEST SCORE
 [0.25749009 0.09555305 0.27052497]
 
   MUTUAL INFORMATION REGRESSION 
-[1.         0.18114727 0.97234327]
+[1.         0.2981894  0.89130357]
 
 BEST ESTIMATOR 
 OrthogonalMatchingPursuitCV(copy=True, cv=10, fit_intercept=True, max_iter=None,
@@ -817,19 +813,19 @@ False
  PRECIPITATION month 7
 
 BEST SCORE 
-0.10519802538550138
+0.15821635347467455
 
  F REGRESSION
 [0.03257317 1.72315482 5.5398457 ]
 [0.85705225 0.19156518 0.02006416]
 
   MUTUAL INFORMATION REGRESSION 
-[1.         0.21925998 0.17423786]
+[1.         0.17625115 0.16613146]
 
 BEST ESTIMATOR 
 MLPRegressor(activation='relu', alpha=0.0005, batch_size='auto', beta_1=0.9,
              beta_2=0.999, early_stopping=False, epsilon=1e-08,
-             hidden_layer_sizes=(25, 25), learning_rate='adaptive',
+             hidden_layer_sizes=(10, 10), learning_rate='adaptive',
              learning_rate_init=0.001, max_iter=200, momentum=0.9,
              n_iter_no_change=15, nesterovs_momentum=True, power_t=0.5,
              random_state=None, shuffle=True, solver='lbfgs', tol=0.0001,
@@ -848,7 +844,7 @@ BEST SCORE
 [0.29295245 0.19335257 0.00995703]
 
   MUTUAL INFORMATION REGRESSION 
-[0.68458638 0.63729403 1.        ]
+[0.58205203 0.64633241 1.        ]
 
 BEST ESTIMATOR 
 GridSearchCV(cv=10, error_score='raise-deprecating',
@@ -873,7 +869,7 @@ BEST SCORE
 [0.12565717 0.27398729 0.07999535]
 
   MUTUAL INFORMATION REGRESSION 
-[1.         0.02117414 0.5960461 ]
+[1.         0.00111869 0.44656978]
 
 BEST ESTIMATOR 
 LarsCV(copy_X=True, cv=10, eps=2.220446049250313e-16, fit_intercept=True,
@@ -886,23 +882,19 @@ False
  PRECIPITATION month 10
 
 BEST SCORE 
-0.0327099841627525
+0.029315172798359157
 
  F REGRESSION
 [0.45087256 5.86888633 5.32196143]
 [0.50309429 0.01676767 0.0226153 ]
 
   MUTUAL INFORMATION REGRESSION 
-[1.         0.75029305 0.87067513]
+[1.         0.75545573 0.87214796]
 
 BEST ESTIMATOR 
-MLPRegressor(activation='relu', alpha=0.0003, batch_size='auto', beta_1=0.9,
-             beta_2=0.999, early_stopping=False, epsilon=1e-08,
-             hidden_layer_sizes=(50, 50), learning_rate='adaptive',
-             learning_rate_init=0.001, max_iter=50, momentum=0.9,
-             n_iter_no_change=15, nesterovs_momentum=True, power_t=0.5,
-             random_state=None, shuffle=True, solver='adam', tol=0.0001,
-             validation_fraction=0.1, verbose=False, warm_start=False)
+LarsCV(copy_X=True, cv=10, eps=2.220446049250313e-16, fit_intercept=True,
+       max_iter=500, max_n_alphas=1000, n_jobs=-1, normalize=True,
+       positive=False, precompute='auto', verbose=False)
 
  log(1 + x)?
 False
@@ -910,17 +902,17 @@ False
  PRECIPITATION month 11
 
 BEST SCORE 
-0.4257904990803433
+0.41807458369448935
 
  F REGRESSION
 [ 2.52104726 29.85260641 18.29740341]
 [1.14728469e-01 2.24160246e-07 3.60007833e-05]
 
   MUTUAL INFORMATION REGRESSION 
-[0.92741076 1.         0.64433632]
+[0.89585282 1.         0.56869312]
 
 BEST ESTIMATOR 
-MLPRegressor(activation='tanh', alpha=0.0001, batch_size='auto', beta_1=0.9,
+MLPRegressor(activation='relu', alpha=0.0005, batch_size='auto', beta_1=0.9,
              beta_2=0.999, early_stopping=False, epsilon=1e-08,
              hidden_layer_sizes=(10, 10), learning_rate='adaptive',
              learning_rate_init=0.001, max_iter=50, momentum=0.9,
@@ -934,21 +926,21 @@ False
  PRECIPITATION month 12
 
 BEST SCORE 
-0.5889474633369576
+0.588871541579481
 
  F REGRESSION
 [ 2.21040526 65.79054549 43.63993725]
 [1.39414462e-01 2.71854897e-13 8.34986288e-10]
 
   MUTUAL INFORMATION REGRESSION 
-[0.64141264 0.86116944 1.        ]
+[0.63570858 0.85138886 1.        ]
 
 BEST ESTIMATOR 
 MLPRegressor(activation='relu', alpha=0.0005, batch_size='auto', beta_1=0.9,
              beta_2=0.999, early_stopping=False, epsilon=1e-08,
-             hidden_layer_sizes=(50, 50), learning_rate='adaptive',
+             hidden_layer_sizes=(50, 50, 50, 50), learning_rate='adaptive',
              learning_rate_init=0.001, max_iter=200, momentum=0.9,
-             n_iter_no_change=5, nesterovs_momentum=True, power_t=0.5,
+             n_iter_no_change=15, nesterovs_momentum=True, power_t=0.5,
              random_state=None, shuffle=True, solver='lbfgs', tol=0.0001,
              validation_fraction=0.1, verbose=False, warm_start=False)
 

@@ -16,6 +16,7 @@ from sklearn.neural_network import MLPRegressor
 from sklearn.linear_model import LinearRegression,ElasticNetCV,MultiTaskElasticNetCV,LarsCV, OrthogonalMatchingPursuitCV,BayesianRidge,ARDRegression
 from sklearn.inspection import plot_partial_dependence
 from sklearn.svm import SVR,NuSVR
+from sklearn.linear_model import LinearRegression
 
 '''
 def warn(*args, **kwargs):
@@ -712,3 +713,75 @@ def predict_points(used_features_iso18,x_y_z_,no_needed_month,temp_bests,rain_be
     return monthly_iso_output
     
 ###########################################################
+    
+def regional_mensual_plot(x_y_z_,monthly_iso18_output,monthly_iso2h_output):
+    for feat in ["CooY"]:
+
+        ymax=x_y_z_[feat].max()
+        ymin=x_y_z_[feat].min()
+        ydis=ymax-ymin
+        m=["x","o","*","s","v","^"]
+        coll=['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
+        mon_name=["Jan","Feb","Mar","Apr","Nov","Dec"]
+        regmean=0
+        regcnt=0
+        regcept=0
+        for mon in range(0,len(monthly_iso18_output)):
+
+
+            region1_iso18=monthly_iso18_output[mon][monthly_iso18_output[mon][feat]<ymin+(ydis/3)]
+            region1_iso2h=monthly_iso2h_output[mon][monthly_iso2h_output[mon][feat]<ymin+(ydis/3)]
+            reg1 = LinearRegression().fit(np.array(region1_iso18["predicted_iso18"]).reshape(-1, 1), np.array(region1_iso2h["predicted_iso2h"]).reshape(-1, 1))
+            reg1_slope=reg1.coef_
+            regmean +=reg1_slope
+            regcept +=reg1.intercept_
+            regcnt +=1
+            print (reg1_slope)
+            print (reg1.intercept_)
+            reg1.score(np.array(region1_iso18["predicted_iso18"]).reshape(-1, 1), np.array(region1_iso2h["predicted_iso2h"]).reshape(-1, 1))
+            plt.scatter(region1_iso18["predicted_iso18"].mean(), region1_iso2h["predicted_iso2h"].mean(),marker=m[mon],c=coll[mon],label=mon_name[mon])
+            '''a = np.linspace(-10,0)
+            b=7.54*a+8
+            plt.plot(a,b)
+            plt.show()
+            for mon in range(0,len(monthly_iso18_output)):'''
+            region2_iso18=monthly_iso18_output[mon][(monthly_iso18_output[mon][feat]>ymin+(ydis/3) ) & (monthly_iso18_output[mon]["CooY"]<ymin+(ydis*2/3))]
+            region2_iso2h=monthly_iso2h_output[mon][(monthly_iso2h_output[mon][feat]>ymin+(ydis/3) ) & (monthly_iso2h_output[mon]["CooY"]<ymin+(ydis*2/3))]
+            reg2 = LinearRegression().fit(np.array(region2_iso18["predicted_iso18"]).reshape(-1, 1), np.array(region2_iso2h["predicted_iso2h"]).reshape(-1, 1))
+            reg2_slope = reg2.coef_
+            regmean +=reg2_slope
+            regcept +=reg2.intercept_
+            regcnt +=1
+            print (reg2_slope)
+            print (reg2.intercept_)
+            reg2.score(np.array(region2_iso18["predicted_iso18"]).reshape(-1, 1), np.array(region2_iso2h["predicted_iso2h"]).reshape(-1, 1))
+            plt.scatter(region2_iso18["predicted_iso18"].mean(), region2_iso2h["predicted_iso2h"].mean(),marker=m[mon],c=coll[mon])
+            '''a = np.linspace(-10,0)
+            b=7.54*a+8
+            plt.plot(a,b)
+            plt.show()
+            plt.show()
+            for mon in range(0,len(monthly_iso18_output)):'''
+            region3_iso18=monthly_iso18_output[mon][monthly_iso18_output[mon][feat]>ymin+(ydis*2/3)]
+            region3_iso2h=monthly_iso2h_output[mon][monthly_iso2h_output[mon][feat]>ymin+(ydis*2/3)]
+            reg3 = LinearRegression().fit(np.array(region3_iso18["predicted_iso18"]).reshape(-1, 1), np.array(region3_iso2h["predicted_iso2h"]).reshape(-1, 1))
+            reg3_slope=reg3.coef_
+            regmean +=reg3_slope
+            regcept +=reg3.intercept_
+            regcnt +=1
+            print (reg3_slope)
+            print (reg3.intercept_)
+            reg3.score(np.array(region3_iso18["predicted_iso18"]).reshape(-1, 1), np.array(region3_iso2h["predicted_iso2h"]).reshape(-1, 1))
+            plt.scatter(region3_iso18["predicted_iso18"].mean(), region3_iso2h["predicted_iso2h"].mean(),marker=m[mon],c=coll[mon])
+        a = np.linspace(-10,0)
+        print ((regmean/regcnt)[0],(regcept/regcnt)[0])
+        
+        b2=8*a+10
+        b1=(regmean/regcnt)[0]*a+(regcept/regcnt)[0]
+        
+        plt.plot(a,b1,label=str(round((regmean/regcnt)[0][0],2))+"*a+"+str( round(( regcept/regcnt )[0],2))  )
+        plt.plot(a,b2,label='8a+10')
+        plt.legend()
+        plt.savefig(r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\output\model_plots\Iso_monthly_graph.pdf",dpi=300)
+        plt.close()
+############################################################
