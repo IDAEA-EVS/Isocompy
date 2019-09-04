@@ -76,13 +76,13 @@ def model_coup():
 
     #############################################################
     # write outputs to a file 
-    file_name='models_output.txt'
+    file_name=r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\output\models_output.txt"
     print_to_file(file_name, temp_bests, rain_bests, hum_bests)
     #############################################################
     #making prediction for the isotope points
     iso_db1=month_grouped_list_with_zeros_iso_18
     predictions_monthly_list, all_preds=iso_prediction(iso_db1,month_grouped_list_with_zeros_iso_2h,month_grouped_list_with_zeros_iso_3h,temp_bests,rain_bests,hum_bests,justsum=True)
-    all_preds.to_excel('C:\\Users\\Ash kan\\Desktop\\sonia\\predicted_results.xlsx')
+    all_preds.to_excel(r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\output\predicted_results.xls")
     #############################################################
     #f_reg and mutual annual
     list_of_dics=[
@@ -93,7 +93,7 @@ def model_coup():
         {"inputs":["CooX","CooY","CooZ","temp","rain","hum"],"outputs":["iso_18"]},
         {"inputs":["CooX","CooY","CooZ","temp","rain","hum"],"outputs":["iso_3h"]},
     ]
-    file_name="f_reg_mutual_output_annual.txt"
+    file_name=r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\output\f_reg_mutual_output_annual.txt"
     f_reg_mutual(file_name,all_preds,list_of_dics)
     #############################################################
     #############################################################
@@ -110,7 +110,7 @@ def model_coup():
             {"inputs":["CooX","CooY","CooZ","temp","rain","hum"],"outputs":["iso_18"]},
             {"inputs":["CooX","CooY","CooZ","temp","rain","hum"],"outputs":["iso_3h"]},
         ]
-        file_name="month_"+str(mn)+"_f_reg_mutual_output_mensual.txt"
+        file_name="C:\\Users\\Ash kan\\Documents\\meteo_iso_model\\meteo_iso_model_input_code_and_results\\output\\monthly_f_test\\"+"month_"+str(mn)+"_f_reg_mutual_output_mensual.txt"
         f_reg_mutual(file_name,all_preds_temp,list_of_dics)
     #############################################################
     '''##################PCA for interpreting the data##############
@@ -141,7 +141,7 @@ def model_coup():
     estrandomfor_temp_normal_with_zeros,X_iso_2h_normal_with_zeros ,Y_iso_2h_normal_with_zeros,X_train_iso_2h_normal_with_zeros, X_test_iso_2h_normal_with_zeros, y_train_iso_2h_normal_with_zeros, y_test_iso_2h_normal_with_zeros,best_estimator_all_iso2h,best_score_all_iso2h,mutual_info_regression_value_iso2h,f_regression_value_iso2h,x_scaler_iso2h,y_scaler_iso2h,didlog_iso2h,used_features_iso2h,rsquared_iso2h=rfmethod(tunedpars,gridsearch_dictionary,all_preds,temp_rain_hum,monthnum,"iso_2h", meteo_or_iso="iso",inputs=["CooX","CooY","CooZ","temp","rain","hum"])
     #############################################################
     #read points for contour
-    data_file = r'C:\Users\Ash kan\Desktop\sonia\x_y_z.xls'
+    data_file = r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\inputs\x_y_z.xls"
     x_y_z_=pd.read_excel(data_file,sheet_name=0,header=0,index_col=False,keep_default_na=True)
     no_needed_month=[4,5,6,7,8,9]
     column_name="predicted_iso18"

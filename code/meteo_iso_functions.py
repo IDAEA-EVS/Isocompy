@@ -329,8 +329,8 @@ def rfmethod(tunedpars,gridsearch_dictionary,newmatdf_temp,temp_rain_hum,monthnu
     else:
         pltttl="Annual_iso_All_data_best_estimator_"+model_type
 
-    pltname='C:\\Users\\Ash kan\\Desktop\\sonia\\model_plots\\'+model_type+"\\"+pltttl+'.pdf'
-    pltnamepardep='C:\\Users\\Ash kan\\Desktop\\sonia\\model_plots\\'+model_type+"\\"+pltttl+'_partial_dependence'+'.pdf'
+    pltname="C:\\Users\\Ash kan\\Documents\\meteo_iso_model\\meteo_iso_model_input_code_and_results\\output\\model_plots\\"+model_type+"\\"+pltttl+'.pdf'
+    pltnamepardep="C:\\Users\\Ash kan\\Documents\\meteo_iso_model\\meteo_iso_model_input_code_and_results\\output\\model_plots\\"+model_type+"\\partial_dependency\\"+pltttl+'_partial_dependence'+'.pdf'
     if elastic==True:
         X_temp_fin=X_temp1
         Y_temp_fin=Y_temp1
@@ -433,7 +433,7 @@ def pcafun(pca_raw_df,kmeans_group_nums=5,filetitlename="no_name"):
     #kmeans
     #kmeans_2d = KMeans(n_clusters=kmeans_group_nums, random_state=0).fit(pcaf[:,:2])
     #plot
-    pltname='C:\\Users\\Ash kan\\Desktop\\sonia\\pca_plots\\'+filetitlename+'.pdf'
+    pltname="C:\\Users\\Ash kan\\Documents\\meteo_iso_model\\meteo_iso_model_input_code_and_results\\output\\pca_plots"+filetitlename+'.pdf'
     plt.scatter(pcaf[:,0],pcaf[:,1])
     #plt.scatter(kmeans_2d.cluster_centers_[:,0],kmeans_2d.cluster_centers_[:,1])
     plt.title(str(pca_raw_df.columns))
@@ -465,7 +465,7 @@ def monthly_uniting(which_value,datab,iso=False):
 def importing_preprocess():
     #######################
     #importing data
-    data_file = r'C:\Users\Ash kan\Desktop\sonia\METEO_CHILE_2.xlsx'
+    data_file = r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\inputs\METEO_CHILE_2.xlsx"
     rain = pd.read_excel(data_file,sheet_name="METEO_CHILE_Rain_All",header=0,index_col=False,keep_default_na=True)
     temper=pd.read_excel(data_file,sheet_name="METEO_CHILE_Temp",header=0,index_col=False,keep_default_na=True)
     hum=pd.read_excel(data_file,sheet_name="METEO_CHILE_HR",header=0,index_col=False,keep_default_na=True)
@@ -501,7 +501,7 @@ def importing_preprocess():
     ############################################################
     ############################################################
     #isotope file preprocess
-    data_file_iso = r'C:\Users\Ash kan\Desktop\sonia\Rain_Snow_01_08_2019.xlsx'
+    data_file_iso = r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\inputs\Rain_Snow_01_08_2019.xlsx"
     iso_18 = pd.read_excel(data_file_iso,sheet_name="ISOT18O",header=0,index_col=False,keep_default_na=True)
     iso_2h=pd.read_excel(data_file_iso,sheet_name="ISOT2H",header=0,index_col=False,keep_default_na=True)
     iso_3h=pd.read_excel(data_file_iso,sheet_name="ISOT3",header=0,index_col=False,keep_default_na=True)
@@ -704,7 +704,7 @@ def predict_points(used_features_iso18,x_y_z_,no_needed_month,temp_bests,rain_be
 
             df_to_excel=pd.concat([x_y_z_copy,meteopredict_res_per_month,each_month_iso_predict],axis=1)
             
-            addd='C:\\Users\\Ash kan\\Desktop\\sonia\\iso_excel_out\\'+"out_iso_month_"+str(month+1)+"_"+column_name+".xls"
+            addd="C:\\Users\\Ash kan\\Documents\\meteo_iso_model\\meteo_iso_model_input_code_and_results\\output\\iso_excel_out\\"+"out_iso_month_"+str(month+1)+"_"+column_name+".xls"
             df_to_excel.to_excel(addd)
             monthly_iso_output.append(df_to_excel)
 
