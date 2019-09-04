@@ -784,4 +784,31 @@ def regional_mensual_plot(x_y_z_,monthly_iso18_output,monthly_iso2h_output):
         plt.legend()
         plt.savefig(r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\output\model_plots\Iso_monthly_graph.pdf",dpi=300)
         plt.close()
+
+
+        #not 3 zone, manual!!
+        #read points for contour
+        '''data_file = "C:\\Users\\Ash kan\\Documents\\meteo_iso_model\\meteo_iso_model_input_code_and_results\\inputs\\Tarapaca.xlsx"
+        x_y_z_=pd.read_excel(data_file,sheet_name=0,header=0,index_col=False,keep_default_na=True)
+        no_needed_month=[4,5,6,7,8,9]
+        column_name="predicted_iso18"
+        monthly_iso18_output_sala_de_ata=predict_points(used_features_iso18,x_y_z_,no_needed_month,temp_bests,rain_bests,hum_bests,x_scaler_iso18,y_scaler_iso18,didlog_iso18,best_estimator_all_iso18,column_name)
+        column_name="predicted_iso2h"
+        monthly_iso2h_output_sala_de_ata=predict_points(used_features_iso2h,x_y_z_,no_needed_month,temp_bests,rain_bests,hum_bests,x_scaler_iso2h,y_scaler_iso2h,didlog_iso2h,best_estimator_all_iso2h,column_name)
+        ############################################################
+        m=["x","o","*","s","v","^"]
+        coll=['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
+        mon_name=["Jan","Feb","Mar","Apr","Nov","Dec"]
+        for mon in range(0,len(monthly_iso18_output_sala_de_ata)):
+            region1_iso18=monthly_iso18_output_sala_de_ata[mon]
+            region1_iso2h=monthly_iso2h_output_sala_de_ata[mon]
+            #plt.scatter(region1_iso18["predicted_iso18"], region1_iso2h["predicted_iso2h"],marker=m[mon],c=coll[mon],label=mon_name[mon])
+            plt.scatter(region1_iso18["predicted_iso18"].mean(), region1_iso2h["predicted_iso2h"].mean(),marker=m[mon],c=coll[mon],label=mon_name[mon])
+            #reg1 = LinearRegression().fit(np.array(region1_iso18["predicted_iso18"]).reshape(-1, 1), np.array(region1_iso2h["predicted_iso2h"]).reshape(-1, 1))
+        a = np.linspace(-6.5,-4)
+        b=reg1.coef_[0]*a+reg1.intercept_[0]
+        plt.plot(a,b,label=str(round(reg1.coef_[0][0],2))+"*a+"+str( round(reg1.intercept_[0],2))  )
+        plt.legend()
+        #plt.savefig(("C:\\Users\\Ash kan\\Documents\\meteo_iso_model\\meteo_iso_model_input_code_and_results\\output\\iso_excel_out"+"\\"+mon_name[mon]+".pdf"),dpi=300)
+        plt.show()'''
 ############################################################
