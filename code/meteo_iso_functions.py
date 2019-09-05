@@ -156,17 +156,15 @@ def grouping_data(rain,which_value,elnino,lanina,month=None,zeross=True,iso=Fals
 def rfmethod(tunedpars,gridsearch_dictionary,newmatdf_temp,temp_rain_hum,monthnum,model_type,meteo_or_iso,inputs=None):
     if meteo_or_iso=="meteo":
         X_temp=newmatdf_temp[["CooX","CooY","CooZ"]].copy().astype(float)
-        Y_temp=newmatdf_temp[[temp_rain_hum]].copy()
-        X_train_temp, X_test_temp, y_train_temp, y_test_temp = train_test_split(X_temp, Y_temp)
         num_var=3
         colmnss=["CooX","CooY","CooZ"]
     ##################################################
     if meteo_or_iso=="iso":
         X_temp=newmatdf_temp[inputs].copy().astype(float)
-        Y_temp=newmatdf_temp[[temp_rain_hum]].copy()
-        X_train_temp, X_test_temp, y_train_temp, y_test_temp = train_test_split(X_temp, Y_temp)
         num_var=len(inputs)
         colmnss=inputs
+    Y_temp=newmatdf_temp[[temp_rain_hum]].copy()
+    X_train_temp, X_test_temp, y_train_temp, y_test_temp = train_test_split(X_temp, Y_temp)    
     ##################################################
     #adjusted r squared
     sam_size=newmatdf_temp.shape[0]
@@ -214,9 +212,9 @@ def rfmethod(tunedpars,gridsearch_dictionary,newmatdf_temp,temp_rain_hum,monthnu
     #print (X_temp)
     #print (Y_temp)
     ########################################################################
-    #best_score_all=-10
-    #rsquared=-10
-    #RandomForestRegressor
+    best_score_all=-10
+    rsquared=-10
+    '''#RandomForestRegressor
     estrandomfor_temp=GridSearchCV(RandomForestRegressor(random_state =0), tunedpars, cv=10,n_jobs=-1)
     estrandomfor_temp.fit(X_temp, Y_temp)
     best_score_all=adj_r_sqrd(estrandomfor_temp.best_score_)
@@ -237,7 +235,7 @@ def rfmethod(tunedpars,gridsearch_dictionary,newmatdf_temp,temp_rain_hum,monthnu
     if adj_r_sqrd(reg_n.score(X_temp, Y_temp))>best_score_all:
         best_score_all=adj_r_sqrd(reg_n.score(X_temp, Y_temp))
         best_estimator_all=reg_n
-        rsquared=reg_n.score(X_temp, Y_temp)
+        rsquared=reg_n.score(X_temp, Y_temp)'''
     ########################################################################
     #multivariate linear regression on log data
     X_temp1=np.log1p(X_temp)
@@ -271,7 +269,7 @@ def rfmethod(tunedpars,gridsearch_dictionary,newmatdf_temp,temp_rain_hum,monthnu
         best_estimator_all=reg
         rsquared=reg.score(X_temp, Y_temp)
     ####################################################################
-    #BayesianRidge
+    '''#BayesianRidge
     reg =BayesianRidge(normalize=True).fit(X_temp, Y_temp)
     #cross validation
     scores = cross_val_score(reg, X_temp, Y_temp, cv=10,n_jobs =-1)
@@ -315,7 +313,7 @@ def rfmethod(tunedpars,gridsearch_dictionary,newmatdf_temp,temp_rain_hum,monthnu
     if adj_r_sqrd(reg.score(X_temp, Y_temp) )>best_score_all:
         best_score_all=adj_r_sqrd(reg.score(X_temp, Y_temp) )
         best_estimator_all=reg
-        rsquared=reg.score(X_temp, Y_temp)
+        rsquared=reg.score(X_temp, Y_temp)'''
     ####################################################################    
     print ("Best score total adj r square:")
     print (best_score_all)
@@ -335,10 +333,19 @@ def rfmethod(tunedpars,gridsearch_dictionary,newmatdf_temp,temp_rain_hum,monthnu
     if elastic==True:
         X_temp_fin=X_temp1
         Y_temp_fin=Y_temp1
+        Y_preds_output = best_estimator_all.predict(X_temp_fin)
+        #transform log
+        Y_preds=np.log1p(Y_preds_output)
     else:
         X_temp_fin=X_temp
         Y_temp_fin=Y_temp
-    plt.scatter(best_estimator_all.predict(X_temp_fin),Y_temp_fin)
+        Y_preds_output = best_estimator_all.predict(X_temp_fin)
+        Y_preds=Y_preds_output.copy()
+    #general standard
+    Y_preds=y_scaler.inverse_transform( Y_preds.reshape(-1, 1) )
+
+    Y_preds=pd.DataFrame(Y_preds,columns=[[model_type+"_"+str(monthnum)]])
+    plt.scatter(Y_preds_output,Y_temp_fin)
     plt.title(pltttl)
     plt.xlabel("Prediction")
     plt.ylabel("Real Value")
@@ -414,7 +421,7 @@ def rfmethod(tunedpars,gridsearch_dictionary,newmatdf_temp,temp_rain_hum,monthnu
     """
     #############################################################
     #############################################################
-    return "estrandomfor_temp",X_temp ,Y_temp,X_train_temp, X_test_temp, y_train_temp, y_test_temp,best_estimator_all,best_score_all,mutual_info_regression_value_rain,f_regression_value_rain,x_scaler,y_scaler,didlog,used_features,rsquared 
+    return Y_preds,X_temp_fin ,newmatdf_temp[[temp_rain_hum]].copy(),X_train_temp, X_test_temp, y_train_temp, y_test_temp,best_estimator_all,best_score_all,mutual_info_regression_value_rain,f_regression_value_rain,x_scaler,y_scaler,didlog,used_features,rsquared 
 ###########################################################
 #pca function
 def pcafun(pca_raw_df,kmeans_group_nums=5,filetitlename="no_name"):
@@ -534,30 +541,34 @@ def importing_preprocess():
 #print the models results in a file
 def print_to_file(file_name,temp_bests,rain_bests,hum_bests):
     m_out_f=open(file_name,'w')
-    for monthnum in range(0,len(temp_bests)):
-        m_out_f.write("########################################################")
-        m_out_f.write('\n TEMPERATURE month')
-        m_out_f.write(str(monthnum+1))
-        m_out_f.write('\n\n\n Used features \n')
-        m_out_f.write(str(temp_bests[monthnum][4]))
-        m_out_f.write('\n\n BEST SCORE adjusted R squared \n')
-        m_out_f.write(str(temp_bests[monthnum][1]))
-        m_out_f.write('\n\n BEST SCORE R squared \n')
-        m_out_f.write(str(temp_bests[monthnum][5]))
-        m_out_f.write('\n\n F REGRESSION \n')
-        m_out_f.write(str(temp_bests[monthnum][3][0]))
-        m_out_f.write('\n')
-        m_out_f.write(str(temp_bests[monthnum][3][1]))
-        m_out_f.write('\n\n MUTUAL INFORMATION REGRESSION \n')
-        m_out_f.write(str(temp_bests[monthnum][2]))
-        m_out_f.write('\n\n BEST ESTIMATOR \n')
-        m_out_f.write(str(temp_bests[monthnum][0]))
-        m_out_f.write('\n\nlog(1 + x)? \n')
-        m_out_f.write(str(temp_bests[monthnum][-1]))
-        m_out_f.write('\n')
-    m_out_f.write("########################################################\n########################################################")
-    m_out_f.write('\n')
-    m_out_f.write("########################################################\n \n")
+    feat_name=["TEMPERATURE","HUMIDITY","PRECIPITATION"]
+    for featt in [temp_bests,hum_bests,rain_bests]:
+        cnt=0
+        for monthnum in range(0,len(featt)):
+            m_out_f.write("########################################################\n")
+            title=feat_name[cnt]+'month\n'
+            m_out_f.write(title)
+            m_out_f.write(str(monthnum+1))
+            m_out_f.write('\n\n\n Used features \n')
+            m_out_f.write(str(featt[monthnum][4]))
+            m_out_f.write('\n\n BEST SCORE adjusted R squared \n')
+            m_out_f.write(str(featt[monthnum][1]))
+            m_out_f.write('\n\n BEST SCORE R squared \n')
+            m_out_f.write(str(featt[monthnum][5]))
+            m_out_f.write('\n\n F REGRESSION \n')
+            m_out_f.write(str(featt[monthnum][3][0]))
+            m_out_f.write('\n')
+            m_out_f.write(str(featt[monthnum][3][1]))
+            m_out_f.write('\n\n MUTUAL INFORMATION REGRESSION \n')
+            m_out_f.write(str(featt[monthnum][2]))
+            m_out_f.write('\n\n BEST ESTIMATOR \n')
+            m_out_f.write(str(featt[monthnum][0]))
+            m_out_f.write('\n\nlog(1 + x)? \n')
+            m_out_f.write(str(featt[monthnum][-1]))
+            m_out_f.write('\n')
+            m_out_f.write("########################################################\n")
+        m_out_f.write('\n"########################################################\n')
+    '''m_out_f.write("########################################################\n \n")
     for monthnum in range(0,len(temp_bests)):
         m_out_f.write("########################################################\nHUMIDITY month ")
         m_out_f.write(str(monthnum+1))
@@ -594,7 +605,7 @@ def print_to_file(file_name,temp_bests,rain_bests,hum_bests):
         m_out_f.write(str(rain_bests[monthnum][-1]))
         m_out_f.write('\n')
     m_out_f.write("######################################################## \n ########################################################")
-    m_out_f.write('\n########################################################\n\n')    
+    m_out_f.write('\n########################################################\n\n') '''   
     m_out_f.close() 
     return       
 ###########################################################
@@ -811,4 +822,106 @@ def regional_mensual_plot(x_y_z_,monthly_iso18_output,monthly_iso2h_output):
         plt.legend()
         #plt.savefig(("C:\\Users\\Ash kan\\Documents\\meteo_iso_model\\meteo_iso_model_input_code_and_results\\output\\iso_excel_out"+"\\"+mon_name[mon]+".pdf"),dpi=300)
         plt.show()'''
+############################################################
+
+# a function to read the new data (input: x y z month/ output:temp, rain, hum, )
+def new_data_prediction_comparison(newd,no_needed_month,temp_bests,rain_bests,hum_bests,didlog_iso18,didlog_iso2h,x_scaler_iso18,x_scaler_iso2h,used_features_iso18,used_features_iso2h,best_estimator_all_iso18,best_estimator_all_iso2h,y_scaler_iso18,y_scaler_iso2h):
+    x_y_z_month=newd[["CooX","CooY","CooZ","month"]]
+    #iso_18_2h=newd[["iso18","iso2h"]]
+    x_y_z_month_org=x_y_z_month.copy()
+    x_y_z_month_copy=x_y_z_month_org.copy()
+    #making a list of existed month
+    existed_month=x_y_z_month[['month']]
+    existed_month.drop_duplicates(keep = 'last', inplace = True)
+    counter_month=0
+    for month in range(0,12):
+        if (month not in no_needed_month) and (existed_month.isin([month+1]).any().bool()==True):
+            
+            counterr=0
+            for meteopredict in [temp_bests,rain_bests,hum_bests]:
+                #just selecting the data for 1 month
+                x_y_z_month_org_2=x_y_z_month_org[x_y_z_month_org["month"]==month+1].copy()
+                #selecting coords
+                x_y_z=x_y_z_month_org_2[meteopredict[month][4]].copy()
+                print ("x_y_z-\n",x_y_z)
+                counterr=counterr+1
+                #general standard
+                x_y_z=meteopredict[month][-3].transform(x_y_z)
+                #transform if there is log in input
+                if meteopredict[month][-1]==True:
+                    x_y_z=np.log1p(x_y_z)
+                #predicting
+                print (month+1)
+                print (x_y_z)    
+                meteopredict_res=meteopredict[month][0].predict(x_y_z)
+                print ("meteopredict_res",meteopredict_res)
+                #inverse transform
+                #log
+                if meteopredict[month][-1]==True:
+                    meteopredict_res=np.expm1(meteopredict_res)
+                #general
+                if counterr==1:
+                    colname="temp"
+                elif counterr==2:
+                    colname="rain"
+                elif counterr==3:
+                    colname="hum"
+                meteopredict_res=pd.DataFrame(meteopredict[month][-2].inverse_transform(pd.DataFrame(meteopredict_res)),columns=[colname])
+                #making the dataframe
+                if counterr==1:
+                    meteopredict_res_per_month=meteopredict_res
+                else:
+                    meteopredict_res_per_month=pd.concat([meteopredict_res_per_month,meteopredict_res],axis=1)
+                    #meteopredict_res_per_month=temp,rain,hum
+            print ("meteopredict_res_per_month\n",meteopredict_res_per_month)        
+            #################################################
+            #################################################
+            print ("x_y_z_month_org_2\n",x_y_z_month_org_2)
+            iso_model_input=pd.concat([x_y_z_month_org_2.reset_index(),meteopredict_res_per_month.reset_index()],axis=1)
+            print ("iso_model_input\n",iso_model_input)
+            print ("used_features_iso18",used_features_iso18)
+            #iso18:
+
+            #transforming
+            iso18_model_input=x_scaler_iso18.transform(iso_model_input[used_features_iso18])
+            if didlog_iso18==True:
+                iso18_model_input=np.expm1(iso18_model_input)
+            #predicting
+            each_month_iso18_predict=best_estimator_all_iso18.predict(iso18_model_input)
+            #inverse transform
+            #log
+            if didlog_iso18==True:
+                each_month_iso18_predict=np.expm1(each_month_iso18_predict)
+            #general
+            each_month_iso18_predict=pd.DataFrame(y_scaler_iso18.inverse_transform(pd.DataFrame(each_month_iso18_predict)),columns=["iso_18"])
+            print ("each_month_iso18_predict\n",each_month_iso18_predict)
+            #################################################
+            #iso2h:
+
+            #transforming
+            iso2h_model_input=x_scaler_iso2h.transform(iso_model_input[used_features_iso2h])
+            if didlog_iso2h==True:
+                iso2h_model_input=np.expm1(iso2h_model_input)
+            #predicting
+            each_month_iso2h_predict=best_estimator_all_iso2h.predict(iso2h_model_input)
+            #inverse transform
+            #log
+            if didlog_iso2h==True:
+                each_month_iso2h_predict=np.expm1(each_month_iso2h_predict)
+            #general
+            each_month_iso2h_predict=pd.DataFrame(y_scaler_iso2h.inverse_transform(pd.DataFrame(each_month_iso2h_predict)),columns=["iso_2h"])
+            print ("each_month_iso2h_predict\n",each_month_iso2h_predict)
+            #################################################
+            df_to_excel=pd.concat([x_y_z_month_org_2.reset_index(),meteopredict_res_per_month.reset_index(),each_month_iso18_predict.reset_index(),each_month_iso2h_predict.reset_index()],axis=1)
+            
+            if counter_month==0:
+                integr_df=df_to_excel
+            else:
+                integr_df=pd.concat([integr_df,df_to_excel])
+            counter_month=counter_month+1    
+            print ("##############\n integr_df last \n",integr_df)    
+    integr_df=integr_df[["CooX","CooY","CooZ","temp","rain","hum","iso_18","iso_2h","month"]].reset_index()
+    addd="C:\\Users\\Ash kan\\Documents\\meteo_iso_model\\meteo_iso_model_input_code_and_results\\output\\iso_excel_out\\new_data_prediction_comparison.xls"
+    integr_df.to_excel(addd)
+    return integr_df
 ############################################################
