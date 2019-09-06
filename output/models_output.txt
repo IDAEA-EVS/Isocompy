@@ -1,5 +1,5 @@
-########################################################
-TEMPERATUREmonth
+TEMPERATURE
+month
 1
 
 
@@ -7,28 +7,32 @@ TEMPERATUREmonth
 ['CooY', 'CooZ']
 
  BEST SCORE adjusted R squared 
-0.7718197712955142
+0.8297176531365559
 
  BEST SCORE R squared 
-0.7817406508044048
+0.8371212334349665
 
  F REGRESSION 
 [  0.53394185  45.29189931 149.92391182]
 [4.67464601e-01 4.33356923e-09 7.33620873e-19]
 
  MUTUAL INFORMATION REGRESSION 
-[0.37613139 0.40554844 1.        ]
+[0.3749715  0.40429784 1.        ]
 
  BEST ESTIMATOR 
-LarsCV(copy_X=True, cv=10, eps=2.220446049250313e-16, fit_intercept=True,
-       max_iter=500, max_n_alphas=1000, n_jobs=-1, normalize=True,
-       positive=False, precompute='auto', verbose=False)
+MLPRegressor(activation='relu', alpha=0.0005, batch_size='auto', beta_1=0.9,
+             beta_2=0.999, early_stopping=False, epsilon=1e-08,
+             hidden_layer_sizes=(50, 50, 50), learning_rate='adaptive',
+             learning_rate_init=0.001, max_iter=200, momentum=0.9,
+             n_iter_no_change=15, nesterovs_momentum=True, power_t=0.5,
+             random_state=None, shuffle=True, solver='lbfgs', tol=0.0001,
+             validation_fraction=0.1, verbose=False, warm_start=False)
 
 log(1 + x)? 
-True
+False
 ########################################################
-########################################################
-TEMPERATUREmonth
+TEMPERATURE
+month
 2
 
 
@@ -36,28 +40,32 @@ TEMPERATUREmonth
 ['CooY', 'CooZ']
 
  BEST SCORE adjusted R squared 
-0.8280375292748882
+0.8737652547587088
 
  BEST SCORE R squared 
-0.8356241088657019
+0.8793344346958246
 
  F REGRESSION 
 [  0.74969775  45.44545504 208.37371725]
 [3.89661909e-01 4.38649596e-09 3.03335381e-22]
 
  MUTUAL INFORMATION REGRESSION 
-[0.31499044 0.38764586 1.        ]
+[0.31616315 0.38908907 1.        ]
 
  BEST ESTIMATOR 
-LarsCV(copy_X=True, cv=10, eps=2.220446049250313e-16, fit_intercept=True,
-       max_iter=500, max_n_alphas=1000, n_jobs=-1, normalize=True,
-       positive=False, precompute='auto', verbose=False)
+MLPRegressor(activation='relu', alpha=0.0005, batch_size='auto', beta_1=0.9,
+             beta_2=0.999, early_stopping=False, epsilon=1e-08,
+             hidden_layer_sizes=(50, 50, 50), learning_rate='adaptive',
+             learning_rate_init=0.001, max_iter=200, momentum=0.9,
+             n_iter_no_change=5, nesterovs_momentum=True, power_t=0.5,
+             random_state=None, shuffle=True, solver='lbfgs', tol=0.0001,
+             validation_fraction=0.1, verbose=False, warm_start=False)
 
 log(1 + x)? 
-True
+False
 ########################################################
-########################################################
-TEMPERATUREmonth
+TEMPERATURE
+month
 3
 
 
@@ -65,10 +73,10 @@ TEMPERATUREmonth
 ['CooY', 'CooZ']
 
  BEST SCORE adjusted R squared 
-0.8345508522022829
+0.8594412326628071
 
  BEST SCORE R squared 
-0.8420712680112701
+0.8658302675417705
 
  F REGRESSION 
 [  0.88586011  37.50267103 223.90645476]
@@ -78,15 +86,23 @@ TEMPERATUREmonth
 [0.29974878 0.40631779 1.        ]
 
  BEST ESTIMATOR 
-LarsCV(copy_X=True, cv=10, eps=2.220446049250313e-16, fit_intercept=True,
-       max_iter=500, max_n_alphas=1000, n_jobs=-1, normalize=True,
-       positive=False, precompute='auto', verbose=False)
+GridSearchCV(cv=10, error_score='raise-deprecating',
+             estimator=SVR(C=1.0, cache_size=200, coef0=0.0, degree=3,
+                           epsilon=0.1, gamma='auto_deprecated', kernel='rbf',
+                           max_iter=-1, shrinking=True, tol=0.001,
+                           verbose=False),
+             iid='warn', n_jobs=-1,
+             param_grid={'C': [1, 0.95, 0.9, 0.8],
+                         'epsilon': [0.1, 0.05, 0.15, 0.2, 0.5],
+                         'kernel': ['linear', 'poly', 'rbf', 'sigmoid']},
+             pre_dispatch='2*n_jobs', refit=True, return_train_score=False,
+             scoring=None, verbose=0)
 
 log(1 + x)? 
-True
+False
 ########################################################
-########################################################
-TEMPERATUREmonth
+TEMPERATURE
+month
 4
 
 
@@ -94,28 +110,33 @@ TEMPERATUREmonth
 ['CooY', 'CooZ']
 
  BEST SCORE adjusted R squared 
-0.7948035368053531
+0.8343599952812502
 
  BEST SCORE R squared 
-0.8044221210176021
+0.8421243705024415
 
  F REGRESSION 
 [1.16928227e-01 3.72592535e+01 2.34715129e+02]
 [7.33528333e-01 7.05725990e-08 6.38115571e-23]
 
  MUTUAL INFORMATION REGRESSION 
-[0.12493527 0.31702909 1.        ]
+[0.12507687 0.3173884  1.        ]
 
  BEST ESTIMATOR 
-LarsCV(copy_X=True, cv=10, eps=2.220446049250313e-16, fit_intercept=True,
-       max_iter=500, max_n_alphas=1000, n_jobs=-1, normalize=True,
-       positive=False, precompute='auto', verbose=False)
+GridSearchCV(cv=10, error_score='raise-deprecating',
+             estimator=NuSVR(C=1.0, cache_size=200, coef0=0.0, degree=3,
+                             gamma='auto_deprecated', kernel='rbf', max_iter=-1,
+                             nu=0.5, shrinking=True, tol=0.001, verbose=False),
+             iid='warn', n_jobs=-1,
+             param_grid={'kernel': ['linear', 'poly', 'rbf', 'sigmoid']},
+             pre_dispatch='2*n_jobs', refit=True, return_train_score=False,
+             scoring=None, verbose=0)
 
 log(1 + x)? 
-True
+False
 ########################################################
-########################################################
-TEMPERATUREmonth
+TEMPERATURE
+month
 5
 
 
@@ -123,27 +144,36 @@ TEMPERATUREmonth
 ['CooY', 'CooZ']
 
  BEST SCORE adjusted R squared 
-0.7751161338332351
+0.8037546592937276
 
  BEST SCORE R squared 
-0.7856575650598022
+0.8129536596393341
 
  F REGRESSION 
 [  0.39589335  23.75720999 230.92219986]
 [5.31492793e-01 7.72974873e-06 9.57264879e-23]
 
  MUTUAL INFORMATION REGRESSION 
-[0.27246277 0.25542139 1.        ]
+[0.27229155 0.25526088 1.        ]
 
  BEST ESTIMATOR 
-OrthogonalMatchingPursuitCV(copy=True, cv=10, fit_intercept=True, max_iter=None,
-                            n_jobs=-1, normalize=True, verbose=False)
+GridSearchCV(cv=10, error_score='raise-deprecating',
+             estimator=SVR(C=1.0, cache_size=200, coef0=0.0, degree=3,
+                           epsilon=0.1, gamma='auto_deprecated', kernel='rbf',
+                           max_iter=-1, shrinking=True, tol=0.001,
+                           verbose=False),
+             iid='warn', n_jobs=-1,
+             param_grid={'C': [1, 0.95, 0.9, 0.8],
+                         'epsilon': [0.1, 0.05, 0.15, 0.2, 0.5],
+                         'kernel': ['linear', 'poly', 'rbf', 'sigmoid']},
+             pre_dispatch='2*n_jobs', refit=True, return_train_score=False,
+             scoring=None, verbose=0)
 
 log(1 + x)? 
-True
+False
 ########################################################
-########################################################
-TEMPERATUREmonth
+TEMPERATURE
+month
 6
 
 
@@ -151,27 +181,32 @@ TEMPERATUREmonth
 ['CooX', 'CooY', 'CooZ']
 
  BEST SCORE adjusted R squared 
-0.7155423536013235
+0.7301590195661877
 
  BEST SCORE R squared 
-0.7282792631415628
+0.7422414515259106
 
  F REGRESSION 
 [  4.70927898   9.74657564 176.89644126]
 [3.36042924e-02 2.66614488e-03 2.41587195e-20]
 
  MUTUAL INFORMATION REGRESSION 
-[0.44907024 0.25849218 1.        ]
+[0.44618238 0.25682988 1.        ]
 
  BEST ESTIMATOR 
-OrthogonalMatchingPursuitCV(copy=True, cv=10, fit_intercept=True, max_iter=None,
-                            n_jobs=-1, normalize=True, verbose=False)
+MultiTaskElasticNetCV(alphas=None, copy_X=True, cv=10, eps=0.001,
+                      fit_intercept=True,
+                      l1_ratio=[0.1, 0.3, 0.5, 0.6, 0.7, 0.8, 0.85, 0.87, 0.9,
+                                0.93, 0.95, 0.97, 0.99],
+                      max_iter=1000, n_alphas=100, n_jobs=-1, normalize=False,
+                      random_state=None, selection='cyclic', tol=0.0001,
+                      verbose=0)
 
 log(1 + x)? 
-True
+False
 ########################################################
-########################################################
-TEMPERATUREmonth
+TEMPERATURE
+month
 7
 
 
@@ -189,17 +224,17 @@ TEMPERATUREmonth
 [1.34434860e-01 6.66029502e-04 4.84592261e-19]
 
  MUTUAL INFORMATION REGRESSION 
-[0.3546851  0.22617603 1.        ]
+[0.35597212 0.22699675 1.        ]
 
  BEST ESTIMATOR 
 OrthogonalMatchingPursuitCV(copy=True, cv=10, fit_intercept=True, max_iter=None,
                             n_jobs=-1, normalize=True, verbose=False)
 
 log(1 + x)? 
-True
+False
 ########################################################
-########################################################
-TEMPERATUREmonth
+TEMPERATURE
+month
 8
 
 
@@ -207,27 +242,33 @@ TEMPERATUREmonth
 ['CooY', 'CooZ']
 
  BEST SCORE adjusted R squared 
-0.7413970145011571
+0.7900758531760168
 
  BEST SCORE R squared 
-0.7531516956601955
+0.7996178598498342
 
  F REGRESSION 
 [  1.00534775  15.02305459 198.31961313]
 [3.19738096e-01 2.49816221e-04 2.02885823e-21]
 
  MUTUAL INFORMATION REGRESSION 
-[0.28131972 0.20031011 1.        ]
+[0.28113099 0.20017572 1.        ]
 
  BEST ESTIMATOR 
-OrthogonalMatchingPursuitCV(copy=True, cv=10, fit_intercept=True, max_iter=None,
-                            n_jobs=-1, normalize=True, verbose=False)
+GridSearchCV(cv=10, error_score='raise-deprecating',
+             estimator=NuSVR(C=1.0, cache_size=200, coef0=0.0, degree=3,
+                             gamma='auto_deprecated', kernel='rbf', max_iter=-1,
+                             nu=0.5, shrinking=True, tol=0.001, verbose=False),
+             iid='warn', n_jobs=-1,
+             param_grid={'kernel': ['linear', 'poly', 'rbf', 'sigmoid']},
+             pre_dispatch='2*n_jobs', refit=True, return_train_score=False,
+             scoring=None, verbose=0)
 
 log(1 + x)? 
-True
+False
 ########################################################
-########################################################
-TEMPERATUREmonth
+TEMPERATURE
+month
 9
 
 
@@ -235,28 +276,33 @@ TEMPERATUREmonth
 ['CooY', 'CooZ']
 
  BEST SCORE adjusted R squared 
-0.7747017824462042
+0.8369989398603
 
  BEST SCORE R squared 
-0.7847897623366727
+0.8442974947919284
 
  F REGRESSION 
 [1.94976264e-01 2.62424154e+01 2.21881202e+02]
 [6.60250119e-01 2.82420651e-06 8.63177559e-23]
 
  MUTUAL INFORMATION REGRESSION 
-[0.15523127 0.25177225 1.        ]
+[0.15512937 0.25160698 1.        ]
 
  BEST ESTIMATOR 
-LarsCV(copy_X=True, cv=10, eps=2.220446049250313e-16, fit_intercept=True,
-       max_iter=500, max_n_alphas=1000, n_jobs=-1, normalize=True,
-       positive=False, precompute='auto', verbose=False)
+GridSearchCV(cv=10, error_score='raise-deprecating',
+             estimator=NuSVR(C=1.0, cache_size=200, coef0=0.0, degree=3,
+                             gamma='auto_deprecated', kernel='rbf', max_iter=-1,
+                             nu=0.5, shrinking=True, tol=0.001, verbose=False),
+             iid='warn', n_jobs=-1,
+             param_grid={'kernel': ['linear', 'poly', 'rbf', 'sigmoid']},
+             pre_dispatch='2*n_jobs', refit=True, return_train_score=False,
+             scoring=None, verbose=0)
 
 log(1 + x)? 
-True
+False
 ########################################################
-########################################################
-TEMPERATUREmonth
+TEMPERATURE
+month
 10
 
 
@@ -264,28 +310,36 @@ TEMPERATUREmonth
 ['CooY', 'CooZ']
 
  BEST SCORE adjusted R squared 
-0.7655096185643723
+0.8282494780178618
 
  BEST SCORE R squared 
-0.7757048525398343
+0.8357168920170851
 
  F REGRESSION 
 [3.99890234e-02 2.91445918e+01 2.07323223e+02]
 [8.42098874e-01 9.22848199e-07 2.47925024e-22]
 
  MUTUAL INFORMATION REGRESSION 
-[0.10767599 0.30071627 1.        ]
+[0.10779464 0.30104763 1.        ]
 
  BEST ESTIMATOR 
-LarsCV(copy_X=True, cv=10, eps=2.220446049250313e-16, fit_intercept=True,
-       max_iter=500, max_n_alphas=1000, n_jobs=-1, normalize=True,
-       positive=False, precompute='auto', verbose=False)
+GridSearchCV(cv=10, error_score='raise-deprecating',
+             estimator=SVR(C=1.0, cache_size=200, coef0=0.0, degree=3,
+                           epsilon=0.1, gamma='auto_deprecated', kernel='rbf',
+                           max_iter=-1, shrinking=True, tol=0.001,
+                           verbose=False),
+             iid='warn', n_jobs=-1,
+             param_grid={'C': [1, 0.95, 0.9, 0.8],
+                         'epsilon': [0.1, 0.05, 0.15, 0.2, 0.5],
+                         'kernel': ['linear', 'poly', 'rbf', 'sigmoid']},
+             pre_dispatch='2*n_jobs', refit=True, return_train_score=False,
+             scoring=None, verbose=0)
 
 log(1 + x)? 
-True
+False
 ########################################################
-########################################################
-TEMPERATUREmonth
+TEMPERATURE
+month
 11
 
 
@@ -293,27 +347,36 @@ TEMPERATUREmonth
 ['CooY', 'CooZ']
 
  BEST SCORE adjusted R squared 
-0.787439156042291
+0.8447049714871937
 
  BEST SCORE R squared 
-0.7966809318665392
+0.85145692924862
 
  F REGRESSION 
 [1.88439679e-02 3.68099141e+01 2.11148384e+02]
 [8.91220396e-01 6.48818835e-08 1.54755246e-22]
 
  MUTUAL INFORMATION REGRESSION 
-[0.1955215  0.42763063 1.        ]
+[0.19609065 0.42887544 1.        ]
 
  BEST ESTIMATOR 
-OrthogonalMatchingPursuitCV(copy=True, cv=10, fit_intercept=True, max_iter=None,
-                            n_jobs=-1, normalize=True, verbose=False)
+GridSearchCV(cv=10, error_score='raise-deprecating',
+             estimator=SVR(C=1.0, cache_size=200, coef0=0.0, degree=3,
+                           epsilon=0.1, gamma='auto_deprecated', kernel='rbf',
+                           max_iter=-1, shrinking=True, tol=0.001,
+                           verbose=False),
+             iid='warn', n_jobs=-1,
+             param_grid={'C': [1, 0.95, 0.9, 0.8],
+                         'epsilon': [0.1, 0.05, 0.15, 0.2, 0.5],
+                         'kernel': ['linear', 'poly', 'rbf', 'sigmoid']},
+             pre_dispatch='2*n_jobs', refit=True, return_train_score=False,
+             scoring=None, verbose=0)
 
 log(1 + x)? 
-True
+False
 ########################################################
-########################################################
-TEMPERATUREmonth
+TEMPERATURE
+month
 12
 
 
@@ -321,30 +384,35 @@ TEMPERATUREmonth
 ['CooY', 'CooZ']
 
  BEST SCORE adjusted R squared 
-0.7981779262241665
+0.8316055188899866
 
  BEST SCORE R squared 
-0.8068274436717022
+0.8388224252232729
 
  F REGRESSION 
 [  0.69676676  43.18480473 179.04484004]
 [4.06753070e-01 7.87993710e-09 7.55789681e-21]
 
  MUTUAL INFORMATION REGRESSION 
-[0.38163276 0.4770246  1.        ]
+[0.38128747 0.47659299 1.        ]
 
  BEST ESTIMATOR 
-LarsCV(copy_X=True, cv=10, eps=2.220446049250313e-16, fit_intercept=True,
-       max_iter=500, max_n_alphas=1000, n_jobs=-1, normalize=True,
-       positive=False, precompute='auto', verbose=False)
+GridSearchCV(cv=10, error_score='raise-deprecating',
+             estimator=NuSVR(C=1.0, cache_size=200, coef0=0.0, degree=3,
+                             gamma='auto_deprecated', kernel='rbf', max_iter=-1,
+                             nu=0.5, shrinking=True, tol=0.001, verbose=False),
+             iid='warn', n_jobs=-1,
+             param_grid={'kernel': ['linear', 'poly', 'rbf', 'sigmoid']},
+             pre_dispatch='2*n_jobs', refit=True, return_train_score=False,
+             scoring=None, verbose=0)
 
 log(1 + x)? 
-True
+False
 ########################################################
 
 "########################################################
-########################################################
-TEMPERATUREmonth
+HUMIDITY
+month
 1
 
 
@@ -352,28 +420,36 @@ TEMPERATUREmonth
 ['CooX', 'CooY']
 
  BEST SCORE adjusted R squared 
-0.4048722561616571
+0.5836766194445502
 
  BEST SCORE R squared 
-0.457383527676805
+0.6204110353759134
 
  F REGRESSION 
 [16.07743827 27.70825393  1.73790726]
 [3.27345281e-04 8.46947286e-06 1.96481614e-01]
 
  MUTUAL INFORMATION REGRESSION 
-[1.         0.31229872 0.44246319]
+[1.         0.31229872 0.43332866]
 
  BEST ESTIMATOR 
-LarsCV(copy_X=True, cv=10, eps=2.220446049250313e-16, fit_intercept=True,
-       max_iter=500, max_n_alphas=1000, n_jobs=-1, normalize=True,
-       positive=False, precompute='auto', verbose=False)
+GridSearchCV(cv=10, error_score='raise-deprecating',
+             estimator=SVR(C=1.0, cache_size=200, coef0=0.0, degree=3,
+                           epsilon=0.1, gamma='auto_deprecated', kernel='rbf',
+                           max_iter=-1, shrinking=True, tol=0.001,
+                           verbose=False),
+             iid='warn', n_jobs=-1,
+             param_grid={'C': [1, 0.95, 0.9, 0.8],
+                         'epsilon': [0.1, 0.05, 0.15, 0.2, 0.5],
+                         'kernel': ['linear', 'poly', 'rbf', 'sigmoid']},
+             pre_dispatch='2*n_jobs', refit=True, return_train_score=False,
+             scoring=None, verbose=0)
 
 log(1 + x)? 
 True
 ########################################################
-########################################################
-TEMPERATUREmonth
+HUMIDITY
+month
 2
 
 
@@ -398,10 +474,10 @@ OrthogonalMatchingPursuitCV(copy=True, cv=10, fit_intercept=True, max_iter=None,
                             n_jobs=-1, normalize=True, verbose=False)
 
 log(1 + x)? 
-True
+False
 ########################################################
-########################################################
-TEMPERATUREmonth
+HUMIDITY
+month
 3
 
 
@@ -409,32 +485,36 @@ TEMPERATUREmonth
 ['CooX', 'CooY']
 
  BEST SCORE adjusted R squared 
-0.521815151488434
+0.630607199497891
 
  BEST SCORE R squared 
-0.5616638888643979
+0.6613899328730668
 
  F REGRESSION 
 [31.91221139 37.33977324  0.62473086]
 [2.24051349e-06 5.52186998e-07 4.34617722e-01]
 
  MUTUAL INFORMATION REGRESSION 
-[1.         0.44785504 0.27094696]
+[1.         0.44785504 0.26777193]
 
  BEST ESTIMATOR 
-MultiTaskElasticNetCV(alphas=None, copy_X=True, cv=10, eps=0.001,
-                      fit_intercept=True,
-                      l1_ratio=[0.1, 0.3, 0.5, 0.6, 0.7, 0.8, 0.85, 0.87, 0.9,
-                                0.93, 0.95, 0.97, 0.99],
-                      max_iter=1000, n_alphas=100, n_jobs=-1, normalize=False,
-                      random_state=None, selection='cyclic', tol=0.0001,
-                      verbose=0)
+GridSearchCV(cv=10, error_score='raise-deprecating',
+             estimator=SVR(C=1.0, cache_size=200, coef0=0.0, degree=3,
+                           epsilon=0.1, gamma='auto_deprecated', kernel='rbf',
+                           max_iter=-1, shrinking=True, tol=0.001,
+                           verbose=False),
+             iid='warn', n_jobs=-1,
+             param_grid={'C': [1, 0.95, 0.9, 0.8],
+                         'epsilon': [0.1, 0.05, 0.15, 0.2, 0.5],
+                         'kernel': ['linear', 'poly', 'rbf', 'sigmoid']},
+             pre_dispatch='2*n_jobs', refit=True, return_train_score=False,
+             scoring=None, verbose=0)
 
 log(1 + x)? 
 True
 ########################################################
-########################################################
-TEMPERATUREmonth
+HUMIDITY
+month
 4
 
 
@@ -452,17 +532,17 @@ TEMPERATUREmonth
 [4.83396602e-08 4.72999063e-11 3.06618607e-03]
 
  MUTUAL INFORMATION REGRESSION 
-[1.         0.5493523  0.21650494]
+[1.         0.54632691 0.21650494]
 
  BEST ESTIMATOR 
 OrthogonalMatchingPursuitCV(copy=True, cv=10, fit_intercept=True, max_iter=None,
                             n_jobs=-1, normalize=True, verbose=False)
 
 log(1 + x)? 
-True
+False
 ########################################################
-########################################################
-TEMPERATUREmonth
+HUMIDITY
+month
 5
 
 
@@ -480,7 +560,7 @@ TEMPERATUREmonth
 [0.04412748 0.0003615  0.0006651 ]
 
  MUTUAL INFORMATION REGRESSION 
-[1.         0.57320015 0.62481116]
+[1.         0.56911521 0.63123035]
 
  BEST ESTIMATOR 
 LarsCV(copy_X=True, cv=10, eps=2.220446049250313e-16, fit_intercept=True,
@@ -488,10 +568,10 @@ LarsCV(copy_X=True, cv=10, eps=2.220446049250313e-16, fit_intercept=True,
        positive=False, precompute='auto', verbose=False)
 
 log(1 + x)? 
-True
+False
 ########################################################
-########################################################
-TEMPERATUREmonth
+HUMIDITY
+month
 6
 
 
@@ -509,7 +589,7 @@ TEMPERATUREmonth
 [1.31985985e-01 1.46738149e-03 6.22254632e-06]
 
  MUTUAL INFORMATION REGRESSION 
-[0.90875244 0.10497819 1.        ]
+[0.89890498 0.100204   1.        ]
 
  BEST ESTIMATOR 
 LarsCV(copy_X=True, cv=10, eps=2.220446049250313e-16, fit_intercept=True,
@@ -517,10 +597,10 @@ LarsCV(copy_X=True, cv=10, eps=2.220446049250313e-16, fit_intercept=True,
        positive=False, precompute='auto', verbose=False)
 
 log(1 + x)? 
-True
+False
 ########################################################
-########################################################
-TEMPERATUREmonth
+HUMIDITY
+month
 7
 
 
@@ -538,7 +618,7 @@ TEMPERATUREmonth
 [0.05483727 0.00055489 0.00011315]
 
  MUTUAL INFORMATION REGRESSION 
-[1.         0.20076165 0.63931288]
+[1.         0.20076165 0.63563693]
 
  BEST ESTIMATOR 
 LarsCV(copy_X=True, cv=10, eps=2.220446049250313e-16, fit_intercept=True,
@@ -546,10 +626,10 @@ LarsCV(copy_X=True, cv=10, eps=2.220446049250313e-16, fit_intercept=True,
        positive=False, precompute='auto', verbose=False)
 
 log(1 + x)? 
-True
+False
 ########################################################
-########################################################
-TEMPERATUREmonth
+HUMIDITY
+month
 8
 
 
@@ -557,27 +637,36 @@ TEMPERATUREmonth
 ['CooX', 'CooY', 'CooZ']
 
  BEST SCORE adjusted R squared 
-0.424396785246403
+0.5043198739848878
 
  BEST SCORE R squared 
-0.47835958662955275
+0.5507898857988045
 
  F REGRESSION 
 [10.32867147 23.80952083 10.76058562]
 [3.05306694e-03 3.03296620e-05 2.56608028e-03]
 
  MUTUAL INFORMATION REGRESSION 
-[0.88022756 0.75040902 1.        ]
+[0.8720916  0.74347296 1.        ]
 
  BEST ESTIMATOR 
-OrthogonalMatchingPursuitCV(copy=True, cv=10, fit_intercept=True, max_iter=None,
-                            n_jobs=-1, normalize=True, verbose=False)
+GridSearchCV(cv=10, error_score='raise-deprecating',
+             estimator=SVR(C=1.0, cache_size=200, coef0=0.0, degree=3,
+                           epsilon=0.1, gamma='auto_deprecated', kernel='rbf',
+                           max_iter=-1, shrinking=True, tol=0.001,
+                           verbose=False),
+             iid='warn', n_jobs=-1,
+             param_grid={'C': [1, 0.95, 0.9, 0.8],
+                         'epsilon': [0.1, 0.05, 0.15, 0.2, 0.5],
+                         'kernel': ['linear', 'poly', 'rbf', 'sigmoid']},
+             pre_dispatch='2*n_jobs', refit=True, return_train_score=False,
+             scoring=None, verbose=0)
 
 log(1 + x)? 
-True
+False
 ########################################################
-########################################################
-TEMPERATUREmonth
+HUMIDITY
+month
 9
 
 
@@ -595,17 +684,17 @@ TEMPERATUREmonth
 [5.66462064e-04 7.95051837e-07 2.33031513e-03]
 
  MUTUAL INFORMATION REGRESSION 
-[1.         0.97399494 0.9659401 ]
+[1.         0.97399494 0.95473484]
 
  BEST ESTIMATOR 
 OrthogonalMatchingPursuitCV(copy=True, cv=10, fit_intercept=True, max_iter=None,
                             n_jobs=-1, normalize=True, verbose=False)
 
 log(1 + x)? 
-True
+False
 ########################################################
-########################################################
-TEMPERATUREmonth
+HUMIDITY
+month
 10
 
 
@@ -613,27 +702,32 @@ TEMPERATUREmonth
 ['CooX', 'CooY', 'CooZ']
 
  BEST SCORE adjusted R squared 
-0.6177892960888886
+0.6186703172479753
 
  BEST SCORE R squared 
-0.6515137699633984
+0.6523170539613893
 
  F REGRESSION 
 [27.9449978  61.69527676  7.37892907]
 [7.92633807e-06 4.69980614e-09 1.04238483e-02]
 
  MUTUAL INFORMATION REGRESSION 
-[0.77598851 1.         0.41692686]
+[0.76598061 1.         0.41154977]
 
  BEST ESTIMATOR 
-OrthogonalMatchingPursuitCV(copy=True, cv=10, fit_intercept=True, max_iter=None,
-                            n_jobs=-1, normalize=True, verbose=False)
+MultiTaskElasticNetCV(alphas=None, copy_X=True, cv=10, eps=0.001,
+                      fit_intercept=True,
+                      l1_ratio=[0.1, 0.3, 0.5, 0.6, 0.7, 0.8, 0.85, 0.87, 0.9,
+                                0.93, 0.95, 0.97, 0.99],
+                      max_iter=1000, n_alphas=100, n_jobs=-1, normalize=False,
+                      random_state=None, selection='cyclic', tol=0.0001,
+                      verbose=0)
 
 log(1 + x)? 
-True
+False
 ########################################################
-########################################################
-TEMPERATUREmonth
+HUMIDITY
+month
 11
 
 
@@ -641,28 +735,33 @@ TEMPERATUREmonth
 ['CooX', 'CooY', 'CooZ']
 
  BEST SCORE adjusted R squared 
-0.538097789360533
+0.5903455795334211
 
  BEST SCORE R squared 
-0.5788538667698977
+0.626491557809884
 
  F REGRESSION 
 [21.18531998 45.29096735  8.37342414]
 [5.91726070e-05 1.14510265e-07 6.69784791e-03]
 
  MUTUAL INFORMATION REGRESSION 
-[1.         0.63928677 0.15156878]
+[1.         0.63928677 0.16294614]
 
  BEST ESTIMATOR 
-LarsCV(copy_X=True, cv=10, eps=2.220446049250313e-16, fit_intercept=True,
-       max_iter=500, max_n_alphas=1000, n_jobs=-1, normalize=True,
-       positive=False, precompute='auto', verbose=False)
+GridSearchCV(cv=10, error_score='raise-deprecating',
+             estimator=NuSVR(C=1.0, cache_size=200, coef0=0.0, degree=3,
+                             gamma='auto_deprecated', kernel='rbf', max_iter=-1,
+                             nu=0.5, shrinking=True, tol=0.001, verbose=False),
+             iid='warn', n_jobs=-1,
+             param_grid={'kernel': ['linear', 'poly', 'rbf', 'sigmoid']},
+             pre_dispatch='2*n_jobs', refit=True, return_train_score=False,
+             scoring=None, verbose=0)
 
 log(1 + x)? 
-True
+False
 ########################################################
-########################################################
-TEMPERATUREmonth
+HUMIDITY
+month
 12
 
 
@@ -670,34 +769,38 @@ TEMPERATUREmonth
 ['CooX', 'CooY', 'CooZ']
 
  BEST SCORE adjusted R squared 
-0.6369925135371204
+0.6618910189516527
 
  BEST SCORE R squared 
-0.6699931941246549
+0.6926281990469569
 
  F REGRESSION 
 [21.95727057 58.7614057  11.05635408]
 [4.94055374e-05 9.76438225e-09 2.22594192e-03]
 
  MUTUAL INFORMATION REGRESSION 
-[1.         0.88990994 0.6426774 ]
+[1.         0.88990994 0.64861274]
 
  BEST ESTIMATOR 
-MultiTaskElasticNetCV(alphas=None, copy_X=True, cv=10, eps=0.001,
-                      fit_intercept=True,
-                      l1_ratio=[0.1, 0.3, 0.5, 0.6, 0.7, 0.8, 0.85, 0.87, 0.9,
-                                0.93, 0.95, 0.97, 0.99],
-                      max_iter=1000, n_alphas=100, n_jobs=-1, normalize=False,
-                      random_state=None, selection='cyclic', tol=0.0001,
-                      verbose=0)
+GridSearchCV(cv=10, error_score='raise-deprecating',
+             estimator=SVR(C=1.0, cache_size=200, coef0=0.0, degree=3,
+                           epsilon=0.1, gamma='auto_deprecated', kernel='rbf',
+                           max_iter=-1, shrinking=True, tol=0.001,
+                           verbose=False),
+             iid='warn', n_jobs=-1,
+             param_grid={'C': [1, 0.95, 0.9, 0.8],
+                         'epsilon': [0.1, 0.05, 0.15, 0.2, 0.5],
+                         'kernel': ['linear', 'poly', 'rbf', 'sigmoid']},
+             pre_dispatch='2*n_jobs', refit=True, return_train_score=False,
+             scoring=None, verbose=0)
 
 log(1 + x)? 
 True
 ########################################################
 
 "########################################################
-########################################################
-TEMPERATUREmonth
+PRECIPITATION
+month
 1
 
 
@@ -705,28 +808,33 @@ TEMPERATUREmonth
 ['CooY', 'CooZ']
 
  BEST SCORE adjusted R squared 
-0.6205690584461758
+0.7735370735315508
 
  BEST SCORE R squared 
-0.6289388586275102
+0.7785325792624724
 
  F REGRESSION 
 [  0.39436019 144.10627778 128.50296332]
 [5.31077240e-01 4.83806776e-23 2.41625766e-21]
 
  MUTUAL INFORMATION REGRESSION 
-[0.65665491 0.5408419  1.        ]
+[0.65260295 0.53905261 1.        ]
 
  BEST ESTIMATOR 
-LarsCV(copy_X=True, cv=10, eps=2.220446049250313e-16, fit_intercept=True,
-       max_iter=500, max_n_alphas=1000, n_jobs=-1, normalize=True,
-       positive=False, precompute='auto', verbose=False)
+GridSearchCV(cv=10, error_score='raise-deprecating',
+             estimator=NuSVR(C=1.0, cache_size=200, coef0=0.0, degree=3,
+                             gamma='auto_deprecated', kernel='rbf', max_iter=-1,
+                             nu=0.5, shrinking=True, tol=0.001, verbose=False),
+             iid='warn', n_jobs=-1,
+             param_grid={'kernel': ['linear', 'poly', 'rbf', 'sigmoid']},
+             pre_dispatch='2*n_jobs', refit=True, return_train_score=False,
+             scoring=None, verbose=0)
 
 log(1 + x)? 
-True
+False
 ########################################################
-########################################################
-TEMPERATUREmonth
+PRECIPITATION
+month
 2
 
 
@@ -734,32 +842,32 @@ TEMPERATUREmonth
 ['CooY', 'CooZ']
 
  BEST SCORE adjusted R squared 
-0.4440399257256983
+0.4934698289638416
 
  BEST SCORE R squared 
-0.45639459404290494
+0.5047260549868674
 
  F REGRESSION 
 [ 2.87324827 53.17084755 86.73091875]
 [9.23854898e-02 2.39447897e-11 3.25692732e-16]
 
  MUTUAL INFORMATION REGRESSION 
-[0.84605461 0.41884999 1.        ]
+[0.84768869 0.42177074 1.        ]
 
  BEST ESTIMATOR 
-MultiTaskElasticNetCV(alphas=None, copy_X=True, cv=10, eps=0.001,
-                      fit_intercept=True,
-                      l1_ratio=[0.1, 0.3, 0.5, 0.6, 0.7, 0.8, 0.85, 0.87, 0.9,
-                                0.93, 0.95, 0.97, 0.99],
-                      max_iter=1000, n_alphas=100, n_jobs=-1, normalize=False,
-                      random_state=None, selection='cyclic', tol=0.0001,
-                      verbose=0)
+MLPRegressor(activation='tanh', alpha=0.0003, batch_size='auto', beta_1=0.9,
+             beta_2=0.999, early_stopping=False, epsilon=1e-08,
+             hidden_layer_sizes=(75, 75), learning_rate='adaptive',
+             learning_rate_init=0.001, max_iter=200, momentum=0.9,
+             n_iter_no_change=5, nesterovs_momentum=True, power_t=0.5,
+             random_state=None, shuffle=True, solver='lbfgs', tol=0.0001,
+             validation_fraction=0.1, verbose=False, warm_start=False)
 
 log(1 + x)? 
-True
+False
 ########################################################
-########################################################
-TEMPERATUREmonth
+PRECIPITATION
+month
 3
 
 
@@ -767,28 +875,32 @@ TEMPERATUREmonth
 ['CooY', 'CooZ']
 
  BEST SCORE adjusted R squared 
-0.5528967457904266
+0.731573181624448
 
  BEST SCORE R squared 
-0.5627593175744613
+0.7374943614415557
 
  F REGRESSION 
 [  1.49610128 123.65005773  95.3553457 ]
 [2.23403049e-01 8.55583914e-21 2.28433978e-17]
 
  MUTUAL INFORMATION REGRESSION 
-[0.49585701 0.60043679 1.        ]
+[0.48965813 0.60832552 1.        ]
 
  BEST ESTIMATOR 
-LarsCV(copy_X=True, cv=10, eps=2.220446049250313e-16, fit_intercept=True,
-       max_iter=500, max_n_alphas=1000, n_jobs=-1, normalize=True,
-       positive=False, precompute='auto', verbose=False)
+MLPRegressor(activation='relu', alpha=0.0005, batch_size='auto', beta_1=0.9,
+             beta_2=0.999, early_stopping=False, epsilon=1e-08,
+             hidden_layer_sizes=(50, 50, 50, 50), learning_rate='adaptive',
+             learning_rate_init=0.001, max_iter=50, momentum=0.9,
+             n_iter_no_change=10, nesterovs_momentum=True, power_t=0.5,
+             random_state=None, shuffle=True, solver='lbfgs', tol=0.0001,
+             validation_fraction=0.1, verbose=False, warm_start=False)
 
 log(1 + x)? 
-True
+False
 ########################################################
-########################################################
-TEMPERATUREmonth
+PRECIPITATION
+month
 4
 
 
@@ -796,28 +908,33 @@ TEMPERATUREmonth
 ['CooY', 'CooZ']
 
  BEST SCORE adjusted R squared 
-0.3511342835546577
+0.5062978032699674
 
  BEST SCORE R squared 
-0.3657703523466579
+0.5174339430458328
 
  F REGRESSION 
 [ 0.85518851 56.66113747 51.40573897]
 [3.56776166e-01 7.20468539e-12 4.80502314e-11]
 
  MUTUAL INFORMATION REGRESSION 
-[0.86201514 0.50814293 1.        ]
+[0.84286416 0.48575645 1.        ]
 
  BEST ESTIMATOR 
-LarsCV(copy_X=True, cv=10, eps=2.220446049250313e-16, fit_intercept=True,
-       max_iter=500, max_n_alphas=1000, n_jobs=-1, normalize=True,
-       positive=False, precompute='auto', verbose=False)
+GridSearchCV(cv=10, error_score='raise-deprecating',
+             estimator=NuSVR(C=1.0, cache_size=200, coef0=0.0, degree=3,
+                             gamma='auto_deprecated', kernel='rbf', max_iter=-1,
+                             nu=0.5, shrinking=True, tol=0.001, verbose=False),
+             iid='warn', n_jobs=-1,
+             param_grid={'kernel': ['linear', 'poly', 'rbf', 'sigmoid']},
+             pre_dispatch='2*n_jobs', refit=True, return_train_score=False,
+             scoring=None, verbose=0)
 
 log(1 + x)? 
-True
+False
 ########################################################
-########################################################
-TEMPERATUREmonth
+PRECIPITATION
+month
 5
 
 
@@ -825,32 +942,33 @@ TEMPERATUREmonth
 ['CooX', 'CooZ']
 
  BEST SCORE adjusted R squared 
-0.09698355383773982
+0.12206153770728556
 
  BEST SCORE R squared 
-0.11735234585643739
+0.14186466091689576
 
  F REGRESSION 
 [ 7.34876986  1.98288848 13.37361419]
 [0.00760342 0.1614373  0.00036744]
 
  MUTUAL INFORMATION REGRESSION 
-[0.57494265 0.57260023 1.        ]
+[0.56840463 0.59328009 1.        ]
 
  BEST ESTIMATOR 
-MultiTaskElasticNetCV(alphas=None, copy_X=True, cv=10, eps=0.001,
-                      fit_intercept=True,
-                      l1_ratio=[0.1, 0.3, 0.5, 0.6, 0.7, 0.8, 0.85, 0.87, 0.9,
-                                0.93, 0.95, 0.97, 0.99],
-                      max_iter=1000, n_alphas=100, n_jobs=-1, normalize=False,
-                      random_state=None, selection='cyclic', tol=0.0001,
-                      verbose=0)
+GridSearchCV(cv=10, error_score='raise-deprecating',
+             estimator=NuSVR(C=1.0, cache_size=200, coef0=0.0, degree=3,
+                             gamma='auto_deprecated', kernel='rbf', max_iter=-1,
+                             nu=0.5, shrinking=True, tol=0.001, verbose=False),
+             iid='warn', n_jobs=-1,
+             param_grid={'kernel': ['linear', 'poly', 'rbf', 'sigmoid']},
+             pre_dispatch='2*n_jobs', refit=True, return_train_score=False,
+             scoring=None, verbose=0)
 
 log(1 + x)? 
 True
 ########################################################
-########################################################
-TEMPERATUREmonth
+PRECIPITATION
+month
 6
 
 
@@ -868,17 +986,17 @@ TEMPERATUREmonth
 [0.25749009 0.09555305 0.27052497]
 
  MUTUAL INFORMATION REGRESSION 
-[0.90460682 0.30475725 1.        ]
+[0.99821434 0.24612283 1.        ]
 
  BEST ESTIMATOR 
 OrthogonalMatchingPursuitCV(copy=True, cv=10, fit_intercept=True, max_iter=None,
                             n_jobs=-1, normalize=True, verbose=False)
 
 log(1 + x)? 
-True
+False
 ########################################################
-########################################################
-TEMPERATUREmonth
+PRECIPITATION
+month
 7
 
 
@@ -886,27 +1004,32 @@ TEMPERATUREmonth
 ['CooZ', 'CooY']
 
  BEST SCORE adjusted R squared 
-0.018130686734189383
+0.09565325412331194
 
  BEST SCORE R squared 
-0.04027811485296706
+0.1160520529024853
 
  F REGRESSION 
 [0.03257317 1.72315482 5.5398457 ]
 [0.85705225 0.19156518 0.02006416]
 
  MUTUAL INFORMATION REGRESSION 
-[1.         0.23731646 0.16874852]
+[1.         0.18594473 0.27155421]
 
  BEST ESTIMATOR 
-OrthogonalMatchingPursuitCV(copy=True, cv=10, fit_intercept=True, max_iter=None,
-                            n_jobs=-1, normalize=True, verbose=False)
+MLPRegressor(activation='relu', alpha=0.0005, batch_size='auto', beta_1=0.9,
+             beta_2=0.999, early_stopping=False, epsilon=1e-08,
+             hidden_layer_sizes=(50, 50, 50, 50), learning_rate='adaptive',
+             learning_rate_init=0.001, max_iter=200, momentum=0.9,
+             n_iter_no_change=10, nesterovs_momentum=True, power_t=0.5,
+             random_state=None, shuffle=True, solver='lbfgs', tol=0.0001,
+             validation_fraction=0.1, verbose=False, warm_start=False)
 
 log(1 + x)? 
-True
+False
 ########################################################
-########################################################
-TEMPERATUREmonth
+PRECIPITATION
+month
 8
 
 
@@ -914,27 +1037,33 @@ TEMPERATUREmonth
 ['CooZ', 'CooY']
 
  BEST SCORE adjusted R squared 
-0.02752430020874075
+0.06436779239071488
 
  BEST SCORE R squared 
-0.04962602065854205
+0.08563216074547131
 
  F REGRESSION 
 [1.11494738 1.70940545 6.84047422]
 [0.29295245 0.19335257 0.00995703]
 
  MUTUAL INFORMATION REGRESSION 
-[0.97149747 0.84809971 1.        ]
+[0.89124784 0.66079197 1.        ]
 
  BEST ESTIMATOR 
-OrthogonalMatchingPursuitCV(copy=True, cv=10, fit_intercept=True, max_iter=None,
-                            n_jobs=-1, normalize=True, verbose=False)
+GridSearchCV(cv=10, error_score='raise-deprecating',
+             estimator=NuSVR(C=1.0, cache_size=200, coef0=0.0, degree=3,
+                             gamma='auto_deprecated', kernel='rbf', max_iter=-1,
+                             nu=0.5, shrinking=True, tol=0.001, verbose=False),
+             iid='warn', n_jobs=-1,
+             param_grid={'kernel': ['linear', 'poly', 'rbf', 'sigmoid']},
+             pre_dispatch='2*n_jobs', refit=True, return_train_score=False,
+             scoring=None, verbose=0)
 
 log(1 + x)? 
-True
+False
 ########################################################
-########################################################
-TEMPERATUREmonth
+PRECIPITATION
+month
 9
 
 
@@ -952,7 +1081,7 @@ TEMPERATUREmonth
 [0.12565717 0.27398729 0.07999535]
 
  MUTUAL INFORMATION REGRESSION 
-[1.         0.         0.46444904]
+[1.         0.03814614 0.57360184]
 
  BEST ESTIMATOR 
 LarsCV(copy_X=True, cv=10, eps=2.220446049250313e-16, fit_intercept=True,
@@ -960,10 +1089,10 @@ LarsCV(copy_X=True, cv=10, eps=2.220446049250313e-16, fit_intercept=True,
        positive=False, precompute='auto', verbose=False)
 
 log(1 + x)? 
-True
+False
 ########################################################
-########################################################
-TEMPERATUREmonth
+PRECIPITATION
+month
 10
 
 
@@ -981,7 +1110,7 @@ TEMPERATUREmonth
 [0.50309429 0.01676767 0.0226153 ]
 
  MUTUAL INFORMATION REGRESSION 
-[0.99100859 0.96370587 1.        ]
+[1.         0.86887102 0.95635309]
 
  BEST ESTIMATOR 
 LarsCV(copy_X=True, cv=10, eps=2.220446049250313e-16, fit_intercept=True,
@@ -989,10 +1118,10 @@ LarsCV(copy_X=True, cv=10, eps=2.220446049250313e-16, fit_intercept=True,
        positive=False, precompute='auto', verbose=False)
 
 log(1 + x)? 
-True
+False
 ########################################################
-########################################################
-TEMPERATUREmonth
+PRECIPITATION
+month
 11
 
 
@@ -1000,32 +1129,32 @@ TEMPERATUREmonth
 ['CooY', 'CooZ']
 
  BEST SCORE adjusted R squared 
-0.20027487570868363
+0.43726999699779934
 
  BEST SCORE R squared 
-0.21831378828668324
+0.449963154960255
 
  F REGRESSION 
 [ 2.52104726 29.85260641 18.29740341]
 [1.14728469e-01 2.24160246e-07 3.60007833e-05]
 
  MUTUAL INFORMATION REGRESSION 
-[0.96923617 1.         0.60836022]
+[0.89579708 1.         0.69584992]
 
  BEST ESTIMATOR 
-MultiTaskElasticNetCV(alphas=None, copy_X=True, cv=10, eps=0.001,
-                      fit_intercept=True,
-                      l1_ratio=[0.1, 0.3, 0.5, 0.6, 0.7, 0.8, 0.85, 0.87, 0.9,
-                                0.93, 0.95, 0.97, 0.99],
-                      max_iter=1000, n_alphas=100, n_jobs=-1, normalize=False,
-                      random_state=None, selection='cyclic', tol=0.0001,
-                      verbose=0)
+MLPRegressor(activation='tanh', alpha=0.0005, batch_size='auto', beta_1=0.9,
+             beta_2=0.999, early_stopping=False, epsilon=1e-08,
+             hidden_layer_sizes=(50, 50, 50), learning_rate='adaptive',
+             learning_rate_init=0.001, max_iter=100, momentum=0.9,
+             n_iter_no_change=15, nesterovs_momentum=True, power_t=0.5,
+             random_state=None, shuffle=True, solver='lbfgs', tol=0.0001,
+             validation_fraction=0.1, verbose=False, warm_start=False)
 
 log(1 + x)? 
-True
+False
 ########################################################
-########################################################
-TEMPERATUREmonth
+PRECIPITATION
+month
 12
 
 
@@ -1033,29 +1162,29 @@ TEMPERATUREmonth
 ['CooY', 'CooZ']
 
  BEST SCORE adjusted R squared 
-0.3716583941975835
+0.58442763321436
 
  BEST SCORE R squared 
-0.3855188707961662
+0.5935946707169844
 
  F REGRESSION 
 [ 2.21040526 65.79054549 43.63993725]
 [1.39414462e-01 2.71854897e-13 8.34986288e-10]
 
  MUTUAL INFORMATION REGRESSION 
-[0.65074168 0.86664456 1.        ]
+[0.64748113 0.85957619 1.        ]
 
  BEST ESTIMATOR 
-MultiTaskElasticNetCV(alphas=None, copy_X=True, cv=10, eps=0.001,
-                      fit_intercept=True,
-                      l1_ratio=[0.1, 0.3, 0.5, 0.6, 0.7, 0.8, 0.85, 0.87, 0.9,
-                                0.93, 0.95, 0.97, 0.99],
-                      max_iter=1000, n_alphas=100, n_jobs=-1, normalize=False,
-                      random_state=None, selection='cyclic', tol=0.0001,
-                      verbose=0)
+MLPRegressor(activation='relu', alpha=0.0001, batch_size='auto', beta_1=0.9,
+             beta_2=0.999, early_stopping=False, epsilon=1e-08,
+             hidden_layer_sizes=(50, 50, 50, 50), learning_rate='adaptive',
+             learning_rate_init=0.001, max_iter=200, momentum=0.9,
+             n_iter_no_change=5, nesterovs_momentum=True, power_t=0.5,
+             random_state=None, shuffle=True, solver='lbfgs', tol=0.0001,
+             validation_fraction=0.1, verbose=False, warm_start=False)
 
 log(1 + x)? 
-True
+False
 ########################################################
 
 "########################################################
