@@ -87,7 +87,7 @@ def model_coup():
     #############################################################
     #making prediction for the isotope points
     iso_db1=month_grouped_list_with_zeros_iso_18
-    predictions_monthly_list, all_preds=iso_prediction(iso_db1,month_grouped_list_with_zeros_iso_2h,month_grouped_list_with_zeros_iso_3h,temp_bests,rain_bests,hum_bests,justsum=True)
+    predictions_monthly_list, all_preds=iso_prediction(iso_db1,month_grouped_list_with_zeros_iso_2h,month_grouped_list_with_zeros_iso_3h,temp_bests,rain_bests,hum_bests,iso_18,justsum=True)
     all_preds.to_excel(r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\output\predicted_results.xls")
     #############################################################
     #f_reg and mutual annual
@@ -95,9 +95,9 @@ def model_coup():
         {"inputs":["CooX","CooY","CooZ"],"outputs":["temp"]},
         {"inputs":["CooX","CooY","CooZ"],"outputs":["hum"]},
         {"inputs":["CooX","CooY","CooZ"],"outputs":["rain"]},
-        {"inputs":["CooX","CooY","CooZ","temp","rain","hum"],"outputs":["iso_2h"]},
-        {"inputs":["CooX","CooY","CooZ","temp","rain","hum"],"outputs":["iso_18"]},
-        {"inputs":["CooX","CooY","CooZ","temp","rain","hum"],"outputs":["iso_3h"]},
+        {"inputs":["CooX","CooY","CooZ","temp","rain","hum","real_distt_alt_n","real_distt_alt_s","real_distt_pac_s","real_distt_pac_n","percentage_alt_n","percentage_alt_s","percentage_pac_s","percentage_pac_n"],"outputs":["iso_2h"]},
+        {"inputs":["CooX","CooY","CooZ","temp","rain","hum","real_distt_alt_n","real_distt_alt_s","real_distt_pac_s","real_distt_pac_n","percentage_alt_n","percentage_alt_s","percentage_pac_s","percentage_pac_n"],"outputs":["iso_18"]},
+        {"inputs":["CooX","CooY","CooZ","temp","rain","hum","real_distt_alt_n","real_distt_alt_s","real_distt_pac_s","real_distt_pac_n","percentage_alt_n","percentage_alt_s","percentage_pac_s","percentage_pac_n"],"outputs":["iso_3h"]},
     ]
     file_name=r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\output\f_reg_mutual_output_annual.txt"
     f_reg_mutual(file_name,all_preds,list_of_dics)
@@ -112,9 +112,9 @@ def model_coup():
             {"inputs":["CooX","CooY","CooZ"],"outputs":["temp"]},
             {"inputs":["CooX","CooY","CooZ"],"outputs":["hum"]},
             {"inputs":["CooX","CooY","CooZ"],"outputs":["rain"]},
-            {"inputs":["CooX","CooY","CooZ","temp","rain","hum"],"outputs":["iso_2h"]},
-            {"inputs":["CooX","CooY","CooZ","temp","rain","hum"],"outputs":["iso_18"]},
-            {"inputs":["CooX","CooY","CooZ","temp","rain","hum"],"outputs":["iso_3h"]},
+            {"inputs":["CooX","CooY","CooZ","temp","rain","hum","real_distt_alt_n","real_distt_alt_s","real_distt_pac_s","real_distt_pac_n","percentage_alt_n","percentage_alt_s","percentage_pac_s","percentage_pac_n"],"outputs":["iso_2h"]},
+            {"inputs":["CooX","CooY","CooZ","temp","rain","hum","real_distt_alt_n","real_distt_alt_s","real_distt_pac_s","real_distt_pac_n","percentage_alt_n","percentage_alt_s","percentage_pac_s","percentage_pac_n"],"outputs":["iso_18"]},
+            {"inputs":["CooX","CooY","CooZ","temp","rain","hum","real_distt_alt_n","real_distt_alt_s","real_distt_pac_s","real_distt_pac_n","percentage_alt_n","percentage_alt_s","percentage_pac_s","percentage_pac_n"],"outputs":["iso_3h"]},
         ]
         file_name="C:\\Users\\Ash kan\\Documents\\meteo_iso_model\\meteo_iso_model_input_code_and_results\\output\\monthly_f_test\\"+"month_"+str(mn)+"_f_reg_mutual_output_mensual.txt"
         f_reg_mutual(file_name,all_preds_temp,list_of_dics)
@@ -141,10 +141,10 @@ def model_coup():
     gridsearch_dictionary={"activation" : ["identity", "logistic", "tanh", "relu"],"solver" : ["lbfgs", "sgd", "adam"],"alpha":[0.0001,0.0003,0.0005,0.001,0.005],"hidden_layer_sizes":[(10,)*2,(25,)*2 ,(50,)*2,(75,)*2,(50,)*3,(50,)*4,(100,)*2,(100,)*3,(100,)*4],"max_iter":[25,50,100,150,200,300],"n_iter_no_change":[5,10,15,20]}
     ####################################
     temp_rain_hum="iso_18"
-    Y_preds_iso18,X_temp_fin_iso18 ,Y_temp_fin_iso18,X_train_iso_18_normal_with_zeros, X_test_iso_18_normal_with_zeros, y_train_iso_18_normal_with_zeros, y_test_iso_18_normal_with_zeros,best_estimator_all_iso18,best_score_all_iso18,mutual_info_regression_value_iso18,f_regression_value_iso18,x_scaler_iso18,y_scaler_iso18,didlog_iso18,used_features_iso18,rsquared_iso18=rfmethod(tunedpars,gridsearch_dictionary,all_preds,temp_rain_hum,monthnum,"iso_18", meteo_or_iso="iso",inputs=["CooX","CooY","CooZ","temp","rain","hum"])
+    Y_preds_iso18,X_temp_fin_iso18 ,Y_temp_fin_iso18,X_train_iso_18_normal_with_zeros, X_test_iso_18_normal_with_zeros, y_train_iso_18_normal_with_zeros, y_test_iso_18_normal_with_zeros,best_estimator_all_iso18,best_score_all_iso18,mutual_info_regression_value_iso18,f_regression_value_iso18,x_scaler_iso18,y_scaler_iso18,didlog_iso18,used_features_iso18,rsquared_iso18=rfmethod(tunedpars,gridsearch_dictionary,all_preds,temp_rain_hum,monthnum,"iso_18", meteo_or_iso="iso",inputs=["CooX","CooY","CooZ","temp","rain","hum","real_distt_alt_n","real_distt_alt_s","real_distt_pac_s","real_distt_pac_n","percentage_alt_n","percentage_alt_s","percentage_pac_s","percentage_pac_n"])
     ####################################
     temp_rain_hum="iso_2h"
-    Y_preds_iso2h,X_temp_fin_iso2h ,Y_temp_fin_iso2h,X_train_iso_2h_normal_with_zeros, X_test_iso_2h_normal_with_zeros, y_train_iso_2h_normal_with_zeros, y_test_iso_2h_normal_with_zeros,best_estimator_all_iso2h,best_score_all_iso2h,mutual_info_regression_value_iso2h,f_regression_value_iso2h,x_scaler_iso2h,y_scaler_iso2h,didlog_iso2h,used_features_iso2h,rsquared_iso2h=rfmethod(tunedpars,gridsearch_dictionary,all_preds,temp_rain_hum,monthnum,"iso_2h", meteo_or_iso="iso",inputs=["CooX","CooY","CooZ","temp","rain","hum"])
+    Y_preds_iso2h,X_temp_fin_iso2h ,Y_temp_fin_iso2h,X_train_iso_2h_normal_with_zeros, X_test_iso_2h_normal_with_zeros, y_train_iso_2h_normal_with_zeros, y_test_iso_2h_normal_with_zeros,best_estimator_all_iso2h,best_score_all_iso2h,mutual_info_regression_value_iso2h,f_regression_value_iso2h,x_scaler_iso2h,y_scaler_iso2h,didlog_iso2h,used_features_iso2h,rsquared_iso2h=rfmethod(tunedpars,gridsearch_dictionary,all_preds,temp_rain_hum,monthnum,"iso_2h", meteo_or_iso="iso",inputs=["CooX","CooY","CooZ","temp","rain","hum","real_distt_alt_n","real_distt_alt_s","real_distt_pac_s","real_distt_pac_n","percentage_alt_n","percentage_alt_s","percentage_pac_s","percentage_pac_n"])
     #############################################################
     #read points for contour
     data_file = r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\inputs\x_y_z.xls"
@@ -158,6 +158,7 @@ def model_coup():
     #regional_mensual_plot
     #regional_mensual_plot(x_y_z_,monthly_iso18_output,monthly_iso2h_output)
     ############################################################
+    #new_data_prediction_comparison
     data_fl=r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\inputs\new_measured.xlsx"
     newd=pd.read_excel(data_fl,sheet_name=0,header=0,index_col=False,keep_default_na=True)
     new_data_prediction=new_data_prediction_comparison(newd,no_needed_month,temp_bests,rain_bests,hum_bests,didlog_iso18,didlog_iso2h,x_scaler_iso18,x_scaler_iso2h,used_features_iso18,used_features_iso2h,best_estimator_all_iso18,best_estimator_all_iso2h,y_scaler_iso18,y_scaler_iso2h)

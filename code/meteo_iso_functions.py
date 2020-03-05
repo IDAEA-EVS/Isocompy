@@ -17,22 +17,22 @@ from sklearn.linear_model import LinearRegression,ElasticNetCV,MultiTaskElasticN
 from sklearn.inspection import plot_partial_dependence
 from sklearn.svm import SVR,NuSVR
 from sklearn.linear_model import LinearRegression
+from pysplit_funcs_for_meteo_model import convertCoords,gen_trajs
 
-'''
 def warn(*args, **kwargs):
     pass
 import warnings
 
-warnings.warn = warn'''
+warnings.warn = warn
 
 
 ###########################################
 ###################################################################
-def iso_prediction(iso_db1,month_grouped_list_with_zeros_iso_2h,month_grouped_list_with_zeros_iso_3h,temp_bests,rain_bests,hum_bests,justsum=True):
+def iso_prediction(iso_db1,month_grouped_list_with_zeros_iso_2h,month_grouped_list_with_zeros_iso_3h,temp_bests,rain_bests,hum_bests,iso_18,justsum=True):
     
     predictions_monthly_list=list()
     for month_num in range(0,len(iso_db1)):
-        if (month_num not in [4,5,6,7,8,9] and justsum ==True) or justsum==False:
+        if (month_num not in [3,4,5,6,7,8,9,11] and justsum ==True) or justsum==False:
             bests_of_all_preds=list()
             col_names=["temp","rain","hum"]
             for bests_of_all, names in zip([temp_bests,rain_bests,hum_bests],col_names):
@@ -61,7 +61,18 @@ def iso_prediction(iso_db1,month_grouped_list_with_zeros_iso_2h,month_grouped_li
             rain_pred=bests_of_all_preds[1]
             hum_pred=bests_of_all_preds[2]
             ###################################################################
-            preds=pd.concat([iso_db1[month_num][["CooX","CooY","CooZ","ID_MeteoPoint","iso_18"]],month_grouped_list_with_zeros_iso_2h[month_num][["iso_2h"]],month_grouped_list_with_zeros_iso_3h[month_num][["iso_3h"]],temp_pred,rain_pred,hum_pred],axis=1,ignore_index =False)
+            ######################
+            #### 2/19/2020: Ash
+            #here, the new coordination system have to be added from excel or calculated
+            xy_df_for_hysplit=iso_db1[month_num][["CooX","CooY","ID_MeteoPoint"]]
+            xy_df_for_hysplit = iso_db1[month_num].join(xy_df_for_hysplit.apply(convertCoords,axis=1)) 
+            ######################   
+            #to pysplit trajectories:
+            all_hysplit_df=gen_trajs(iso_18,xy_df_for_hysplit,month_num+1)
+            #print ("############all_hysplit_df##########")
+            #print (all_hysplit_df)
+            ###################################################    
+            preds=pd.concat([iso_db1[month_num][["CooX","CooY","CooZ","ID_MeteoPoint","iso_18"]],month_grouped_list_with_zeros_iso_2h[month_num][["iso_2h"]],month_grouped_list_with_zeros_iso_3h[month_num][["iso_3h"]],temp_pred,rain_pred,hum_pred,all_hysplit_df[["real_distt_alt_n","real_distt_alt_s","real_distt_pac_s","real_distt_pac_n","percentage_alt_n","percentage_alt_s","percentage_pac_s","percentage_pac_n"]]],axis=1,ignore_index =False)
             preds["month"]=month_num+1
             predictions_monthly_list.append([preds])
             
@@ -130,7 +141,7 @@ def grouping_data(rain,which_value,elnino,lanina,month=None,zeross=True,iso=Fals
 
             if  sum_elnino !=None:       
                 Mean_Value_elnino=sum_elnino/cnt_elnino
-                newmat_elnino.append({"ID_MeteoPoint":row['ID_MeteoPoint'], "CooX":tempp["CooX"].iat[0], "CooY":tempp["CooY"].iat[0], "CooZ":tempp["CooZ"].iat[0], which_value:Mean_Value_elnino})
+                newmat_elnino.append({"ID_MeteoPoint":row['ID_MeteoPoint'], "CooX":tempp["CooX"].iat[0], "CooY":tempp["CooY"].iat[0], "CooZ":tempp["CooZ"].iat[0], "Date":tempp["DateMeas"], which_value:Mean_Value_elnino})
             if sum_lanina !=None:
                 Mean_Value_lanina=sum_lanina/cnt_lanina
                 newmat_lanina.append({"ID_MeteoPoint":row['ID_MeteoPoint'], "CooX":tempp["CooX"].iat[0], "CooY":tempp["CooY"].iat[0], "CooZ":tempp["CooZ"].iat[0], which_value:Mean_Value_lanina})
@@ -213,8 +224,10 @@ def rfmethod(tunedpars,gridsearch_dictionary,newmatdf_temp,temp_rain_hum,monthnu
     #print (X_temp)
     #print (Y_temp)
     ########################################################################
-    #best_score_all=-10
-    #rsquared=-10
+    '''best_score_all=-10
+    rsquared=-10
+    elastic=False
+    didlog=False'''
     #RandomForestRegressor
     estrandomfor_temp=GridSearchCV(RandomForestRegressor(random_state =0), tunedpars, cv=10,n_jobs=-1)
     estrandomfor_temp.fit(X_temp, Y_temp)
@@ -318,6 +331,7 @@ def rfmethod(tunedpars,gridsearch_dictionary,newmatdf_temp,temp_rain_hum,monthnu
     ####################################################################    
     print ("Best score total adj r square:")
     print (best_score_all)
+    print ("sample size,num of variables:\n",sam_size,num_var)
     print ("Best score total r square:")
     print (rsquared)
     print ("Best estimator total:")
@@ -344,8 +358,8 @@ def rfmethod(tunedpars,gridsearch_dictionary,newmatdf_temp,temp_rain_hum,monthnu
         Y_preds=Y_preds_output.copy()
     #general standard
     Y_preds=y_scaler.inverse_transform( Y_preds.reshape(-1, 1) )
-
-    Y_preds=pd.DataFrame(Y_preds,columns=[[model_type+"_"+str(monthnum)]])
+    clnm=model_type+"_"+str(monthnum)
+    Y_preds=pd.DataFrame(Y_preds,columns=[clnm])
     plt.scatter(Y_preds_output,Y_temp_fin)
     plt.title(pltttl)
     plt.xlabel("Prediction")
@@ -463,9 +477,11 @@ def monthly_uniting(which_value,datab,iso=False):
     month_grouped_list_without_zeros=list()
     for month in range(1,13):
         rain_cop=datab.copy()
+        #with zeros
         newmatdf_rain_elnino,newmatdf_rain_lanina,newmatdf_rain_all2=grouping_data(rain_cop,which_value,elnino,lanina,iso=iso,month=month,zeross=True)
         month_grouped_list_with_zeros.append(newmatdf_rain_all2)
         rain_cop=datab.copy()
+        #without zeros
         newmatdf_rain_elnino,newmatdf_rain_lanina,newmatdf_rain_all=grouping_data(rain_cop,which_value,elnino,lanina,iso=iso,month=month,zeross=False)
         month_grouped_list_without_zeros.append(newmatdf_rain_all)
     return    month_grouped_list_with_zeros,month_grouped_list_without_zeros
@@ -474,7 +490,7 @@ def monthly_uniting(which_value,datab,iso=False):
 def importing_preprocess():
     #######################
     #importing data
-    data_file = r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\inputs\METEO_CHILE_2.xlsx"
+    data_file = r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\inputs\Meteorological_Data_25_02_UTM.xlsx"
     rain = pd.read_excel(data_file,sheet_name="METEO_CHILE_Rain_All",header=0,index_col=False,keep_default_na=True)
     temper=pd.read_excel(data_file,sheet_name="METEO_CHILE_Temp",header=0,index_col=False,keep_default_na=True)
     hum=pd.read_excel(data_file,sheet_name="METEO_CHILE_HR",header=0,index_col=False,keep_default_na=True)
@@ -510,7 +526,7 @@ def importing_preprocess():
     ############################################################
     ############################################################
     #isotope file preprocess
-    data_file_iso = r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\inputs\Rain_Snow_01_08_2019.xlsx"
+    data_file_iso = r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\inputs\test_iso_pysplit_04_03_2020.xlsx"
     iso_18 = pd.read_excel(data_file_iso,sheet_name="ISOT18O",header=0,index_col=False,keep_default_na=True)
     iso_2h=pd.read_excel(data_file_iso,sheet_name="ISOT2H",header=0,index_col=False,keep_default_na=True)
     iso_3h=pd.read_excel(data_file_iso,sheet_name="ISOT3",header=0,index_col=False,keep_default_na=True)
@@ -577,6 +593,8 @@ def f_reg_mutual(file_name,all_preds,list_of_dics):
     m_out_f=open(file_name,'w')
     for sets in list_of_dics:
         st_exist=False
+        print ("all_preds[sets[inputs]:", all_preds[sets["inputs"]])
+        print ("all_preds[sets[outputs]]:",all_preds[sets["outputs"]])
         mutual_info = mutual_info_regression(all_preds[sets["inputs"]],all_preds[sets["outputs"]])
         try:
             maxx=np.max(mutual_info)
