@@ -27,67 +27,73 @@ import warnings
 
 warnings.warn = warn
 
-def model_coup():
+def model_coup(rerun_meteo=False):
 
-        
-    ############################################################
-    t_total_start=time.time()
-    #read files and some pre processing
-    month_grouped_list_with_zeros_iso_18,month_grouped_list_without_zeros_iso_18,month_grouped_list_with_zeros_iso_2h,month_grouped_list_without_zeros_iso_2h,month_grouped_list_with_zeros_iso_3h,month_grouped_list_without_zeros_iso_3h,month_grouped_list_with_zeros_hum,month_grouped_list_without_zeros_hum,month_grouped_list_with_zeros_rain,month_grouped_list_without_zeros_rain,month_grouped_list_with_zeros_temp,month_grouped_list_without_zeros_temp,rain,temper,elnino,lanina,iso_18,iso_2h,iso_3h=importing_preprocess()
-    ############################################################
-    #METEO MODELS!
+    if rerun_meteo==False:
+        dill.load_session(r"C:\\Users\\Ash kan\\Documents\\meteo_iso_model\\meteo_iso_model_input_code_and_results\\code\\internal_dill_dump.pkl")
+    else:        
+        ############################################################
+        t_total_start=time.time()
+        #read files and some pre processing
+        month_grouped_list_with_zeros_iso_18,month_grouped_list_without_zeros_iso_18,month_grouped_list_with_zeros_iso_2h,month_grouped_list_without_zeros_iso_2h,month_grouped_list_with_zeros_iso_3h,month_grouped_list_without_zeros_iso_3h,month_grouped_list_with_zeros_hum,month_grouped_list_without_zeros_hum,month_grouped_list_with_zeros_rain,month_grouped_list_without_zeros_rain,month_grouped_list_with_zeros_temp,month_grouped_list_without_zeros_temp,rain,temper,elnino,lanina,iso_18,iso_2h,iso_3h=importing_preprocess()
+        ############################################################
+        #METEO MODELS!
 
-    #RAIN normal for 12 month
-    rain_bests=list()
-    rain_preds_real=list()
-    for monthnum in range(1,13):
-        print ("########################################################")
-        print ("##RAIN NORMAL month: ", str(monthnum))
-        print ("########################################################")
-        temp_rain_hum="Mean_Value_rain"
-        #print ("########WITH ZEROS#####")
-        tunedpars={"min_weight_fraction_leaf":[0,0.02,0.04],"n_estimators":[50,100,150,200,250,300],"criterion": ["mse","mae"],"min_samples_split":[2,5] }
-        gridsearch_dictionary={"activation" : ["identity", "logistic", "tanh", "relu"],"solver" : ["lbfgs", "sgd", "adam"],"alpha":[0.0001,0.0003,0.0005],"hidden_layer_sizes":[(10,)*2,(25,)*2 ,(50,)*2,(75,)*2,(50,)*3,(50,)*4],"max_iter":[50,100,200],"n_iter_no_change":[5,10,15]}
-        Y_preds,X_temp_fin ,Y_temp_fin,X_train_rain_normal_with_zeros, X_test_rain_normal_with_zeros, y_train_rain_normal_with_zeros, y_test_rain_normal_with_zeros,best_estimator_all,best_score_all,mutual_info_regression_value,f_regression_value,x_scaler,y_scaler,didlog,used_features,rsquared=rfmethod(tunedpars,gridsearch_dictionary,month_grouped_list_with_zeros_rain[monthnum-1],temp_rain_hum,monthnum,"rain",meteo_or_iso="meteo")
-        rain_bests.append([best_estimator_all,best_score_all,mutual_info_regression_value,f_regression_value,used_features,rsquared,x_scaler,y_scaler,didlog])
-        rain_preds_real.append([Y_preds,Y_temp_fin])
-    ###########################################
-    #TEMP
-    temp_bests=list()
-    temp_preds_real=list()
-    for monthnum in range(1,13):
+        #RAIN normal for 12 month
+        rain_bests=list()
+        rain_preds_real=list()
+        for monthnum in range(1,13):
+            print ("########################################################")
+            print ("##RAIN NORMAL month: ", str(monthnum))
+            print ("########################################################")
+            temp_rain_hum="Mean_Value_rain"
+            #print ("########WITH ZEROS#####")
+            tunedpars={"min_weight_fraction_leaf":[0,0.02,0.04],"n_estimators":[50,100,150,200,250,300],"criterion": ["mse","mae"],"min_samples_split":[2,5] }
+            gridsearch_dictionary={"activation" : ["identity", "logistic", "tanh", "relu"],"solver" : ["lbfgs", "sgd", "adam"],"alpha":[0.0001,0.0003,0.0005],"hidden_layer_sizes":[(10,)*2,(25,)*2 ,(50,)*2,(75,)*2,(50,)*3,(50,)*4],"max_iter":[50,100,200],"n_iter_no_change":[5,10,15]}
+            Y_preds,X_temp_fin ,Y_temp_fin,X_train_rain_normal_with_zeros, X_test_rain_normal_with_zeros, y_train_rain_normal_with_zeros, y_test_rain_normal_with_zeros,best_estimator_all,best_score_all,mutual_info_regression_value,f_regression_value,x_scaler,y_scaler,didlog,used_features,rsquared=rfmethod(tunedpars,gridsearch_dictionary,month_grouped_list_with_zeros_rain[monthnum-1],temp_rain_hum,monthnum,"rain",meteo_or_iso="meteo")
+            rain_bests.append([best_estimator_all,best_score_all,mutual_info_regression_value,f_regression_value,used_features,rsquared,x_scaler,y_scaler,didlog])
+            rain_preds_real.append([Y_preds,Y_temp_fin])
+        ###########################################
+        #TEMP
+        temp_bests=list()
+        temp_preds_real=list()
+        for monthnum in range(1,13):
 
-        print ("########################################################")
-        print ("##TEMP NORMAL month: ", str(monthnum))
-        print ("########################################################")
-        temp_rain_hum="Mean_Value_temp"
-        tunedpars={"min_weight_fraction_leaf":[0,0.02,0.04],"n_estimators":[50,100,150,200,250,300],"criterion": ["mse","mae"],"min_samples_split":[2,5] }
-        gridsearch_dictionary={"activation" : ["identity", "logistic", "tanh", "relu"],"solver" : ["lbfgs", "sgd", "adam"],"alpha":[0.0001,0.0003,0.0005],"hidden_layer_sizes":[(10,)*2,(25,)*2 ,(50,)*2,(75,)*2,(50,)*3,(50,)*4],"max_iter":[50,100,200],"n_iter_no_change":[5,10,15]}
-        Y_preds,X_temp_fin ,Y_temp_fin,X_train_temp_normal_with_zeros, X_test_temp_normal_with_zeros, y_train_temp_normal_with_zeros, y_test_temp_normal_with_zeros,best_estimator_all,best_score_all,mutual_info_regression_value,f_regression_value,x_scaler,y_scaler,didlog,used_features,rsquared=rfmethod(tunedpars,gridsearch_dictionary,month_grouped_list_with_zeros_temp[monthnum-1],temp_rain_hum,monthnum,"temp",meteo_or_iso="meteo")
-        temp_bests.append([best_estimator_all,best_score_all,mutual_info_regression_value,f_regression_value,used_features,rsquared,x_scaler,y_scaler,didlog])
-        temp_preds_real.append([Y_preds,Y_temp_fin])
-    ##########################################
-    #Humidity
-    hum_bests=list()
-    hum_preds_real=list()
-    for monthnum in range(1,13):
-        print ("########################################################")
-        print ("##HUMIDITY NORMAL month: ", str(monthnum))
-        print ("########################################################")
-        temp_rain_hum="Mean_Value_hum"
-        tunedpars={"min_weight_fraction_leaf":[0,0.02,0.04],"n_estimators":[50,100,150,200,250,300],"criterion": ["mse","mae"],"min_samples_split":[2,5] }
-        gridsearch_dictionary={"activation" : ["identity", "logistic", "tanh", "relu"],"solver" : ["lbfgs", "sgd", "adam"],"alpha":[0.0001,0.0003,0.0005],"hidden_layer_sizes":[(10,)*2,(25,)*2 ,(50,)*2,(75,)*2,(50,)*3,(50,)*4],"max_iter":[50,100,200],"n_iter_no_change":[5,10,15]}
-        Y_preds,X_temp_fin ,Y_temp_fin,X_train_hum_normal_with_zeros, X_test_hum_normal_with_zeros, y_train_hum_normal_with_zeros, y_test_hum_normal_with_zeros,best_estimator_all,best_score_all,mutual_info_regression_value,f_regression_value,x_scaler,y_scaler,didlog,used_features,rsquared=rfmethod(tunedpars,gridsearch_dictionary,month_grouped_list_with_zeros_hum[monthnum-1],temp_rain_hum,monthnum,"humid",meteo_or_iso="meteo")
-        hum_bests.append([best_estimator_all,best_score_all,mutual_info_regression_value,f_regression_value,used_features,rsquared,x_scaler,y_scaler,didlog])
-        hum_preds_real.append([Y_preds,Y_temp_fin])
-    #############################################################
-    # write outputs to a file 
-    file_name=r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\output\models_output.txt"
-    print_to_file(file_name, temp_bests, rain_bests, hum_bests)
-    #############################################################
+            print ("########################################################")
+            print ("##TEMP NORMAL month: ", str(monthnum))
+            print ("########################################################")
+            temp_rain_hum="Mean_Value_temp"
+            tunedpars={"min_weight_fraction_leaf":[0,0.02,0.04],"n_estimators":[50,100,150,200,250,300],"criterion": ["mse","mae"],"min_samples_split":[2,5] }
+            gridsearch_dictionary={"activation" : ["identity", "logistic", "tanh", "relu"],"solver" : ["lbfgs", "sgd", "adam"],"alpha":[0.0001,0.0003,0.0005],"hidden_layer_sizes":[(10,)*2,(25,)*2 ,(50,)*2,(75,)*2,(50,)*3,(50,)*4],"max_iter":[50,100,200],"n_iter_no_change":[5,10,15]}
+            Y_preds,X_temp_fin ,Y_temp_fin,X_train_temp_normal_with_zeros, X_test_temp_normal_with_zeros, y_train_temp_normal_with_zeros, y_test_temp_normal_with_zeros,best_estimator_all,best_score_all,mutual_info_regression_value,f_regression_value,x_scaler,y_scaler,didlog,used_features,rsquared=rfmethod(tunedpars,gridsearch_dictionary,month_grouped_list_with_zeros_temp[monthnum-1],temp_rain_hum,monthnum,"temp",meteo_or_iso="meteo")
+            temp_bests.append([best_estimator_all,best_score_all,mutual_info_regression_value,f_regression_value,used_features,rsquared,x_scaler,y_scaler,didlog])
+            temp_preds_real.append([Y_preds,Y_temp_fin])
+        ##########################################
+        #Humidity
+        hum_bests=list()
+        hum_preds_real=list()
+        for monthnum in range(1,13):
+            print ("########################################################")
+            print ("##HUMIDITY NORMAL month: ", str(monthnum))
+            print ("########################################################")
+            temp_rain_hum="Mean_Value_hum"
+            tunedpars={"min_weight_fraction_leaf":[0,0.02,0.04],"n_estimators":[50,100,150,200,250,300],"criterion": ["mse","mae"],"min_samples_split":[2,5] }
+            gridsearch_dictionary={"activation" : ["identity", "logistic", "tanh", "relu"],"solver" : ["lbfgs", "sgd", "adam"],"alpha":[0.0001,0.0003,0.0005],"hidden_layer_sizes":[(10,)*2,(25,)*2 ,(50,)*2,(75,)*2,(50,)*3,(50,)*4],"max_iter":[50,100,200],"n_iter_no_change":[5,10,15]}
+            Y_preds,X_temp_fin ,Y_temp_fin,X_train_hum_normal_with_zeros, X_test_hum_normal_with_zeros, y_train_hum_normal_with_zeros, y_test_hum_normal_with_zeros,best_estimator_all,best_score_all,mutual_info_regression_value,f_regression_value,x_scaler,y_scaler,didlog,used_features,rsquared=rfmethod(tunedpars,gridsearch_dictionary,month_grouped_list_with_zeros_hum[monthnum-1],temp_rain_hum,monthnum,"humid",meteo_or_iso="meteo")
+            hum_bests.append([best_estimator_all,best_score_all,mutual_info_regression_value,f_regression_value,used_features,rsquared,x_scaler,y_scaler,didlog])
+            hum_preds_real.append([Y_preds,Y_temp_fin])
+        #############################################################
+        # write outputs to a file 
+        file_name=r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\output\models_output_temp_rain_hum_12_month.txt"
+        print_to_file(file_name, temp_bests, rain_bests, hum_bests)
+        #############################################################
+        #add a dill dum session:
+        dill.dump_session(r"C:\\Users\\Ash kan\\Documents\\meteo_iso_model\\meteo_iso_model_input_code_and_results\\code\\internal_dill_dump.pkl")
+    
     #making prediction for the isotope points
     iso_db1=month_grouped_list_with_zeros_iso_18
-    predictions_monthly_list, all_preds=iso_prediction(iso_db1,month_grouped_list_with_zeros_iso_2h,month_grouped_list_with_zeros_iso_3h,temp_bests,rain_bests,hum_bests,iso_18,justsum=True)
+    justsum=True
+    predictions_monthly_list, all_preds,all_hysplit_df_list_all_atts,col_for_f_reg=iso_prediction(iso_db1,month_grouped_list_with_zeros_iso_2h,month_grouped_list_with_zeros_iso_3h,temp_bests,rain_bests,hum_bests,iso_18,justsum=justsum)
     all_preds.to_excel(r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\output\predicted_results.xls")
     #############################################################
     #f_reg and mutual annual
@@ -95,9 +101,9 @@ def model_coup():
         {"inputs":["CooX","CooY","CooZ"],"outputs":["temp"]},
         {"inputs":["CooX","CooY","CooZ"],"outputs":["hum"]},
         {"inputs":["CooX","CooY","CooZ"],"outputs":["rain"]},
-        {"inputs":["CooX","CooY","CooZ","temp","rain","hum","real_distt_alt_n","real_distt_alt_s","real_distt_pac_s","real_distt_pac_n","percentage_alt_n","percentage_alt_s","percentage_pac_s","percentage_pac_n"],"outputs":["iso_2h"]},
-        {"inputs":["CooX","CooY","CooZ","temp","rain","hum","real_distt_alt_n","real_distt_alt_s","real_distt_pac_s","real_distt_pac_n","percentage_alt_n","percentage_alt_s","percentage_pac_s","percentage_pac_n"],"outputs":["iso_18"]},
-        {"inputs":["CooX","CooY","CooZ","temp","rain","hum","real_distt_alt_n","real_distt_alt_s","real_distt_pac_s","real_distt_pac_n","percentage_alt_n","percentage_alt_s","percentage_pac_s","percentage_pac_n"],"outputs":["iso_3h"]},
+        {"inputs":["CooX","CooY","CooZ","temp","rain","hum"]+col_for_f_reg,"outputs":["iso_2h"]},
+        {"inputs":["CooX","CooY","CooZ","temp","rain","hum"]+col_for_f_reg,"outputs":["iso_18"]},
+        {"inputs":["CooX","CooY","CooZ","temp","rain","hum"]+col_for_f_reg,"outputs":["iso_3h"]},
     ]
     file_name=r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\output\f_reg_mutual_output_annual.txt"
     f_reg_mutual(file_name,all_preds,list_of_dics)
@@ -108,14 +114,14 @@ def model_coup():
     all_preds_month.drop_duplicates(keep = 'last', inplace = True)
     for mn in all_preds_month:
         all_preds_temp=all_preds[all_preds["month"]==mn]
-        list_of_dics=[
+        '''list_of_dics=[
             {"inputs":["CooX","CooY","CooZ"],"outputs":["temp"]},
             {"inputs":["CooX","CooY","CooZ"],"outputs":["hum"]},
             {"inputs":["CooX","CooY","CooZ"],"outputs":["rain"]},
             {"inputs":["CooX","CooY","CooZ","temp","rain","hum","real_distt_alt_n","real_distt_alt_s","real_distt_pac_s","real_distt_pac_n","percentage_alt_n","percentage_alt_s","percentage_pac_s","percentage_pac_n"],"outputs":["iso_2h"]},
             {"inputs":["CooX","CooY","CooZ","temp","rain","hum","real_distt_alt_n","real_distt_alt_s","real_distt_pac_s","real_distt_pac_n","percentage_alt_n","percentage_alt_s","percentage_pac_s","percentage_pac_n"],"outputs":["iso_18"]},
             {"inputs":["CooX","CooY","CooZ","temp","rain","hum","real_distt_alt_n","real_distt_alt_s","real_distt_pac_s","real_distt_pac_n","percentage_alt_n","percentage_alt_s","percentage_pac_s","percentage_pac_n"],"outputs":["iso_3h"]},
-        ]
+        ]'''
         file_name="C:\\Users\\Ash kan\\Documents\\meteo_iso_model\\meteo_iso_model_input_code_and_results\\output\\monthly_f_test\\"+"month_"+str(mn)+"_f_reg_mutual_output_mensual.txt"
         f_reg_mutual(file_name,all_preds_temp,list_of_dics)
     #############################################################
@@ -141,10 +147,17 @@ def model_coup():
     gridsearch_dictionary={"activation" : ["identity", "logistic", "tanh", "relu"],"solver" : ["lbfgs", "sgd", "adam"],"alpha":[0.0001,0.0003,0.0005,0.001,0.005],"hidden_layer_sizes":[(10,)*2,(25,)*2 ,(50,)*2,(75,)*2,(50,)*3,(50,)*4,(100,)*2,(100,)*3,(100,)*4],"max_iter":[25,50,100,150,200,300],"n_iter_no_change":[5,10,15,20]}
     ####################################
     temp_rain_hum="iso_18"
-    Y_preds_iso18,X_temp_fin_iso18 ,Y_temp_fin_iso18,X_train_iso_18_normal_with_zeros, X_test_iso_18_normal_with_zeros, y_train_iso_18_normal_with_zeros, y_test_iso_18_normal_with_zeros,best_estimator_all_iso18,best_score_all_iso18,mutual_info_regression_value_iso18,f_regression_value_iso18,x_scaler_iso18,y_scaler_iso18,didlog_iso18,used_features_iso18,rsquared_iso18=rfmethod(tunedpars,gridsearch_dictionary,all_preds,temp_rain_hum,monthnum,"iso_18", meteo_or_iso="iso",inputs=["CooX","CooY","CooZ","temp","rain","hum","real_distt_alt_n","real_distt_alt_s","real_distt_pac_s","real_distt_pac_n","percentage_alt_n","percentage_alt_s","percentage_pac_s","percentage_pac_n"])
+    Y_preds_iso18,X_temp_fin_iso18 ,Y_temp_fin_iso18,X_train_iso_18_normal_with_zeros, X_test_iso_18_normal_with_zeros, y_train_iso_18_normal_with_zeros, y_test_iso_18_normal_with_zeros,best_estimator_all_iso18,best_score_all_iso18,mutual_info_regression_value_iso18,f_regression_value_iso18,x_scaler_iso18,y_scaler_iso18,didlog_iso18,used_features_iso18,rsquared_iso18=rfmethod(tunedpars,gridsearch_dictionary,all_preds,temp_rain_hum,monthnum,"iso_18", meteo_or_iso="iso",inputs=["CooX","CooY","CooZ","temp","rain","hum"]+col_for_f_reg)
     ####################################
     temp_rain_hum="iso_2h"
-    Y_preds_iso2h,X_temp_fin_iso2h ,Y_temp_fin_iso2h,X_train_iso_2h_normal_with_zeros, X_test_iso_2h_normal_with_zeros, y_train_iso_2h_normal_with_zeros, y_test_iso_2h_normal_with_zeros,best_estimator_all_iso2h,best_score_all_iso2h,mutual_info_regression_value_iso2h,f_regression_value_iso2h,x_scaler_iso2h,y_scaler_iso2h,didlog_iso2h,used_features_iso2h,rsquared_iso2h=rfmethod(tunedpars,gridsearch_dictionary,all_preds,temp_rain_hum,monthnum,"iso_2h", meteo_or_iso="iso",inputs=["CooX","CooY","CooZ","temp","rain","hum","real_distt_alt_n","real_distt_alt_s","real_distt_pac_s","real_distt_pac_n","percentage_alt_n","percentage_alt_s","percentage_pac_s","percentage_pac_n"])
+    Y_preds_iso2h,X_temp_fin_iso2h ,Y_temp_fin_iso2h,X_train_iso_2h_normal_with_zeros, X_test_iso_2h_normal_with_zeros, y_train_iso_2h_normal_with_zeros, y_test_iso_2h_normal_with_zeros,best_estimator_all_iso2h,best_score_all_iso2h,mutual_info_regression_value_iso2h,f_regression_value_iso2h,x_scaler_iso2h,y_scaler_iso2h,didlog_iso2h,used_features_iso2h,rsquared_iso2h=rfmethod(tunedpars,gridsearch_dictionary,all_preds,temp_rain_hum,monthnum,"iso_2h", meteo_or_iso="iso",inputs=["CooX","CooY","CooZ","temp","rain","hum"]+col_for_f_reg)
+    ###########3333
+
+    if justsum==True:
+        dill.dump_session(r"C:\\Users\\Ash kan\\Documents\\meteo_iso_model\\meteo_iso_model_input_code_and_results\\code\\internal_dill_dump_iso_18_2h_model_done_just_summer.pkl")
+    else:
+
+        dill.dump_session(r"C:\\Users\\Ash kan\\Documents\\meteo_iso_model\\meteo_iso_model_input_code_and_results\\code\\internal_dill_dump_iso_18_2h_model_done_all_year.pkl")
     #############################################################
     #read points for contour
     data_file = r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\inputs\x_y_z.xls"

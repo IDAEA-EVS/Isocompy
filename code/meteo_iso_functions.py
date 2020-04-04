@@ -18,11 +18,11 @@ from sklearn.inspection import plot_partial_dependence
 from sklearn.svm import SVR,NuSVR
 from sklearn.linear_model import LinearRegression
 from pysplit_funcs_for_meteo_model import convertCoords,gen_trajs
-
+import os
 def warn(*args, **kwargs):
     pass
 import warnings
-
+import pysplit
 warnings.warn = warn
 
 
@@ -31,6 +31,26 @@ warnings.warn = warn
 def iso_prediction(iso_db1,month_grouped_list_with_zeros_iso_2h,month_grouped_list_with_zeros_iso_3h,temp_bests,rain_bests,hum_bests,iso_18,justsum=True):
     
     predictions_monthly_list=list()
+    altitudes=[1500,3000,5500]
+    #generating reports- removing existed files
+
+    if os.path.exists(os.path.join(r'C:\trajectories\RP',"error_in_meteo_file.txt")):
+        os.remove(os.path.join(r'C:\trajectories\RP',"error_in_meteo_file.txt"))
+    if os.path.exists(os.path.join(r'C:\trajectories\RP',"input_pass_to_bulkrajfun_report.txt")):
+        os.remove(os.path.join(r'C:\trajectories\RP',"input_pass_to_bulkrajfun_report.txt"))
+    error_in_meteo_file=open(os.path.join(r'C:\trajectories\RP',"error_in_meteo_file.txt"),"a+")
+    input_pass_to_bulkrajfun_report=open(os.path.join(r'C:\trajectories\RP',"input_pass_to_bulkrajfun_report.txt"),"a+")
+    for alti in altitudes:
+        storage_dir =os.path.join(r'C:\trajectories\RP', str(alti))
+        if os.path.exists(storage_dir)==False:
+            os.mkdir(storage_dir)
+        if os.path.exists(os.path.join(storage_dir,"points_all_in_water_report.txt")):
+            os.remove(os.path.join(storage_dir,"points_all_in_water_report.txt"))
+        if os.path.exists(os.path.join(storage_dir,"points_origin_not_detected_report.txt")):
+            os.remove(os.path.join(storage_dir,"points_origin_not_detected_report.txt"))
+        if os.path.exists(os.path.join(storage_dir,"traj_shorter_than_runtime_report.txt")):
+            os.remove(os.path.join(storage_dir,"traj_shorter_than_runtime_report.txt"))        
+    ##########################
     for month_num in range(0,len(iso_db1)):
         if (month_num not in [3,4,5,6,7,8,9,11] and justsum ==True) or justsum==False:
             bests_of_all_preds=list()
@@ -66,16 +86,31 @@ def iso_prediction(iso_db1,month_grouped_list_with_zeros_iso_2h,month_grouped_li
             #here, the new coordination system have to be added from excel or calculated
             xy_df_for_hysplit=iso_db1[month_num][["CooX","CooY","ID_MeteoPoint"]]
             xy_df_for_hysplit = iso_db1[month_num].join(xy_df_for_hysplit.apply(convertCoords,axis=1)) 
-            ######################   
-            #to pysplit trajectories:
-            all_hysplit_df=gen_trajs(iso_18,xy_df_for_hysplit,month_num+1)
-            #print ("############all_hysplit_df##########")
-            #print (all_hysplit_df)
-            ###################################################    
-            preds=pd.concat([iso_db1[month_num][["CooX","CooY","CooZ","ID_MeteoPoint","iso_18"]],month_grouped_list_with_zeros_iso_2h[month_num][["iso_2h"]],month_grouped_list_with_zeros_iso_3h[month_num][["iso_3h"]],temp_pred,rain_pred,hum_pred,all_hysplit_df[["real_distt_alt_n","real_distt_alt_s","real_distt_pac_s","real_distt_pac_n","percentage_alt_n","percentage_alt_s","percentage_pac_s","percentage_pac_n"]]],axis=1,ignore_index =False)
-            preds["month"]=month_num+1
-            predictions_monthly_list.append([preds])
+            ######################
+            preds=pd.concat([iso_db1[month_num][["CooX","CooY","CooZ","ID_MeteoPoint","iso_18"]],month_grouped_list_with_zeros_iso_2h[month_num][["iso_2h"]],month_grouped_list_with_zeros_iso_3h[month_num][["iso_3h"]],temp_pred,rain_pred,hum_pred],axis=1,ignore_index =False)   
+            ######################
+            #to pysplit trajectories: iterate altitudes
             
+            all_hysplit_df_list_all_atts=list()
+            for altitude in range(0,len(altitudes)):
+                al=altitudes[altitude]
+                t_d=os.path.join(r'C:\trajectories\RP', str(al))
+                points_all_in_water_report=open(os.path.join(t_d,"points_all_in_water_report.txt"),"a+")    
+                points_origin_not_detected_report=open(os.path.join(t_d,"points_origin_not_detected_report.txt"),"a+")
+                traj_shorter_than_runtime_report=open(os.path.join(t_d,"traj_shorter_than_runtime_report.txt"),"a+")  
+                all_hysplit_df=gen_trajs(iso_18,xy_df_for_hysplit,month_num+1,al,points_all_in_water_report,points_origin_not_detected_report,error_in_meteo_file,traj_shorter_than_runtime_report,input_pass_to_bulkrajfun_report)
+                all_hysplit_df_list_all_atts.append(all_hysplit_df)
+                #print ("############all_hysplit_df##########")
+                #print (all_hysplit_df)
+                ################################################### 
+                col_for_hy=["real_distt_alt_n"+"_"+str(al),"real_distt_alt_s"+"_"+str(al),"real_distt_pac_s"+"_"+str(al),"real_distt_pac_n"+"_"+str(al),"percentage_alt_n"+"_"+str(al),"percentage_alt_s"+"_"+str(al),"percentage_pac_s"+"_"+str(al),"percentage_pac_n"+"_"+str(al)]   
+                preds=pd.concat([preds,all_hysplit_df[col_for_hy]],axis=1,ignore_index =False)
+                preds["month"]=month_num+1
+                predictions_monthly_list.append([preds])
+                if altitude==0:
+                    col_for_f_reg=col_for_hy
+                else:
+                    col_for_f_reg=col_for_f_reg+col_for_hy   
             if month_num==0:
                 all_preds=preds
             else:
@@ -83,7 +118,13 @@ def iso_prediction(iso_db1,month_grouped_list_with_zeros_iso_2h,month_grouped_li
             '''except:
                 print ("IN except!!!!!!!!!!!!!!!!")
                 print (month_num)'''
-    return  predictions_monthly_list, all_preds      
+    
+    points_all_in_water_report.close()
+    points_origin_not_detected_report.close()
+    error_in_meteo_file.close() 
+    traj_shorter_than_runtime_report.close()
+    input_pass_to_bulkrajfun_report.close()
+    return  predictions_monthly_list, all_preds,all_hysplit_df_list_all_atts,col_for_f_reg      
 #grouping data
 def grouping_data(rain,which_value,elnino,lanina,month=None,zeross=True,iso=False):
     if zeross==False:
@@ -328,7 +369,7 @@ def rfmethod(tunedpars,gridsearch_dictionary,newmatdf_temp,temp_rain_hum,monthnu
         best_score_all=adj_r_sqrd(reg.score(X_temp, Y_temp) )
         best_estimator_all=reg
         rsquared=reg.score(X_temp, Y_temp)
-    ####################################################################    
+    ####################################################################   ''' 
     print ("Best score total adj r square:")
     print (best_score_all)
     print ("sample size,num of variables:\n",sam_size,num_var)
@@ -526,7 +567,7 @@ def importing_preprocess():
     ############################################################
     ############################################################
     #isotope file preprocess
-    data_file_iso = r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\inputs\test_iso_pysplit_04_03_2020.xlsx"
+    data_file_iso = r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\inputs\pysplit_isotope_28_3_2020.xlsx"
     iso_18 = pd.read_excel(data_file_iso,sheet_name="ISOT18O",header=0,index_col=False,keep_default_na=True)
     iso_2h=pd.read_excel(data_file_iso,sheet_name="ISOT2H",header=0,index_col=False,keep_default_na=True)
     iso_3h=pd.read_excel(data_file_iso,sheet_name="ISOT3",header=0,index_col=False,keep_default_na=True)
@@ -593,9 +634,13 @@ def f_reg_mutual(file_name,all_preds,list_of_dics):
     m_out_f=open(file_name,'w')
     for sets in list_of_dics:
         st_exist=False
+        st_exist_m=True
         print ("all_preds[sets[inputs]:", all_preds[sets["inputs"]])
         print ("all_preds[sets[outputs]]:",all_preds[sets["outputs"]])
-        mutual_info = mutual_info_regression(all_preds[sets["inputs"]],all_preds[sets["outputs"]])
+        try:
+            mutual_info = mutual_info_regression(all_preds[sets["inputs"]],all_preds[sets["outputs"]])
+        except:
+            st_exist_m=False
         try:
             maxx=np.max(mutual_info)
             mutual_info_st=list()
@@ -630,15 +675,23 @@ def f_reg_mutual(file_name,all_preds,list_of_dics):
         m_out_f.write('\n')
         m_out_f.write(str(f_reg[1]))
         m_out_f.write('\n\n')
+        m_out_f.write("mutual_info_standard ")
+        m_out_f.write('\n')
         if st_exist==True:
-            m_out_f.write("mutual_info_standard ")
-            m_out_f.write('\n')
             m_out_f.write(str(mutual_info_st))
-            m_out_f.write('\n\n')
+        else:
+            m_out_f.write("Not possible to calculate the STANDARD mutual, possibly division by zero problem!") 
+        m_out_f.write('\n\n')
         m_out_f.write("mutual_info ")
-        m_out_f.write('\n')
-        m_out_f.write(str(mutual_info))
-        m_out_f.write('\n')
+        m_out_f.write('\n')     
+        if st_exist_m==True:
+            m_out_f.write(str(mutual_info))
+            m_out_f.write('\n')
+        else:
+            m_out_f.write("Not possible to calculate mutual. Possibly not enough data")
+            m_out_f.write('\n')
+
+            
         
     m_out_f.close()
 
@@ -810,7 +863,6 @@ def new_data_prediction_comparison(newd,no_needed_month,temp_bests,rain_bests,hu
     x_y_z_month=newd[["CooX","CooY","CooZ","month"]]
     #iso_18_2h=newd[["iso18","iso2h"]]
     x_y_z_month_org=x_y_z_month.copy()
-    x_y_z_month_copy=x_y_z_month_org.copy()
     #making a list of existed month
     existed_month=x_y_z_month[['month']]
     existed_month.drop_duplicates(keep = 'last', inplace = True)
@@ -854,6 +906,14 @@ def new_data_prediction_comparison(newd,no_needed_month,temp_bests,rain_bests,hu
             #################################################
             #################################################
             iso_model_input=pd.concat([x_y_z_month_org_2.reset_index(),meteopredict_res_per_month.reset_index()],axis=1)
+            
+            #here I have to add trajectories:
+            #if trajs are needed:
+                #gen traj:
+                #3 report file
+            #    gen_trajs()    
+                #add traj to iso_model_input
+
             #iso18:
 
             #transforming
