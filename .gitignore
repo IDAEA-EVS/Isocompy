@@ -1,0 +1,12 @@
+#skip commiting the compiled files
+*.pyc
+*.ipynb
+*.JPEG
+*.xls
+*.xlsx
+*.JPG
+*.pdf
+*.rar
+*.zip
+output
+input
