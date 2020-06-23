@@ -28,10 +28,10 @@ warnings.warn = warn
 
 ###########################################
 ###################################################################
-def iso_prediction(iso_db1,month_grouped_list_with_zeros_iso_2h,month_grouped_list_with_zeros_iso_3h,temp_bests,rain_bests,hum_bests,iso_18,justsum=True):
+def iso_prediction(iso_db1,month_grouped_list_with_zeros_iso_2h,month_grouped_list_with_zeros_iso_3h,temp_bests,rain_bests,hum_bests,iso_18,dates_db,justsum=True):
     
     predictions_monthly_list=list()
-    altitudes=[1500,3000,5500]
+    altitudes=[3000,5500]
     #generating reports- removing existed files
 
     if os.path.exists(os.path.join(r'C:\trajectories\RP',"error_in_meteo_file.txt")):
@@ -92,14 +92,21 @@ def iso_prediction(iso_db1,month_grouped_list_with_zeros_iso_2h,month_grouped_li
             #to pysplit trajectories: iterate altitudes
             
             all_hysplit_df_list_all_atts=list()
+            all_hysplit_df_list_all_atts_without_averaging=list()
             for altitude in range(0,len(altitudes)):
                 al=altitudes[altitude]
                 t_d=os.path.join(r'C:\trajectories\RP', str(al))
                 points_all_in_water_report=open(os.path.join(t_d,"points_all_in_water_report.txt"),"a+")    
                 points_origin_not_detected_report=open(os.path.join(t_d,"points_origin_not_detected_report.txt"),"a+")
                 traj_shorter_than_runtime_report=open(os.path.join(t_d,"traj_shorter_than_runtime_report.txt"),"a+")  
-                all_hysplit_df=gen_trajs(iso_18,xy_df_for_hysplit,month_num+1,al,points_all_in_water_report,points_origin_not_detected_report,error_in_meteo_file,traj_shorter_than_runtime_report,input_pass_to_bulkrajfun_report)
+                #the following input is for the times that there is no database for measurment dates, So we use the trajectories of 1 whole month
+                if type(dates_db) is None:
+                    all_hysplit_df,nw_ex_all_df=gen_trajs(iso_18,xy_df_for_hysplit,month_num+1,al,points_all_in_water_report,points_origin_not_detected_report,error_in_meteo_file,traj_shorter_than_runtime_report,input_pass_to_bulkrajfun_report,Sampling_date_db=False)
+                else:
+                    all_hysplit_df,nw_ex_all_df=gen_trajs(dates_db,xy_df_for_hysplit,month_num+1,al,points_all_in_water_report,points_origin_not_detected_report,error_in_meteo_file,traj_shorter_than_runtime_report,input_pass_to_bulkrajfun_report,Sampling_date_db=True)
+
                 all_hysplit_df_list_all_atts.append(all_hysplit_df)
+                #all_hysplit_df_list_all_atts_without_averaging.append(nw_ex_all_df)
                 #print ("############all_hysplit_df##########")
                 #print (all_hysplit_df)
                 ################################################### 
@@ -109,12 +116,20 @@ def iso_prediction(iso_db1,month_grouped_list_with_zeros_iso_2h,month_grouped_li
                 predictions_monthly_list.append([preds])
                 if altitude==0:
                     col_for_f_reg=col_for_hy
+                    all_hysplit_df_list_all_atts_without_averaging=nw_ex_all_df
                 else:
                     col_for_f_reg=col_for_f_reg+col_for_hy   
+                    all_hysplit_df_list_all_atts_without_averaging=all_hysplit_df_list_all_atts_without_averaging+nw_ex_all_df
+            #print(all_hysplit_df_list_all_atts_without_averaging)        
+            #print (list(all_hysplit_df_list_all_atts_without_averaging[0].columns))
+            dfdf=pd.DataFrame(all_hysplit_df_list_all_atts_without_averaging,columns=["ID_MeteoPoint","newLat", "newLong","Cumulative_Dist","Dist_from_origin","continentality","altitude","year","month","day"])
+            #print (dfdf)
             if month_num==0:
                 all_preds=preds
+                all_without_averaging=dfdf
             else:
                 all_preds=pd.concat([all_preds,preds],ignore_index=True)
+                all_without_averaging=pd.concat([all_without_averaging,dfdf],ignore_index=True)
             '''except:
                 print ("IN except!!!!!!!!!!!!!!!!")
                 print (month_num)'''
@@ -124,7 +139,7 @@ def iso_prediction(iso_db1,month_grouped_list_with_zeros_iso_2h,month_grouped_li
     error_in_meteo_file.close() 
     traj_shorter_than_runtime_report.close()
     input_pass_to_bulkrajfun_report.close()
-    return  predictions_monthly_list, all_preds,all_hysplit_df_list_all_atts,col_for_f_reg      
+    return  predictions_monthly_list, all_preds,all_hysplit_df_list_all_atts,col_for_f_reg,all_without_averaging      
 #grouping data
 def grouping_data(rain,which_value,elnino,lanina,month=None,zeross=True,iso=False):
     if zeross==False:
@@ -270,15 +285,17 @@ def rfmethod(tunedpars,gridsearch_dictionary,newmatdf_temp,temp_rain_hum,monthnu
     elastic=False
     didlog=False'''
     #RandomForestRegressor
+    
+
     estrandomfor_temp=GridSearchCV(RandomForestRegressor(random_state =0), tunedpars, cv=10,n_jobs=-1)
-    estrandomfor_temp.fit(X_temp, Y_temp)
+    estrandomfor_temp.fit(X_temp, Y_temp.ravel())
     best_score_all=adj_r_sqrd(estrandomfor_temp.best_score_)
     best_estimator_all=estrandomfor_temp.best_estimator_
     rsquared=estrandomfor_temp.best_score_
     ########################################################################
     #NEURAL NETWORK
     mlp_temp=GridSearchCV( MLPRegressor(learning_rate="adaptive"), gridsearch_dictionary, cv=5,n_jobs=-1) 
-    mlp_temp.fit(X_temp, Y_temp)
+    mlp_temp.fit(X_temp, Y_temp.ravel())
     if adj_r_sqrd(mlp_temp.best_score_)>best_score_all:
         best_score_all=adj_r_sqrd(mlp_temp.best_score_)
         best_estimator_all=mlp_temp.best_estimator_
@@ -327,7 +344,7 @@ def rfmethod(tunedpars,gridsearch_dictionary,newmatdf_temp,temp_rain_hum,monthnu
     #BayesianRidge
     reg =BayesianRidge(normalize=True).fit(X_temp, Y_temp)
     #cross validation
-    scores = cross_val_score(reg, X_temp, Y_temp, cv=10,n_jobs =-1)
+    scores = cross_val_score(reg, X_temp, Y_temp.ravel(), cv=10,n_jobs =-1)
     print ("BayesianRidge")
     print ("cross - validation cv=10 scores:\n", scores)
     print("Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
@@ -340,7 +357,7 @@ def rfmethod(tunedpars,gridsearch_dictionary,newmatdf_temp,temp_rain_hum,monthnu
     #ARDRegression
     reg =ARDRegression().fit(X_temp, Y_temp)
     #cross validation
-    scores = cross_val_score(reg, X_temp, Y_temp, cv=10,n_jobs =-1)
+    scores = cross_val_score(reg, X_temp, Y_temp.ravel(), cv=10,n_jobs =-1)
     print ("ARDRegression")
     print ("cross - validation cv=10 scores:\n", scores)
     print("Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
@@ -352,7 +369,7 @@ def rfmethod(tunedpars,gridsearch_dictionary,newmatdf_temp,temp_rain_hum,monthnu
     ####################################################################
     #svm
     tunedpars_svm={"kernel":["linear", "poly", "rbf", "sigmoid"],"C":[1,.95,.9,.8],"epsilon":[.1,.05,.15,.2,.5] }
-    reg=GridSearchCV(SVR(), tunedpars_svm, cv=10,n_jobs=-1).fit(X_temp, Y_temp)
+    reg=GridSearchCV(SVR(), tunedpars_svm, cv=10,n_jobs=-1).fit(X_temp, Y_temp.ravel())
     print ("SVR")
     print ("SCORE:\n",adj_r_sqrd(reg.score(X_temp, Y_temp) ))
     if adj_r_sqrd(reg.score(X_temp, Y_temp))>best_score_all:
@@ -362,7 +379,7 @@ def rfmethod(tunedpars,gridsearch_dictionary,newmatdf_temp,temp_rain_hum,monthnu
     ####################################################################    
     #NuSVR    
     tunedpars_svm={"kernel":["linear", "poly", "rbf", "sigmoid"] }
-    reg=GridSearchCV(NuSVR(), tunedpars_svm, cv=10,n_jobs=-1).fit(X_temp, Y_temp)
+    reg=GridSearchCV(NuSVR(), tunedpars_svm, cv=10,n_jobs=-1).fit(X_temp, Y_temp.ravel())
     print ("NuSVR")
     print ("SCORE:\n",adj_r_sqrd(reg.score(X_temp, Y_temp) ))
     if adj_r_sqrd(reg.score(X_temp, Y_temp) )>best_score_all:
@@ -567,7 +584,7 @@ def importing_preprocess():
     ############################################################
     ############################################################
     #isotope file preprocess
-    data_file_iso = r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\inputs\pysplit_isotope_28_3_2020.xlsx"
+    data_file_iso = r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\inputs\pysplit_isotope_registro_Pp_02_05_2020.xlsx"
     iso_18 = pd.read_excel(data_file_iso,sheet_name="ISOT18O",header=0,index_col=False,keep_default_na=True)
     iso_2h=pd.read_excel(data_file_iso,sheet_name="ISOT2H",header=0,index_col=False,keep_default_na=True)
     iso_3h=pd.read_excel(data_file_iso,sheet_name="ISOT3",header=0,index_col=False,keep_default_na=True)
@@ -594,7 +611,14 @@ def importing_preprocess():
     #newmatdf_iso_3h_elnino,newmatdf_iso_3h_lanina,newmatdf_iso_3h_norm=grouping_data(iso_3h,which_value,elnino,lanina)
     month_grouped_list_with_zeros_iso_3h,month_grouped_list_without_zeros_iso_3h=monthly_uniting(which_value,datab,iso=True)
     #return month_grouped_list_with_zeros_rain,month_grouped_list_without_zeros_rain,month_grouped_list_with_zeros_temp,month_grouped_list_without_zeros_temp,rain,temper,elnino,lanina,newmatdf_rain_elnino,newmatdf_rain_lanina,newmatdf_temp_elnino,newmatdf_temp_lanina,newmatdf_temp_norm,iso_18,iso_2h,iso_3h,newmatdf_iso_18_elnino,newmatdf_iso_18_lanina,newmatdf_iso_18_norm,newmatdf_iso_2h_elnino,newmatdf_iso_2h_lanina,newmatdf_iso_2h_norm,newmatdf_iso_3h_elnino,newmatdf_iso_3h_lanina,newmatdf_iso_3h_norm
-    return month_grouped_list_with_zeros_iso_18,month_grouped_list_without_zeros_iso_18,month_grouped_list_with_zeros_iso_2h,month_grouped_list_without_zeros_iso_2h,month_grouped_list_with_zeros_iso_3h,month_grouped_list_without_zeros_iso_3h,month_grouped_list_with_zeros_hum,month_grouped_list_without_zeros_hum,month_grouped_list_with_zeros_rain,month_grouped_list_without_zeros_rain,month_grouped_list_with_zeros_temp,month_grouped_list_without_zeros_temp,rain,temper,elnino,lanina,iso_18,iso_2h,iso_3h
+    #############################################################
+    #2020 datadb
+    try:
+        data_file_iso = r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\inputs\Date_Rain_02_05_2020.xlsx"
+        dates_db = pd.read_excel(data_file_iso,sheet_name="traj_samp_date",header=0,index_col=False,keep_default_na=True)
+    except:
+        dates_db=None
+    return month_grouped_list_with_zeros_iso_18,month_grouped_list_without_zeros_iso_18,month_grouped_list_with_zeros_iso_2h,month_grouped_list_without_zeros_iso_2h,month_grouped_list_with_zeros_iso_3h,month_grouped_list_without_zeros_iso_3h,month_grouped_list_with_zeros_hum,month_grouped_list_without_zeros_hum,month_grouped_list_with_zeros_rain,month_grouped_list_without_zeros_rain,month_grouped_list_with_zeros_temp,month_grouped_list_without_zeros_temp,rain,temper,elnino,lanina,iso_18,iso_2h,iso_3h,dates_db
 ###################################################################
 #print the models results in a file
 def print_to_file(file_name,temp_bests,rain_bests,hum_bests):

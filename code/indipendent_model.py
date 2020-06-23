@@ -35,7 +35,7 @@ def model_coup(rerun_meteo=False):
         ############################################################
         t_total_start=time.time()
         #read files and some pre processing
-        month_grouped_list_with_zeros_iso_18,month_grouped_list_without_zeros_iso_18,month_grouped_list_with_zeros_iso_2h,month_grouped_list_without_zeros_iso_2h,month_grouped_list_with_zeros_iso_3h,month_grouped_list_without_zeros_iso_3h,month_grouped_list_with_zeros_hum,month_grouped_list_without_zeros_hum,month_grouped_list_with_zeros_rain,month_grouped_list_without_zeros_rain,month_grouped_list_with_zeros_temp,month_grouped_list_without_zeros_temp,rain,temper,elnino,lanina,iso_18,iso_2h,iso_3h=importing_preprocess()
+        month_grouped_list_with_zeros_iso_18,month_grouped_list_without_zeros_iso_18,month_grouped_list_with_zeros_iso_2h,month_grouped_list_without_zeros_iso_2h,month_grouped_list_with_zeros_iso_3h,month_grouped_list_without_zeros_iso_3h,month_grouped_list_with_zeros_hum,month_grouped_list_without_zeros_hum,month_grouped_list_with_zeros_rain,month_grouped_list_without_zeros_rain,month_grouped_list_with_zeros_temp,month_grouped_list_without_zeros_temp,rain,temper,elnino,lanina,iso_18,iso_2h,iso_3h,dates_db=importing_preprocess()
         ############################################################
         #METEO MODELS!
 
@@ -92,9 +92,10 @@ def model_coup(rerun_meteo=False):
     
     #making prediction for the isotope points
     iso_db1=month_grouped_list_with_zeros_iso_18
-    justsum=True
-    predictions_monthly_list, all_preds,all_hysplit_df_list_all_atts,col_for_f_reg=iso_prediction(iso_db1,month_grouped_list_with_zeros_iso_2h,month_grouped_list_with_zeros_iso_3h,temp_bests,rain_bests,hum_bests,iso_18,justsum=justsum)
+    justsum=False
+    predictions_monthly_list, all_preds,all_hysplit_df_list_all_atts,col_for_f_reg,all_without_averaging=iso_prediction(iso_db1,month_grouped_list_with_zeros_iso_2h,month_grouped_list_with_zeros_iso_3h,temp_bests,rain_bests,hum_bests,iso_18,dates_db,justsum=justsum)
     all_preds.to_excel(r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\output\predicted_results.xls")
+    all_without_averaging.to_excel(r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\output\traj_data_no_averaging.xls")
     #############################################################
     #f_reg and mutual annual
     list_of_dics=[
@@ -151,13 +152,26 @@ def model_coup(rerun_meteo=False):
     ####################################
     temp_rain_hum="iso_2h"
     Y_preds_iso2h,X_temp_fin_iso2h ,Y_temp_fin_iso2h,X_train_iso_2h_normal_with_zeros, X_test_iso_2h_normal_with_zeros, y_train_iso_2h_normal_with_zeros, y_test_iso_2h_normal_with_zeros,best_estimator_all_iso2h,best_score_all_iso2h,mutual_info_regression_value_iso2h,f_regression_value_iso2h,x_scaler_iso2h,y_scaler_iso2h,didlog_iso2h,used_features_iso2h,rsquared_iso2h=rfmethod(tunedpars,gridsearch_dictionary,all_preds,temp_rain_hum,monthnum,"iso_2h", meteo_or_iso="iso",inputs=["CooX","CooY","CooZ","temp","rain","hum"]+col_for_f_reg)
-    ###########3333
-
+    ####################################
+    #writing isotope results to a txt file
+    pr_is_18="\n################\n\n best_estimator_all_iso18\n"+str(best_estimator_all_iso18)+"\n\n################\n\n used_features_iso18 \n"+str(used_features_iso18)+"\n\n################\n\n best_score_all_iso18 \n"+str(best_score_all_iso18)+"\n\n################\n\n rsquared_iso18 \n"+str(rsquared_iso18)+"\n\n#########################\n#########################\n#########################\n"
+    pr_is_2h="\n################\n\n best_estimator_all_iso2h\n"+str(best_estimator_all_iso2h)+"\n\n################\n\n used_features_iso2h \n"+str(used_features_iso2h)+"\n\n################\n\n best_score_all_iso2h \n"+str(best_score_all_iso2h)+"\n\n################\n\n rsquared_iso2h \n"+str(rsquared_iso2h)+"\n\n#########################\n#########################\n#########################\n"
+    file_name="C:\\Users\\Ash kan\\Documents\\meteo_iso_model\\meteo_iso_model_input_code_and_results\\output\\isotope_modeling_results_18_2h.txt"
+    m_out_f=open(file_name,'w')
+    m_out_f.write(pr_is_18)
+    m_out_f.write(pr_is_2h)
+    m_out_f.close()
+    ###########
+    #dill.dump_session(r"C:\\Users\\Ash kan\\Documents\\meteo_iso_model\\meteo_iso_model_input_code_and_results\\code\\internal_dill_dump_iso_18_2h_model_done_just_summer_alt_3000.pkl")
     if justsum==True:
         dill.dump_session(r"C:\\Users\\Ash kan\\Documents\\meteo_iso_model\\meteo_iso_model_input_code_and_results\\code\\internal_dill_dump_iso_18_2h_model_done_just_summer.pkl")
+        #dill.load_session(r"C:\\Users\\Ash kan\\Documents\\meteo_iso_model\\meteo_iso_model_input_code_and_results\\code\\internal_dill_dump_iso_18_2h_model_done_just_summer.pkl")
+
     else:
 
         dill.dump_session(r"C:\\Users\\Ash kan\\Documents\\meteo_iso_model\\meteo_iso_model_input_code_and_results\\code\\internal_dill_dump_iso_18_2h_model_done_all_year.pkl")
+        #dill.load_session(r"C:\\Users\\Ash kan\\Documents\\meteo_iso_model\\meteo_iso_model_input_code_and_results\\code\\internal_dill_dump_iso_18_2h_model_done_all_year.pkl")
+
     #############################################################
     #read points for contour
     data_file = r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\inputs\x_y_z.xls"

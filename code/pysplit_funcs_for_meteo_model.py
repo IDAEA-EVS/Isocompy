@@ -8,14 +8,18 @@ import pandas as pd
 from mpl_toolkits.basemap import Basemap
 import os
 import shutil
-def gen_trajs(iso_18,xy_df_for_hysplit,month_real,altitude,points_all_in_water_report,points_origin_not_detected_report,error_in_meteo_file,traj_shorter_than_runtime_report,input_pass_to_bulkrajfun_report):
+import matplotlib.pyplot as plt
+import numpy as np
+
+def gen_trajs(iso_18,xy_df_for_hysplit,month_real,altitude,points_all_in_water_report,points_origin_not_detected_report,error_in_meteo_file,traj_shorter_than_runtime_report,input_pass_to_bulkrajfun_report,Sampling_date_db=False):
     working_dir = r'C:/hysplit4/working'
     meteo_dir = r'C:/Users/Ash kan/Documents/meteo_iso_model/meteo_iso_model_input_code_and_results/inputs/meteo_for_trajs_pysplit/meteo_for_traj_new_name'
     basename = 'RP'
     hours = [12]
     altitudes = [altitude]
-    runtime = -650
+    runtime = -350
     all_hysplit=list()
+    nw_ex_all=list()
     cols=[
         "ID_MeteoPoint",
         "newLat", 
@@ -47,35 +51,88 @@ def gen_trajs(iso_18,xy_df_for_hysplit,month_real,altitude,points_all_in_water_r
         if not os.path.isdir(storage_dir):
             os.mkdir(storage_dir)
         storage_dir =os.path.join(storage_dir, str(month_real))
-        location = (row["newLat"], row["newLong"])  
+        ################
+        location = (row["newLat"], row["newLong"])
         tem=iso_18.loc[iso_18["CooX"]==row["CooX"]]
-        temp=tem.loc[tem["CooY"]==row["CooY"]]
-        dates_1=pd.DatetimeIndex(temp["DateMeas"])
-        dates=dates_1[dates_1.month.isin([month_real])]
-        years=dates.year.to_list()
-        years = list(dict.fromkeys(years))
-        #months=dates.month.to_list()
-        #months = list(dict.fromkeys(months))
-        months=[month_real]
-        ###############################
-        print_for_input_pass_to_bulkrajfun_report="\n\n##################\n"+str(altitudes)+"\n"+"\n"+str(months)+"\n"+str(years)
-        print_for_input_pass_to_bulkrajfun_report="\n\n##################\n"+str(altitudes)+"\n"+str(row["ID_MeteoPoint"])+"\n"+str(months)+"\n"+str(years)
-        input_pass_to_bulkrajfun_report.write(print_for_input_pass_to_bulkrajfun_report)
-        print (print_for_input_pass_to_bulkrajfun_report)
-        ###############################
-        #print ("years, month:\n",years, months)
-        pysplit.generate_bulktraj(basename, working_dir, storage_dir, meteo_dir,
+        temp=tem.loc[tem["CooY"]==row["CooY"]]    
+        
+        #new code to consider database for real dates! 30 april 2020
+        
+        if Sampling_date_db==False:  
+            dates_general=pd.DatetimeIndex(temp["DateMeas"])
+            dates_general=dates_general[dates_general.month.isin([month_real])]
+            years=dates_general.year.to_list()
+            months=dates_general.month.to_list()
+            years = list(dict.fromkeys(years))
+            months=list(dict.fromkeys(months))
+            days=None
+            day_type="all_month"
+            pysplit.generate_bulktraj(basename, working_dir, storage_dir, meteo_dir,
                                 years, months, hours, altitudes, location, runtime,
                                 error_in_meteo_file=error_in_meteo_file,
-                                meteo_bookends=([4,5], [1]),
+                                days=days, #list or none
+                                day_type=day_type, #"all_month" or "daily"
+                                meteo_bookends=([1,2,3,4,5], [1]),
                                 monthslice=slice(0, 32, 1),
                                 meteoyr_2digits=False,
                                 get_reverse=False,
                                 get_clipped=False)
+        elif Sampling_date_db==True: 
+            dates_for_daily_trajs=temp["Date_Meas_real"]
+            dates_for_daily_trajs = pd.concat([temp["DateMeas"],dates_for_daily_trajs,temp["day_type"]], names=["DateMeas","Date_Meas_real","day_type"],axis=1) 
+            dates_for_daily_trajs=dates_for_daily_trajs[pd.DatetimeIndex(dates_for_daily_trajs["DateMeas"]).month.isin([month_real])]
+            dates_general=pd.DatetimeIndex(dates_for_daily_trajs["DateMeas"])
+            dates_measured=pd.DatetimeIndex(dates_for_daily_trajs["Date_Meas_real"])
+
+            if "Monthly" in dates_for_daily_trajs["day_type"]:
+                years=dates_general.year.to_list()
+                months=dates_general.month.to_list()
+                years = list(dict.fromkeys(years))
+                months=list(dict.fromkeys(months))  
+                days=None
+                day_type="all_month"
+                pysplit.generate_bulktraj(basename, working_dir, storage_dir, meteo_dir,
+                                years, months, hours, altitudes, location, runtime,
+                                error_in_meteo_file=error_in_meteo_file,
+                                days=days, #list or none
+                                day_type=day_type, #"all_month" or "daily"
+                                meteo_bookends=([1,2,3,4,5], [1]),
+                                monthslice=slice(0, 32, 1),
+                                meteoyr_2digits=False,
+                                get_reverse=False,
+                                get_clipped=False)
+
+            else:
+                date_measured_done_list=list() 
+                for date in dates_measured:
+                    if date not in date_measured_done_list:
+                        date_measured_done_list.append(date) 
+                        years=[date.year]
+                        months=[date.month]
+                        days=[date.day]
+                        day_type="daily"
+                        days=list(dict.fromkeys(days))    
+                        years = list(dict.fromkeys(years))
+                        months=list(dict.fromkeys(months))   
+                        ###############################
+                        #print_for_input_pass_to_bulkrajfun_report="\n\n##################\n"+str(altitudes)+"\n"+str(row["ID_MeteoPoint"])+"\n"+str(months)+"\n"+str(years)+"\n"+str(days)
+                        #print (print_for_input_pass_to_bulkrajfun_report)
+                        ###############################
+                        pysplit.generate_bulktraj(basename, working_dir, storage_dir, meteo_dir,
+                                                years, months, hours, altitudes, location, runtime,
+                                                error_in_meteo_file=error_in_meteo_file,
+                                                days=days, #list or none
+                                                day_type=day_type, #"all_month" or "daily"
+                                                meteo_bookends=([1,2,3,4,5], [1]),
+                                                monthslice=slice(0, 32, 1),
+                                                meteoyr_2digits=False,
+                                                get_reverse=False,
+                                                get_clipped=False)
         if len(os.listdir(storage_dir) )==0:
             print ("remove empty folder!")
             shutil.rmtree( storage_dir) 
             continue
+        storage_dir_for_plot=storage_dir
         storage_dir =os.path.join(storage_dir,'*')                       
         umn_tg = pysplit.make_trajectorygroup(storage_dir)
         bm = Basemap()   # default: projection='cyl'
@@ -96,19 +153,25 @@ def gen_trajs(iso_18,xy_df_for_hysplit,month_real,altitude,points_all_in_water_r
         for traj in umn_tg:
             timestep_is_border=-1*len(traj.data.geometry)
             #sometimes hysplit trajectories is not complete because z in coordination reaches the ground!
-            if len(traj.data.geometry)<101:
+            '''if len(traj.data.geometry)<101:
                 #write it to a report file
                 traj_shorter_than_runtime_report.write("\n#####Trajectory data#####\n")
                 traj_shorter_than_runtime_report.write(str(traj.data.loc[0]))
                 traj_shorter_than_runtime_report.write("\n")
                 print("traj_shorter_than_runtime")
-                continue
+                continue'''
             for i in range(len(traj.data.geometry)-1,-1,-1):
                 timestep_is_border=timestep_is_border+1
                 lng=traj.data.geometry[-i].x
                 lat=traj.data.geometry[-i].y
                 if (lng >-100 and lng <-32) and (lat>-60 and lat<14) and bm.is_land(lng, lat)==True:  #True or False
                     #print ("timestep_is_border:",timestep_is_border)
+                    #to consider the point in water! (Since there are points that the first reverse step goes into water!)
+                    if timestep_is_border==-1*len(traj.data.geometry)+1:
+                        pass
+                    else:
+                        timestep_is_border=timestep_is_border-1
+
                     break
             if timestep_is_border==0:
                 print("points_all_in_water")
@@ -163,7 +226,21 @@ def gen_trajs(iso_18,xy_df_for_hysplit,month_real,altitude,points_all_in_water_r
                 points_origin_not_detected_report.write("\n")
                 points_origin_not_detected_report.write(str(traj.data.loc[timestep_is_border]))
                 print ("Attention: couldn't find the origin, skipping!",timestep_is_border)
-
+            
+            #18 june 2020 Ashkan: Sonia needs excel with trajctory data before averaging!!
+            if day_type=="daily":
+                nw_ex=[row["ID_MeteoPoint"],row["newLat"], row["newLong"]]+ [traj.data.loc[timestep_is_border]["Cumulative_Dist"]]+ [traj.data.loc[timestep_is_border]["Dist_from_origin"]]+[continentality]+altitudes+[int(traj.trajid[-13:-9])]+[int(traj.trajid[-9:-7])]+[int(traj.trajid[-7:-5])]
+                nw_ex_all.append(nw_ex)
+            #23 june 2020 Ashkan: Drawing traj maps
+            m = Basemap(projection='cyl',llcrnrlat=-60,urcrnrlat=30,llcrnrlon=-90,urcrnrlon=-20,resolution='c')
+            m.drawcoastlines()
+            m.drawparallels(np.arange(-60.,31.,20.),labels=[False,True,True,False])
+            m.drawmeridians(np.arange(-90.,-21.,20.),labels=[True,False,False,True])
+            plt.plot(*traj.path.xy,color="c")
+            pltname=os.path.join(storage_dir_for_plot,str(row["ID_MeteoPoint"])+"_"+traj.trajid[-13:-3])
+            plt.savefig(pltname,dpi=300)
+            plt.close()
+            #######################################    
         average_real_dist=list()
         average_straight_distt=list()
         porc_list=list()
@@ -182,8 +259,11 @@ def gen_trajs(iso_18,xy_df_for_hysplit,month_real,altitude,points_all_in_water_r
         te=[row["ID_MeteoPoint"],row["newLat"], row["newLong"]]+ average_real_dist+ average_straight_distt+porc_list+[cnt_sum]+[cnt_unk]    
         all_hysplit.append(te)
     all_hysplit_df = pd.DataFrame(all_hysplit, columns =cols)
+    #nw_ex_all_df=pd.DataFrame(nw_ex_all,columns=["ID_MeteoPoint","newLat", "newLong","Cumulative_Dist","Dist_from_origin","continentality","altitude","year","month","day"])
+    nw_ex_all_df=nw_ex_all
+
     #all_hysplit_df.to_excel(r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\output\all_hysplit.xls")
-    return all_hysplit_df     
+    return all_hysplit_df,nw_ex_all_df     
         ###
         # output have to be something with the same dimension as xyhysplit so it can be added to all_preds after this function!        
 
