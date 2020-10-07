@@ -1,24 +1,8 @@
-
 import pandas as pd
-import numpy as np
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler, MinMaxScaler
-from sklearn.neural_network import MLPRegressor
-from sklearn.metrics import classification_report,confusion_matrix,mean_squared_error,mean_absolute_error
-import matplotlib.pyplot as plt
-from sklearn.inspection import partial_dependence,plot_partial_dependence
-from sklearn.ensemble import RandomForestRegressor,GradientBoostingRegressor
-from mpl_toolkits.mplot3d import Axes3D
-from sklearn.cluster import KMeans, DBSCAN
-from sklearn.decomposition import PCA
-from sklearn import svm
-from sklearn.feature_selection import f_classif,SelectPercentile
 import time
 import dill
 from datetime import date
-#import function py file
-from meteo_iso_functions import regional_mensual_plot,grouping_data,pcafun,rfmethod,importing_preprocess,print_to_file,iso_prediction,f_reg_mutual,predict_points,new_data_prediction_comparison
-from sklearn.linear_model import LinearRegression
+from meteo_iso_functions import rfmethod,importing_preprocess,print_to_file,iso_prediction,f_reg_mutual,predict_points,new_data_prediction_comparison
 
 
 def warn(*args, **kwargs):
@@ -26,20 +10,51 @@ def warn(*args, **kwargs):
 import warnings
 
 warnings.warn = warn
-
 def model_coup(rerun_meteo=False):
 
     if rerun_meteo==False:
-        dill.load_session(r"C:\\Users\\Ash kan\\Documents\\meteo_iso_model\\meteo_iso_model_input_code_and_results\\code\\internal_dill_dump.pkl")
+        #load already ran sessions
+        dill.load_session(r"C:\\Users\\Ash kan\\Documents\\meteo_iso_model\\meteo_iso_model_input_code_and_results\\code\\internal_dill_dump_sep_for_papermeteo_after_log_bug.pkl")
     else:        
         ############################################################
         t_total_start=time.time()
+        #######################
+        #importing data
+        #data_file = r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\inputs\Meteorological_Data_25_02_UTM.xlsx"
+        #rain = pd.read_excel(data_file,sheet_name="METEO_CHILE_Rain_All",header=0,index_col=False,keep_default_na=True)
+        temp=pd.read_excel(r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\inputs\T_Daily.xlsx",sheet_name="T_Daily",header=0,index_col=False,keep_default_na=True)
+        hum=pd.read_excel(r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\inputs\RH_Daily_0_100.xlsx",sheet_name="TODAS",header=0,index_col=False,keep_default_na=True)
+        #rain csv Ashkan 2020
+        data_file = r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\inputs\pp_daily_all.csv"
+        
+        #rain = pd.read_excel(data_file,sheet_name="T_Daily",header=0,index_col=False,keep_default_na=True)
+        rain = pd.read_csv(data_file,sep=';',header=0,index_col=False,keep_default_na=True)
+        rain['Date'] = pd.to_datetime(rain['Date'],format=date_format)
+        #############################################################    
+        ############################################################
+        #isotope file preprocess
+        data_file_iso = r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\inputs\pysplit_isotope_registro_Pp_02_05_2020.xlsx"
+        iso_18 = pd.read_excel(data_file_iso,sheet_name="ISOT18O",header=0,index_col=False,keep_default_na=True)
+        iso_2h=pd.read_excel(data_file_iso,sheet_name="ISOT2H",header=0,index_col=False,keep_default_na=True)
+        iso_3h=pd.read_excel(data_file_iso,sheet_name="ISOT3",header=0,index_col=False,keep_default_na=True)
+        #############################################################
+        #2020 trajectory dates datadb for iso predictions
+        try:
+            data_file_iso = r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\inputs\Date_Rain_02_05_2020.xlsx"
+            dates_db = pd.read_excel(data_file_iso,sheet_name="traj_samp_date",header=0,index_col=False,keep_default_na=True)
+        except:
+            dates_db=None
+        ###########################################################
+        #nino nina years
+        elnino=list()
+        lanina=list() 
+        ###########################################################
         #read files and some pre processing
-        month_grouped_list_with_zeros_iso_18,month_grouped_list_without_zeros_iso_18,month_grouped_list_with_zeros_iso_2h,month_grouped_list_without_zeros_iso_2h,month_grouped_list_with_zeros_iso_3h,month_grouped_list_without_zeros_iso_3h,month_grouped_list_with_zeros_hum,month_grouped_list_without_zeros_hum,month_grouped_list_with_zeros_rain,month_grouped_list_without_zeros_rain,month_grouped_list_with_zeros_temp,month_grouped_list_without_zeros_temp,rain,temper,elnino,lanina,iso_18,iso_2h,iso_3h,dates_db=importing_preprocess()
+        month_grouped_list_with_zeros_iso_18,month_grouped_list_with_zeros_iso_2h,month_grouped_list_with_zeros_iso_3h,month_grouped_list_with_zeros_hum,month_grouped_list_with_zeros_rain,month_grouped_list_with_zeros_temp,rain,temp,hum=importing_preprocess(rain,temp,hum,iso_18,iso_2h,iso_3h,meteo_input_type="monthly",write_outliers_input=True) #meteo_input_type="daily_remove_outliers"
         ############################################################
         #METEO MODELS!
 
-        #RAIN normal for 12 month
+        #RAIN
         rain_bests=list()
         rain_preds_real=list()
         for monthnum in range(1,13):
@@ -47,7 +62,6 @@ def model_coup(rerun_meteo=False):
             print ("##RAIN NORMAL month: ", str(monthnum))
             print ("########################################################")
             temp_rain_hum="Mean_Value_rain"
-            #print ("########WITH ZEROS#####")
             tunedpars={"min_weight_fraction_leaf":[0,0.02,0.04],"n_estimators":[50,100,150,200,250,300],"criterion": ["mse","mae"],"min_samples_split":[2,5] }
             gridsearch_dictionary={"activation" : ["identity", "logistic", "tanh", "relu"],"solver" : ["lbfgs", "sgd", "adam"],"alpha":[0.0001,0.0003,0.0005],"hidden_layer_sizes":[(10,)*2,(25,)*2 ,(50,)*2,(75,)*2,(50,)*3,(50,)*4],"max_iter":[50,100,200],"n_iter_no_change":[5,10,15]}
             Y_preds,X_temp_fin ,Y_temp_fin,X_train_rain_normal_with_zeros, X_test_rain_normal_with_zeros, y_train_rain_normal_with_zeros, y_test_rain_normal_with_zeros,best_estimator_all,best_score_all,mutual_info_regression_value,f_regression_value,x_scaler,y_scaler,didlog,used_features,rsquared=rfmethod(tunedpars,gridsearch_dictionary,month_grouped_list_with_zeros_rain[monthnum-1],temp_rain_hum,monthnum,"rain",meteo_or_iso="meteo")
@@ -58,7 +72,6 @@ def model_coup(rerun_meteo=False):
         temp_bests=list()
         temp_preds_real=list()
         for monthnum in range(1,13):
-
             print ("########################################################")
             print ("##TEMP NORMAL month: ", str(monthnum))
             print ("########################################################")
@@ -80,23 +93,28 @@ def model_coup(rerun_meteo=False):
             tunedpars={"min_weight_fraction_leaf":[0,0.02,0.04],"n_estimators":[50,100,150,200,250,300],"criterion": ["mse","mae"],"min_samples_split":[2,5] }
             gridsearch_dictionary={"activation" : ["identity", "logistic", "tanh", "relu"],"solver" : ["lbfgs", "sgd", "adam"],"alpha":[0.0001,0.0003,0.0005],"hidden_layer_sizes":[(10,)*2,(25,)*2 ,(50,)*2,(75,)*2,(50,)*3,(50,)*4],"max_iter":[50,100,200],"n_iter_no_change":[5,10,15]}
             Y_preds,X_temp_fin ,Y_temp_fin,X_train_hum_normal_with_zeros, X_test_hum_normal_with_zeros, y_train_hum_normal_with_zeros, y_test_hum_normal_with_zeros,best_estimator_all,best_score_all,mutual_info_regression_value,f_regression_value,x_scaler,y_scaler,didlog,used_features,rsquared=rfmethod(tunedpars,gridsearch_dictionary,month_grouped_list_with_zeros_hum[monthnum-1],temp_rain_hum,monthnum,"humid",meteo_or_iso="meteo")
-            hum_bests.append([best_estimator_all,best_score_all,mutual_info_regression_value,f_regression_value,used_features,rsquared,x_scaler,y_scaler,didlog])
-            hum_preds_real.append([Y_preds,Y_temp_fin])
+            #hum_bests.append([best_estimator_all,best_score_all,mutual_info_regression_value,f_regression_value,used_features,rsquared,x_scaler,y_scaler,didlog])
+            #hum_preds_real.append([Y_preds,Y_temp_fin])
         #############################################################
         # write outputs to a file 
-        file_name=r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\output\models_output_temp_rain_hum_12_month.txt"
+        file_name=r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\output\models_output_temp_rain_hum_12_month_inc_outliers_logforallfunctions.txt"
         print_to_file(file_name, temp_bests, rain_bests, hum_bests)
         #############################################################
         #add a dill dum session:
-        dill.dump_session(r"C:\\Users\\Ash kan\\Documents\\meteo_iso_model\\meteo_iso_model_input_code_and_results\\code\\internal_dill_dump.pkl")
-    
+        dill.dump_session(r"C:\\Users\\Ash kan\\Documents\\meteo_iso_model\\meteo_iso_model_input_code_and_results\\code\\internal_dill_dump_sep_for_papermeteo_after_log_bug_include_outliers_logforallfunctions.pkl")
+
+
     #making prediction for the isotope points
-    iso_db1=month_grouped_list_with_zeros_iso_18
-    justsum=False
-    predictions_monthly_list, all_preds,all_hysplit_df_list_all_atts,col_for_f_reg,all_without_averaging=iso_prediction(iso_db1,month_grouped_list_with_zeros_iso_2h,month_grouped_list_with_zeros_iso_3h,temp_bests,rain_bests,hum_bests,iso_18,dates_db,justsum=justsum)
-    all_preds.to_excel(r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\output\predicted_results.xls")
-    all_without_averaging.to_excel(r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\output\traj_data_no_averaging.xls")
+    run_iso_whole_year=False
+    trajectories=False
+    iso_model_month_list=[6,7,8]
+    predictions_monthly_list, all_preds,all_hysplit_df_list_all_atts,col_for_f_reg,all_without_averaging=iso_prediction(month_grouped_list_with_zeros_iso_18,month_grouped_list_with_zeros_iso_2h,month_grouped_list_with_zeros_iso_3h,temp_bests,rain_bests,hum_bests,iso_18,dates_db,trajectories,iso_model_month_list,run_iso_whole_year)
+    all_preds.to_excel(r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\output\predicted_results_678_include_outliers_logforallfunctions.xls")
+    if trajectories==True:
+        all_without_averaging.to_excel(r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\output\traj_data_no_averaging.xls")
     #############################################################
+
+    
     #f_reg and mutual annual
     list_of_dics=[
         {"inputs":["CooX","CooY","CooZ"],"outputs":["temp"]},
@@ -106,7 +124,7 @@ def model_coup(rerun_meteo=False):
         {"inputs":["CooX","CooY","CooZ","temp","rain","hum"]+col_for_f_reg,"outputs":["iso_18"]},
         {"inputs":["CooX","CooY","CooZ","temp","rain","hum"]+col_for_f_reg,"outputs":["iso_3h"]},
     ]
-    file_name=r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\output\f_reg_mutual_output_annual.txt"
+    file_name=r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\output\f_reg_mutual_output_annual_678_include_coutliers_logforallfunctions.txt"
     f_reg_mutual(file_name,all_preds,list_of_dics)
     #############################################################
     #############################################################
@@ -125,21 +143,19 @@ def model_coup(rerun_meteo=False):
         ]'''
         file_name="C:\\Users\\Ash kan\\Documents\\meteo_iso_model\\meteo_iso_model_input_code_and_results\\output\\monthly_f_test\\"+"month_"+str(mn)+"_f_reg_mutual_output_mensual.txt"
         f_reg_mutual(file_name,all_preds_temp,list_of_dics)
+
+
     #############################################################
     '''##################PCA for interpreting the data##############
-        print(['CooX', 'CooY', 'CooZ', 'iso_18','temp', 'rain'])
         pca_raw_df=all_preds.drop(columns=["month","ID_MeteoPoint","iso_2h","iso_3h","hum"]).copy()
         pca_fit_Rain_normal=pcafun(pca_raw_df,kmeans_group_nums=5,filetitlename="xyz_18_temp_rain") 
         #############################################################
-        print(['CooX', 'CooY', 'CooZ', 'iso_3h','temp', 'rain'])
         pca_raw_df=all_preds.drop(columns=["month","ID_MeteoPoint","iso_2h","iso_18","hum"]).copy()
         pca_fit_Rain_normal=pcafun(pca_raw_df,kmeans_group_nums=5,filetitlename="xyz_3h_temp_rain")
         #############################################################
-        print([ 'iso_18','temp', 'rain'])
         pca_raw_df=all_preds.drop(columns=["month","ID_MeteoPoint","iso_2h","iso_3h",'CooX', 'CooY', 'CooZ',"hum"]).copy()
         pca_fit_Rain_normal=pcafun(pca_raw_df,kmeans_group_nums=5,filetitlename="18_temp_rain")
         #############################################################
-        print([ 'iso_3h','temp', 'rain'])
         pca_raw_df=all_preds.drop(columns=["month","ID_MeteoPoint","iso_2h","iso_18",'CooX', 'CooY', 'CooZ',"hum"]).copy()
         pca_fit_Rain_normal=pcafun(pca_raw_df,kmeans_group_nums=5,filetitlename="3h_temp_rain")'''
     ############################################################
@@ -153,34 +169,38 @@ def model_coup(rerun_meteo=False):
     temp_rain_hum="iso_2h"
     Y_preds_iso2h,X_temp_fin_iso2h ,Y_temp_fin_iso2h,X_train_iso_2h_normal_with_zeros, X_test_iso_2h_normal_with_zeros, y_train_iso_2h_normal_with_zeros, y_test_iso_2h_normal_with_zeros,best_estimator_all_iso2h,best_score_all_iso2h,mutual_info_regression_value_iso2h,f_regression_value_iso2h,x_scaler_iso2h,y_scaler_iso2h,didlog_iso2h,used_features_iso2h,rsquared_iso2h=rfmethod(tunedpars,gridsearch_dictionary,all_preds,temp_rain_hum,monthnum,"iso_2h", meteo_or_iso="iso",inputs=["CooX","CooY","CooZ","temp","rain","hum"]+col_for_f_reg)
     ####################################
+    ####################################
+    temp_rain_hum="iso_3h"
+    Y_preds_iso3h,X_temp_fin_iso3h ,Y_temp_fin_iso3h,X_train_iso_3h_normal_with_zeros, X_test_iso_3h_normal_with_zeros, y_train_iso_3h_normal_with_zeros, y_test_iso_3h_normal_with_zeros,best_estimator_all_iso3h,best_score_all_iso3h,mutual_info_regression_value_iso3h,f_regression_value_iso3h,x_scaler_iso3h,y_scaler_iso3h,didlog_iso3h,used_features_iso3h,rsquared_iso3h=rfmethod(tunedpars,gridsearch_dictionary,all_preds,temp_rain_hum,monthnum,"iso_3h", meteo_or_iso="iso",inputs=["CooX","CooY","CooZ","temp","rain","hum"]+col_for_f_reg)
+    ####################################
     #writing isotope results to a txt file
-    pr_is_18="\n################\n\n best_estimator_all_iso18\n"+str(best_estimator_all_iso18)+"\n\n################\n\n used_features_iso18 \n"+str(used_features_iso18)+"\n\n################\n\n best_score_all_iso18 \n"+str(best_score_all_iso18)+"\n\n################\n\n rsquared_iso18 \n"+str(rsquared_iso18)+"\n\n#########################\n#########################\n#########################\n"
-    pr_is_2h="\n################\n\n best_estimator_all_iso2h\n"+str(best_estimator_all_iso2h)+"\n\n################\n\n used_features_iso2h \n"+str(used_features_iso2h)+"\n\n################\n\n best_score_all_iso2h \n"+str(best_score_all_iso2h)+"\n\n################\n\n rsquared_iso2h \n"+str(rsquared_iso2h)+"\n\n#########################\n#########################\n#########################\n"
-    file_name="C:\\Users\\Ash kan\\Documents\\meteo_iso_model\\meteo_iso_model_input_code_and_results\\output\\isotope_modeling_results_18_2h.txt"
+    pr_is_18="\n################\n\n best_estimator_all_iso18\n"+str(best_estimator_all_iso18)+"\n\n################\n\n used_features_iso18 \n"+str(used_features_iso18)+"\n\n################\n\n best_score_all_iso18 \n"+str(best_score_all_iso18)+"\n\n################\n\n rsquared_iso18 \n"+str(rsquared_iso18)+"\n\n################\n\n didlog_iso18 \n"+str(didlog_iso18)+"\n\n#########################\n#########################\n#########################\n"
+    pr_is_2h="\n################\n\n best_estimator_all_iso2h\n"+str(best_estimator_all_iso2h)+"\n\n################\n\n used_features_iso2h \n"+str(used_features_iso2h)+"\n\n################\n\n best_score_all_iso2h \n"+str(best_score_all_iso2h)+"\n\n################\n\n rsquared_iso2h \n"+str(rsquared_iso2h)+"\n\n################\n\n rsquared_iso2h \n"+str(rsquared_iso2h)+"\n\n#########################\n#########################\n#########################\n"
+    pr_is_3h="\n################\n\n best_estimator_all_iso3h\n"+str(best_estimator_all_iso3h)+"\n\n################\n\n used_features_iso3h \n"+str(used_features_iso3h)+"\n\n################\n\n best_score_all_iso3h \n"+str(best_score_all_iso3h)+"\n\n################\n\n rsquared_iso3h \n"+str(rsquared_iso3h)+"\n\n################\n\n didlog_iso3h \n"+str(didlog_iso3h)+"\n\n#########################\n#########################\n#########################\n"
+    file_name="C:\\Users\\Ash kan\\Documents\\meteo_iso_model\\meteo_iso_model_input_code_and_results\\output\\isotope_modeling_results_18_2h_3h.txt"
+    
     m_out_f=open(file_name,'w')
     m_out_f.write(pr_is_18)
     m_out_f.write(pr_is_2h)
+    m_out_f.write(pr_is_3h)
     m_out_f.close()
     ###########
     #dill.dump_session(r"C:\\Users\\Ash kan\\Documents\\meteo_iso_model\\meteo_iso_model_input_code_and_results\\code\\internal_dill_dump_iso_18_2h_model_done_just_summer_alt_3000.pkl")
-    if justsum==True:
-        dill.dump_session(r"C:\\Users\\Ash kan\\Documents\\meteo_iso_model\\meteo_iso_model_input_code_and_results\\code\\internal_dill_dump_iso_18_2h_model_done_just_summer.pkl")
-        #dill.load_session(r"C:\\Users\\Ash kan\\Documents\\meteo_iso_model\\meteo_iso_model_input_code_and_results\\code\\internal_dill_dump_iso_18_2h_model_done_just_summer.pkl")
+    if run_iso_whole_year==False:
+        dill.dump_session(r"C:\\Users\\Ash kan\\Documents\\meteo_iso_model\\meteo_iso_model_input_code_and_results\\code\\internal_dill_dump_iso_18_2h_model_done_678_iso_after_logbug_including_outliers_logforallfunctions.pkl")
 
     else:
 
-        dill.dump_session(r"C:\\Users\\Ash kan\\Documents\\meteo_iso_model\\meteo_iso_model_input_code_and_results\\code\\internal_dill_dump_iso_18_2h_model_done_all_year.pkl")
-        #dill.load_session(r"C:\\Users\\Ash kan\\Documents\\meteo_iso_model\\meteo_iso_model_input_code_and_results\\code\\internal_dill_dump_iso_18_2h_model_done_all_year.pkl")
-
+        dill.dump_session(r"C:\\Users\\Ash kan\\Documents\\meteo_iso_model\\meteo_iso_model_input_code_and_results\\code\\internal_dill_dump_iso_18_2h_model_done_allyear_iso_after_logbug_including_outliers_logforallfunctions.pkl")
     #############################################################
     #read points for contour
     data_file = r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\inputs\x_y_z.xls"
     x_y_z_=pd.read_excel(data_file,sheet_name=0,header=0,index_col=False,keep_default_na=True)
-    no_needed_month=[4,5,6,7,8,9]
+     #here and iso_prediction, identifying the month should be nicer!
     column_name="predicted_iso18"
-    monthly_iso18_output=predict_points(used_features_iso18,x_y_z_,no_needed_month,temp_bests,rain_bests,hum_bests,x_scaler_iso18,y_scaler_iso18,didlog_iso18,best_estimator_all_iso18,column_name)
+    monthly_iso18_output=predict_points(used_features_iso18,x_y_z_,iso_model_month_list,temp_bests,rain_bests,hum_bests,x_scaler_iso18,y_scaler_iso18,didlog_iso18,best_estimator_all_iso18,column_name,trajectory_features_list=col_for_f_reg)
     column_name="predicted_iso2h"
-    monthly_iso2h_output=predict_points(used_features_iso2h,x_y_z_,no_needed_month,temp_bests,rain_bests,hum_bests,x_scaler_iso2h,y_scaler_iso2h,didlog_iso2h,best_estimator_all_iso2h,column_name)
+    monthly_iso2h_output=predict_points(used_features_iso2h,x_y_z_,iso_model_month_list,temp_bests,rain_bests,hum_bests,x_scaler_iso2h,y_scaler_iso2h,didlog_iso2h,best_estimator_all_iso2h,column_name,trajectory_features_list=col_for_f_reg)
     ############################################################
     #regional_mensual_plot
     #regional_mensual_plot(x_y_z_,monthly_iso18_output,monthly_iso2h_output)
@@ -188,13 +208,23 @@ def model_coup(rerun_meteo=False):
     #new_data_prediction_comparison
     data_fl=r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\inputs\new_measured.xlsx"
     newd=pd.read_excel(data_fl,sheet_name=0,header=0,index_col=False,keep_default_na=True)
-    new_data_prediction=new_data_prediction_comparison(newd,no_needed_month,temp_bests,rain_bests,hum_bests,didlog_iso18,didlog_iso2h,x_scaler_iso18,x_scaler_iso2h,used_features_iso18,used_features_iso2h,best_estimator_all_iso18,best_estimator_all_iso2h,y_scaler_iso18,y_scaler_iso2h)
+    new_data_prediction=new_data_prediction_comparison(newd,iso_model_month_list,temp_bests,rain_bests,hum_bests,didlog_iso18,didlog_iso2h,x_scaler_iso18,x_scaler_iso2h,used_features_iso18,used_features_iso2h,best_estimator_all_iso18,best_estimator_all_iso2h,y_scaler_iso18,y_scaler_iso2h)
     #time
     t_total_end=time.time()
     print ("#################################\n######Total run time:\n", t_total_end-t_total_start)
     #writing isotope predictions into a file
     pd.concat([all_preds,Y_preds_iso18,Y_preds_iso2h],axis=1).to_excel(r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\output\isotope_main_data_predictions.xlsx")
-    return Y_preds_iso18,Y_preds_iso2h,rain_preds_real,hum_preds_real,temp_preds_real,temp_bests,rain_bests,hum_bests,monthly_iso2h_output,monthly_iso18_output,x_scaler_iso18,y_scaler_iso18,didlog_iso18,used_features_iso18,rsquared_iso18,best_estimator_all_iso18,best_score_all_iso18,x_scaler_iso2h,y_scaler_iso2h,didlog_iso2h,used_features_iso2h,rsquared_iso2h,best_estimator_all_iso2h,best_score_all_iso2h,predictions_monthly_list, all_preds,month_grouped_list_with_zeros_iso_18,month_grouped_list_without_zeros_iso_18,month_grouped_list_with_zeros_iso_2h,month_grouped_list_without_zeros_iso_2h,month_grouped_list_with_zeros_iso_3h,month_grouped_list_without_zeros_iso_3h,month_grouped_list_with_zeros_hum,month_grouped_list_without_zeros_hum,month_grouped_list_with_zeros_rain,month_grouped_list_without_zeros_rain,month_grouped_list_with_zeros_temp,month_grouped_list_without_zeros_temp,rain,temper,elnino,lanina,iso_18,iso_2h,iso_3h
+    #return Y_preds_iso18,Y_preds_iso2h,rain_preds_real,hum_preds_real,temp_preds_real,temp_bests,rain_bests,hum_bests,monthly_iso2h_output,monthly_iso18_output,x_scaler_iso18,y_scaler_iso18,didlog_iso18,used_features_iso18,rsquared_iso18,best_estimator_all_iso18,best_score_all_iso18,x_scaler_iso2h,y_scaler_iso2h,didlog_iso2h,used_features_iso2h,rsquared_iso2h,best_estimator_all_iso2h,best_score_all_iso2h,predictions_monthly_list, all_preds,month_grouped_list_with_zeros_iso_18,month_grouped_list_with_zeros_iso_2h,month_grouped_list_with_zeros_iso_3h,month_grouped_list_with_zeros_hum,month_grouped_list_with_zeros_rain,month_grouped_list_with_zeros_temp,rain,temp,hum,elnino,lanina,iso_18,iso_2h,iso_3h
+
+
+
+if __name__ == "__main__":
+    Y_preds_iso18,Y_preds_iso2h,rain_preds_real,hum_preds_real,temp_preds_real,temp_bests,rain_bests,hum_bests,monthly_iso2h_output,monthly_iso18_output,x_scaler_iso18,y_scaler_iso18,didlog_iso18,used_features_iso18,rsquared_iso18,best_estimator_all_iso18,best_score_all_iso18,x_scaler_iso2h,y_scaler_iso2h,didlog_iso2h,used_features_iso2h,rsquared_iso2h,best_estimator_all_iso2h,best_score_all_iso2h,predictions_monthly_list, all_preds,month_grouped_list_with_zeros_iso_18,month_grouped_list_without_zeros_iso_18,month_grouped_list_with_zeros_iso_2h,month_grouped_list_without_zeros_iso_2h,month_grouped_list_with_zeros_iso_3h,month_grouped_list_without_zeros_iso_3h,month_grouped_list_with_zeros_hum,month_grouped_list_without_zeros_hum,month_grouped_list_with_zeros_rain,month_grouped_list_without_zeros_rain,month_grouped_list_with_zeros_temp,month_grouped_list_without_zeros_temp,rain,temp,hum,elnino,lanina,iso_18,iso_2h,iso_3h=model_coup() 
+    #dill dump session
+    today = date.today()
+    dump_session_name="dill_dump_"+str(date.today())
+    dill.dump_session("C:\\Users\\Ash kan\\Documents\\meteo_iso_model\\meteo_iso_model_input_code_and_results\\code\\"+dump_session_name+".pkl")
+    ############################################################   
 
     ############################################################
     #some tests
@@ -343,13 +373,3 @@ def model_coup(rerun_meteo=False):
         print ("mutual_info_regression_value_temp",mutual_info_regression_value_temp)'''
     #############################################################
 
-
-
-
-if __name__ == "__main__":
-    Y_preds_iso18,Y_preds_iso2h,rain_preds_real,hum_preds_real,temp_preds_real,temp_bests,rain_bests,hum_bests,monthly_iso2h_output,monthly_iso18_output,x_scaler_iso18,y_scaler_iso18,didlog_iso18,used_features_iso18,rsquared_iso18,best_estimator_all_iso18,best_score_all_iso18,x_scaler_iso2h,y_scaler_iso2h,didlog_iso2h,used_features_iso2h,rsquared_iso2h,best_estimator_all_iso2h,best_score_all_iso2h,predictions_monthly_list, all_preds,month_grouped_list_with_zeros_iso_18,month_grouped_list_without_zeros_iso_18,month_grouped_list_with_zeros_iso_2h,month_grouped_list_without_zeros_iso_2h,month_grouped_list_with_zeros_iso_3h,month_grouped_list_without_zeros_iso_3h,month_grouped_list_with_zeros_hum,month_grouped_list_without_zeros_hum,month_grouped_list_with_zeros_rain,month_grouped_list_without_zeros_rain,month_grouped_list_with_zeros_temp,month_grouped_list_without_zeros_temp,rain,temper,elnino,lanina,iso_18,iso_2h,iso_3h=model_coup() 
-    #dill dump session
-    today = date.today()
-    dump_session_name="dill_dump_"+str(date.today())
-    dill.dump_session("C:\\Users\\Ash kan\\Documents\\meteo_iso_model\\meteo_iso_model_input_code_and_results\\code\\"+dump_session_name+".pkl")
-    ############################################################   

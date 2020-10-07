@@ -1,0 +1,90 @@
+
+################
+
+ best_estimator_all_iso18
+OrthogonalMatchingPursuitCV(copy=True, cv=10, fit_intercept=True, max_iter=None,
+                            n_jobs=-1, normalize=True, verbose=False)
+
+################
+
+ used_features_iso18 
+['CooY', 'CooZ', 'temp', 'rain', 'hum']
+
+################
+
+ best_score_all_iso18 
+0.2914817363667602
+
+################
+
+ rsquared_iso18 
+0.3138559973235992
+
+################
+
+ didlog_iso18 
+False
+
+#########################
+#########################
+#########################
+
+################
+
+ best_estimator_all_iso2h
+OrthogonalMatchingPursuitCV(copy=True, cv=10, fit_intercept=True, max_iter=None,
+                            n_jobs=-1, normalize=True, verbose=False)
+
+################
+
+ used_features_iso2h 
+['CooY', 'CooZ', 'temp', 'rain', 'hum']
+
+################
+
+ best_score_all_iso2h 
+0.24833119138691018
+
+################
+
+ rsquared_iso2h 
+0.2720681011325867
+
+################
+
+ rsquared_iso2h 
+False
+
+#########################
+#########################
+#########################
+
+################
+
+ best_estimator_all_iso3h
+OrthogonalMatchingPursuitCV(copy=True, cv=10, fit_intercept=True, max_iter=None,
+                            n_jobs=-1, normalize=True, verbose=False)
+
+################
+
+ used_features_iso3h 
+['CooZ', 'temp', 'rain']
+
+################
+
+ best_score_all_iso3h 
+0.17439813516377067
+
+################
+
+ rsquared_iso3h 
+0.20046977300070412
+
+################
+
+ didlog_iso3h 
+True
+
+#########################
+#########################
+#########################

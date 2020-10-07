@@ -59,7 +59,7 @@ def gen_trajs(iso_18,xy_df_for_hysplit,month_real,altitude,points_all_in_water_r
         #new code to consider database for real dates! 30 april 2020
         
         if Sampling_date_db==False:  
-            dates_general=pd.DatetimeIndex(temp["DateMeas"])
+            dates_general=pd.DatetimeIndex(temp["Date"])
             dates_general=dates_general[dates_general.month.isin([month_real])]
             years=dates_general.year.to_list()
             months=dates_general.month.to_list()
@@ -79,9 +79,9 @@ def gen_trajs(iso_18,xy_df_for_hysplit,month_real,altitude,points_all_in_water_r
                                 get_clipped=False)
         elif Sampling_date_db==True: 
             dates_for_daily_trajs=temp["Date_Meas_real"]
-            dates_for_daily_trajs = pd.concat([temp["DateMeas"],dates_for_daily_trajs,temp["day_type"]], names=["DateMeas","Date_Meas_real","day_type"],axis=1) 
-            dates_for_daily_trajs=dates_for_daily_trajs[pd.DatetimeIndex(dates_for_daily_trajs["DateMeas"]).month.isin([month_real])]
-            dates_general=pd.DatetimeIndex(dates_for_daily_trajs["DateMeas"])
+            dates_for_daily_trajs = pd.concat([temp["Date"],dates_for_daily_trajs,temp["day_type"]], names=["Date","Date_Meas_real","day_type"],axis=1) 
+            dates_for_daily_trajs=dates_for_daily_trajs[pd.DatetimeIndex(dates_for_daily_trajs["Date"]).month.isin([month_real])]
+            dates_general=pd.DatetimeIndex(dates_for_daily_trajs["Date"])
             dates_measured=pd.DatetimeIndex(dates_for_daily_trajs["Date_Meas_real"])
 
             if "Monthly" in dates_for_daily_trajs["day_type"]:
