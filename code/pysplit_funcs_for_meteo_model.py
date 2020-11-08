@@ -13,7 +13,7 @@ import numpy as np
 
 def gen_trajs(iso_18,xy_df_for_hysplit,month_real,altitude,points_all_in_water_report,points_origin_not_detected_report,error_in_meteo_file,traj_shorter_than_runtime_report,input_pass_to_bulkrajfun_report,Sampling_date_db=False):
     working_dir = r'C:/hysplit4/working'
-    meteo_dir = r'C:/Users/Ash kan/Documents/meteo_iso_model/meteo_iso_model_input_code_and_results/inputs/meteo_for_trajs_pysplit/meteo_for_traj_new_name'
+    meteo_dir = r'C:/Users/Ash kan/Documents/meteo_iso_model/meteo_iso_model_input_code_and_results/inputs/meteo_for_trajs_pysplit/meteo_for_traj_new_name' #.gbl files : ex: RPapr1973.gbl format basename+3 letter month + year
     basename = 'RP'
     hours = [12]
     altitudes = [altitude]
@@ -175,9 +175,7 @@ def gen_trajs(iso_18,xy_df_for_hysplit,month_real,altitude,points_all_in_water_r
                     break
             if timestep_is_border==0:
                 print("points_all_in_water")
-                points_all_in_water_report.write("\n\n##########\n##########\n")
-                points_all_in_water_report.write(str(traj.data.loc[timestep_is_border]))
-                points_all_in_water_report.write("\n")
+                points_all_in_water_report.write("\n\n##########\n##########\n\n"+str(traj.data.loc[timestep_is_border])+"\n\n")
                 continue
                 #print ("ATTENTION, Still in land, more timesteps!!!!")    
             #else:
@@ -217,14 +215,8 @@ def gen_trajs(iso_18,xy_df_for_hysplit,month_real,altitude,points_all_in_water_r
             else:
                 continentality="UNKNOWN"
                 cnt_unk=cnt_unk+1
-                points_origin_not_detected_report.write("\n\n##### First point #####\n")
-                points_origin_not_detected_report.write(str(traj.data.loc[0].geometry))
-                points_origin_not_detected_report.write("\n")
-                points_origin_not_detected_report.write(str(traj.data.loc[0].DateTime))
-                points_origin_not_detected_report.write("\n#####last point #####\n")
-                points_origin_not_detected_report.write(str(timestep_is_border))
-                points_origin_not_detected_report.write("\n")
-                points_origin_not_detected_report.write(str(traj.data.loc[timestep_is_border]))
+                points_origin_not_detected_report.write("\n\n##### First point #####\n\n"+str(traj.data.loc[0].geometry)+"\n\n"+str(traj.data.loc[0].DateTime)+
+                "\n\n#####last point #####\n\n"+str(timestep_is_border)+"\n\n\n"+str(traj.data.loc[timestep_is_border]))
                 print ("Attention: couldn't find the origin, skipping!",timestep_is_border)
             
             #18 june 2020 Ashkan: Sonia needs excel with trajctory data before averaging!!

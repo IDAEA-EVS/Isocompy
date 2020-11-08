@@ -771,12 +771,14 @@ def f_reg_mutual(file_name,all_preds,list_of_dics):
 
 ###########################################################
 #predict points for contouring
-def predict_points(used_features_iso18,x_y_z_,iso_model_month_list,temp_bests,rain_bests,hum_bests,x_scaler_iso18,y_scaler_iso18,didlog_iso18,best_estimator_all_iso18,column_name,trajectory_features_list):
+def predict_points(used_features_iso18,x_y_z_,iso_model_month_list,temp_bests,rain_bests,hum_bests,x_scaler_iso18,y_scaler_iso18,didlog_iso18,best_estimator_all_iso18,column_name,trajectory_features_list,run_iso_whole_year):
 
     x_y_z_org=x_y_z_.drop(["FID"],axis=1)
     x_y_z_copy=x_y_z_org.copy()
     monthly_iso_output=list()
     iso_model_month_list_min_one=[n-1 for n in iso_model_month_list]
+    if run_iso_whole_year==True:
+        iso_model_month_list_min_one=[n for n in range(0,12)]
     for month in range(0,12):
         if month in iso_model_month_list_min_one:
             counterr=0
@@ -805,9 +807,12 @@ def predict_points(used_features_iso18,x_y_z_,iso_model_month_list,temp_bests,ra
                     meteopredict_res_per_month=pd.concat([meteopredict_res_per_month,meteopredict_res],axis=1)
             #################################################
             #trajectories prediction
+
             for i in trajectory_features_list:
                 if i in colname:
                     calc_trajectories=True
+            if len(trajectory_features_list)==0:
+                calc_trajectories=False
             if calc_trajectories==True:
                 pass #(?????) 
             #################################################

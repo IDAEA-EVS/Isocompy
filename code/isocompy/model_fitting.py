@@ -1,3 +1,4 @@
+from math import gamma
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
@@ -186,21 +187,22 @@ warnings.filterwarnings(action='ignore', category=DataConversionWarning)
 ##########################################################################################
 ##########################################################################################
 #model!
-def rfmethod(tunedpars,gridsearch_dictionary,newmatdframe,temp_rain_hum,model_type,meteo_or_iso,inputs,apply_on_log,direc):
+def rfmethod(tunedpars_rfr,tunedpars_svr,tunedpars_nusvr,gridsearch_dictionary,newmatdframe,meteo_or_iso,inputs,apply_on_log,direc,cv):
     ########################################################################
 
     #regression functions
     def regressionfunctions(X_temp,Y_temp):
         #OrthogonalMatchingPursuitCV
-        reg =OrthogonalMatchingPursuitCV(cv=10,n_jobs=-1).fit(X_temp, Y_temp)
+        reg =OrthogonalMatchingPursuitCV(cv,n_jobs=-1).fit(X_temp, Y_temp)
         print ("OMP")
         print ("SCORE:\n",adj_r_sqrd(reg.score(X_temp, Y_temp)) )
         best_score_all=adj_r_sqrd(reg.score(X_temp, Y_temp))
         best_estimator_all=reg
         rsquared=reg.score(X_temp, Y_temp)
-        '''########################################################################    
+        '''
+        ########################################################################    
         #RandomForestRegressor
-        estrandomfor_temp=GridSearchCV(RandomForestRegressor(random_state =0), tunedpars, cv=10,n_jobs=-1)
+        estrandomfor_temp=GridSearchCV(RandomForestRegressor(random_state =0), tunedpars_rfr, cv,n_jobs=-1)
         estrandomfor_temp.fit(X_temp, Y_temp.ravel())
         if adj_r_sqrd(estrandomfor_temp.best_score_)>best_score_all:
             best_score_all=adj_r_sqrd(estrandomfor_temp.best_score_)
@@ -208,7 +210,7 @@ def rfmethod(tunedpars,gridsearch_dictionary,newmatdframe,temp_rain_hum,model_ty
             rsquared=estrandomfor_temp.best_score_
         ########################################################################
         #NEURAL NETWORK
-        mlp_temp=GridSearchCV( MLPRegressor(learning_rate="adaptive"), gridsearch_dictionary, cv=5,n_jobs=-1) 
+        mlp_temp=GridSearchCV( MLPRegressor(learning_rate="adaptive"), gridsearch_dictionary, cv,n_jobs=-1) 
         mlp_temp.fit(X_temp, Y_temp.ravel())
         if adj_r_sqrd(mlp_temp.best_score_)>best_score_all:
             best_score_all=adj_r_sqrd(mlp_temp.best_score_)
@@ -217,14 +219,14 @@ def rfmethod(tunedpars,gridsearch_dictionary,newmatdframe,temp_rain_hum,model_ty
         ########################################################################
         #(MULTI TASK) ELASTIC NET CV
         #elastic net on standardized data
-        reg_n = MultiTaskElasticNetCV(l1_ratio=[.1, .3, .5, .6, .7,.8,.85,.87,.9,.93,.95,.97,0.99],n_jobs =-1,cv=10,normalize=False ).fit(X_temp, Y_temp)
+        reg_n = MultiTaskElasticNetCV(l1_ratio=[.1, .5, .7,.9,.99],n_jobs =-1,cv,normalize=False ).fit(X_temp, Y_temp)
         if adj_r_sqrd(reg_n.score(X_temp, Y_temp))>best_score_all:
             best_score_all=adj_r_sqrd(reg_n.score(X_temp, Y_temp))
             best_estimator_all=reg_n
             rsquared=reg_n.score(X_temp, Y_temp)
         #################################################################################
         #OrthogonalMatchingPursuitCV
-        reg =OrthogonalMatchingPursuitCV(cv=10,n_jobs=-1).fit(X_temp, Y_temp)
+        reg =OrthogonalMatchingPursuitCV(cv,n_jobs=-1).fit(X_temp, Y_temp)
         print ("OMP")
         print ("SCORE:\n",adj_r_sqrd(reg.score(X_temp, Y_temp)) )
         if adj_r_sqrd(reg.score(X_temp, Y_temp))>best_score_all:
@@ -235,53 +237,55 @@ def rfmethod(tunedpars,gridsearch_dictionary,newmatdframe,temp_rain_hum,model_ty
         #BayesianRidge
         reg =BayesianRidge(normalize=True).fit(X_temp, Y_temp)
         #cross validation
-        scores = cross_val_score(reg, X_temp, Y_temp.ravel(), cv=10,n_jobs =-1)
+        scores = cross_val_score(reg, X_temp, Y_temp.ravel(), cv,n_jobs =-1)
         print ("BayesianRidge")
-        print ("cross - validation cv=10 scores:\n", scores)
+        print ("cross - validation cv scores:\n", scores)
         print("Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
-        print ("SCORE:\n",adj_r_sqrd(reg.score(X_temp, Y_temp) ))
+        #print ("SCORE:\n",adj_r_sqrd(reg.score(X_temp, Y_temp) ))
         if adj_r_sqrd(scores.mean())>best_score_all:
-            best_score_all=adj_r_sqrd(reg.score(X_temp, Y_temp))
+            best_score_all=adj_r_sqrd(scores.mean())
             best_estimator_all=reg
-            rsquared=reg.score(X_temp, Y_temp)
+            rsquared=scores.mean()
         ####################################################################
         #ARDRegression
         reg =ARDRegression().fit(X_temp, Y_temp)
         #cross validation
-        scores = cross_val_score(reg, X_temp, Y_temp.ravel(), cv=10,n_jobs =-1)
+        scores = cross_val_score(reg, X_temp, Y_temp.ravel(), cv,n_jobs =-1)
         print ("ARDRegression")
-        print ("cross - validation cv=10 scores:\n", scores)
+        print ("cross - validation cv scores:\n", scores)
         print("Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
-        print ("SCORE:\n",adj_r_sqrd(reg.score(X_temp, Y_temp) ))
+        #print ("SCORE:\n",adj_r_sqrd(reg.score(X_temp, Y_temp) ))
         if adj_r_sqrd(scores.mean())>best_score_all:
-            best_score_all=adj_r_sqrd(reg.score(X_temp, Y_temp))
+            best_score_all=adj_r_sqrd(scores.mean())
             best_estimator_all=reg
-            rsquared=reg.score(X_temp, Y_temp)
+            rsquared=scores.mean()
         ####################################################################
+        '''
         #svr
-        tunedpars_svm={"kernel":["linear", "poly", "rbf", "sigmoid"],"C":[1,.95,.9,.8],"epsilon":[.1,.05,.15,.2,.5] }
-        reg=GridSearchCV(SVR(), tunedpars_svm, cv=10,n_jobs=-1).fit(X_temp, Y_temp.ravel())
+        
+
+        reg=GridSearchCV(SVR(cache_size=4000), tunedpars_svr, cv,n_jobs=-1).fit(X_temp, Y_temp.ravel())
         print ("SVR")
-        print ("SCORE:\n",adj_r_sqrd(reg.score(X_temp, Y_temp) ))
-        if adj_r_sqrd(reg.score(X_temp, Y_temp))>best_score_all:
-            best_score_all=adj_r_sqrd(reg.score(X_temp, Y_temp))
+        print ("SCORE:\n",adj_r_sqrd(reg.best_score_ ))
+        if adj_r_sqrd(reg.best_score_)>best_score_all:
+            best_score_all=adj_r_sqrd(reg.best_score_)
             best_estimator_all=reg
-            rsquared=reg.score(X_temp, Y_temp)
+            rsquared=reg.best_score_
         ####################################################################    
-        #NuSVR    
-        tunedpars_svm={"kernel":["linear", "poly", "rbf", "sigmoid"] }
-        reg=GridSearchCV(NuSVR(), tunedpars_svm, cv=10,n_jobs=-1).fit(X_temp, Y_temp.ravel())
+        '''#NuSVR    
+        reg=GridSearchCV(NuSVR(), tunedpars_nusvr, cv,n_jobs=-1).fit(X_temp, Y_temp.ravel())
         print ("NuSVR")
-        print ("SCORE:\n",adj_r_sqrd(reg.score(X_temp, Y_temp) ))
-        if adj_r_sqrd(reg.score(X_temp, Y_temp) )>best_score_all:
-            best_score_all=adj_r_sqrd(reg.score(X_temp, Y_temp) )
+        print ("SCORE:\n",adj_r_sqrd(reg.best_score_ ))
+        if adj_r_sqrd(reg.best_score_  )>best_score_all:
+            best_score_all=adj_r_sqrd(reg.best_score_ )
             best_estimator_all=reg
-            rsquared=reg.score(X_temp, Y_temp)'''
+            rsquared=reg.best_score_'''
         #################################################################### 
         return  best_score_all,best_estimator_all,rsquared
     ########################################################################    
     list_bests=list()
-    list_preds_real=list()
+    list_preds_real_dic=list()
+    list_bests_dic=list()
     if meteo_or_iso=="meteo":
         num_var=3
         colmnss=["CooX","CooY","CooZ"]
@@ -299,7 +303,7 @@ def rfmethod(tunedpars,gridsearch_dictionary,newmatdframe,temp_rain_hum,model_ty
         else:    
             newmatdf_temp=newmatdframe
             X_temp=newmatdframe[inputs].copy().astype(float)
-        Y_temp=newmatdf_temp[[temp_rain_hum]].copy()
+        Y_temp=newmatdf_temp[["Value"]].copy()
         X_train_temp, X_test_temp, y_train_temp, y_test_temp = train_test_split(X_temp, Y_temp)    
         ##################################################
         #adjusted r squared
@@ -368,61 +372,66 @@ def rfmethod(tunedpars,gridsearch_dictionary,newmatdframe,temp_rain_hum,model_ty
                 rsquared=rsquared_log
         else:
             didlog=False
+            best_score_all=best_score_all_normal
+            best_estimator_all=best_estimator_all_normal
+            rsquared=rsquared_normal
         ########################################################################
         # scale transformations
         if didlog==True:
-            Y_preds_output = best_estimator_all.predict(X_temp1) #predict created based on logged data, so Y_preds_output is logged!
+            Y_preds = best_estimator_all.predict(X_temp1) #predict created based on logged data, so Y_preds is logged!
             #transform log
-            Y_preds=np.expm1(Y_preds_output) # inverse transform the log to not logged
+            Y_preds=np.expm1(Y_preds) # inverse transform the log to not logged
         else:
-            Y_temp_fin=Y_temp
-            Y_preds_output = best_estimator_all.predict(X_temp)
-            Y_preds=Y_preds_output.copy()
+            Y_preds = best_estimator_all.predict(X_temp)
         #general standard
-        Y_temp_fin=Y_temp
+        Y_measured=y_scaler.inverse_transform( Y_temp.reshape(-1, 1) )
         Y_preds=y_scaler.inverse_transform( Y_preds.reshape(-1, 1) )    
         ######################################################################## 
         # Plots       
-        lens=len(f_less_ind)
-        f_namess=used_features
-        if meteo_or_iso=="meteo":
-            pltttl="month_"+ str(monthnum) +"_All_data_best_estimator_"+model_type
-        else:
-            pltttl="Annual_iso_All_data_best_estimator_"+model_type
+        """
+            lens=len(f_less_ind)
+            f_namess=used_features
+            if meteo_or_iso=="meteo":
+                pltttl="month_"+ str(monthnum) +"_All_data_best_estimator_"+model_type
+            else:
+                pltttl="Annual_iso_All_data_best_estimator_"+model_type
 
-        pltname=os.path.join(direc,"model_plots",model_type,"best_estimators",pltttl+'.pdf')
-        pltnamepardep=os.path.join(direc,"model_plots",model_type,"partial_dependency",'_partial_dependence'+pltttl+'.pdf')
-        #folder making and checking:
-        Path(os.path.join(direc,"model_plots",model_type,"best_estimators")).mkdir(parents=True,exist_ok=True)
-        Path(os.path.join(direc,"model_plots",model_type,"partial_dependency")).mkdir(parents=True,exist_ok=True)
+            pltname=os.path.join(direc,"model_plots",model_type,"best_estimators",pltttl+'.pdf')
+            pltnamepardep=os.path.join(direc,"model_plots",model_type,"partial_dependency",'_partial_dependence'+pltttl+'.pdf')
+            #folder making and checking:
+            Path(os.path.join(direc,"model_plots",model_type,"best_estimators")).mkdir(parents=True,exist_ok=True)
+            Path(os.path.join(direc,"model_plots",model_type,"partial_dependency")).mkdir(parents=True,exist_ok=True)
 
-        clnm=model_type+"_"+str(monthnum)
-        Y_preds=pd.DataFrame(Y_preds,columns=[clnm])
-        plt.scatter(Y_preds,Y_temp_fin)
-        plt.title(pltttl)
-        plt.xlabel("Prediction")
-        plt.ylabel("Real Value")
-        left, right = plt.xlim()
-        left1, right1 = plt.ylim()
-        a = np.linspace(min(left,left1),max(right,right1),100)
-        b=a
-        plt.plot(a,b)
-        plt.savefig(pltname,dpi=300)
-        #plt.show()
-        plt.close()
-        if didlog==False:
-            plot_partial_dependence(best_estimator_all, X_temp, features=list(range(0,lens)),feature_names=f_namess)
-        else:
+            clnm=model_type+"_"+str(monthnum)
+            Y_preds=pd.DataFrame(Y_preds,columns=[clnm])
+            plt.scatter(Y_preds,Y_measured)
+            plt.title(pltttl)
+            plt.xlabel("Prediction")
+            plt.ylabel("Real Value")
+            left, right = plt.xlim()
+            left1, right1 = plt.ylim()
+            a = np.linspace(min(left,left1),max(right,right1),100)
+            b=a
+            plt.plot(a,b)
+            plt.savefig(pltname,dpi=300)
+            #plt.show()
+            plt.close()
+            if didlog==False:
+                plot_partial_dependence(best_estimator_all, X_temp, features=list(range(0,lens)),feature_names=f_namess)
+            else:
 
-            plot_partial_dependence(best_estimator_all, X_temp1, features=list(range(0,lens)),feature_names=f_namess)
+                plot_partial_dependence(best_estimator_all, X_temp1, features=list(range(0,lens)),feature_names=f_namess)
 
-        plt.savefig(pltnamepardep,dpi=300)
-        #plt.show()
-        plt.close()
-
+            plt.savefig(pltnamepardep,dpi=300)
+            #plt.show()
+            plt.close()
+        """
+        Y_preds=pd.DataFrame(Y_preds,columns=["Value"])
         list_bests.append([best_estimator_all,best_score_all,mutual_info_regression_value,f_regression_value,used_features,rsquared,x_scaler,y_scaler,didlog])
-        list_preds_real.append([Y_preds,Y_temp_fin,X_temp])  
-    return list_bests,list_preds_real
+        list_preds_real_dic.append({"Y_preds":Y_preds,"Y_temp_fin":Y_measured,"X_temp":X_temp})  
+        list_bests_dic.append({"best_estimator":best_estimator_all,"best_score":best_score_all,"mutual_info_regression":mutual_info_regression_value,
+        "f_regression":f_regression_value,"used_features":used_features,"rsquared":rsquared,"didlog":didlog})
+    return list_bests,list_preds_real_dic,list_bests_dic
 
         #some old lines
     
@@ -482,6 +491,10 @@ def iso_prediction(iso_db1,month_grouped_list_with_zeros_iso_2h,month_grouped_li
             hum_pred=bests_of_all_preds[2]
             ###################################################################
             ######################
+            iso_db1[month_num]=iso_db1[month_num].rename(columns={"Value": "iso_18"})
+            month_grouped_list_with_zeros_iso_2h[month_num]=month_grouped_list_with_zeros_iso_2h[month_num].rename(columns={"Value": "iso_2h"})
+            month_grouped_list_with_zeros_iso_3h[month_num]=month_grouped_list_with_zeros_iso_3h[month_num].rename(columns={"Value": "iso_3h"})
+
             preds=pd.concat([iso_db1[month_num][["CooX","CooY","CooZ","ID_MeteoPoint","iso_18"]],month_grouped_list_with_zeros_iso_2h[month_num][["iso_2h"]],month_grouped_list_with_zeros_iso_3h[month_num][["iso_3h"]],temp_pred,rain_pred,hum_pred],axis=1,ignore_index =False)   
             ######################
             all_hysplit_df_list_all_atts=list()
@@ -552,71 +565,34 @@ def iso_prediction(iso_db1,month_grouped_list_with_zeros_iso_2h,month_grouped_li
     return  predictions_monthly_list, all_preds,all_hysplit_df_list_all_atts,col_for_f_reg,all_without_averaging      
 
 ###########################################################
-
-#f_reg and mutual
-def f_reg_mutual(file_name,all_preds,list_of_dics):
+def print_to_file(file_name,temp_bests,rain_bests,hum_bests):
     m_out_f=open(file_name,'w')
-    for sets in list_of_dics:
-        st_exist=False
-        st_exist_m=True
-        print ("all_preds[sets[inputs]:", all_preds[sets["inputs"]])
-        print ("all_preds[sets[outputs]]:",all_preds[sets["outputs"]])
-        try:
-            mutual_info = mutual_info_regression(all_preds[sets["inputs"]],all_preds[sets["outputs"]])
-        except:
-            st_exist_m=False
-        try:
-            maxx=np.max(mutual_info)
-            mutual_info_st=list()
-            for jj in range(0,len(mutual_info)):
-                mutual_info_st.append(mutual_info[jj]/ maxx)
-            st_exist=True
-        except:
-            print ("MI ALL ZEROSS!!!")   
-            
-            
-        f_reg=f_regression(all_preds[sets["inputs"]],all_preds[sets["outputs"]])
-        #print (type(f_reg[0]))
-        try:
-            mxx=np.max(f_reg[0])
-            for jj in range(0,len(f_reg[0])):
-                f_reg[0][jj]/= mxx
-        except:
-            print ("f test all zeross!!")
-        m_out_f.write("########################################################")
-        m_out_f.write('\n')
-        m_out_f.write("########################################################")
-        m_out_f.write('\n\n')
-        m_out_f.write('inputs:')
-        m_out_f.write(str(sets["inputs"]))
-        m_out_f.write('\n')
-        m_out_f.write('output:')
-        m_out_f.write(str(sets["outputs"]))
-        m_out_f.write('\n\n\n')
-        m_out_f.write("f_regression ")
-        m_out_f.write('\n')
-        m_out_f.write(str(f_reg[0]))
-        m_out_f.write('\n')
-        m_out_f.write(str(f_reg[1]))
-        m_out_f.write('\n\n')
-        m_out_f.write("mutual_info_standard ")
-        m_out_f.write('\n')
-        if st_exist==True:
-            m_out_f.write(str(mutual_info_st))
-        else:
-            m_out_f.write("Not possible to calculate the STANDARD mutual, possibly division by zero problem!") 
-        m_out_f.write('\n\n')
-        m_out_f.write("mutual_info ")
-        m_out_f.write('\n')     
-        if st_exist_m==True:
-            m_out_f.write(str(mutual_info))
+    feat_name=["TEMPERATURE","HUMIDITY","PRECIPITATION"]
+    cnt=0
+    for featt in [temp_bests,hum_bests,rain_bests]:
+        for monthnum in range(0,len(featt)):
+            title=feat_name[cnt]+'\nmonth\n'
+            m_out_f.write(title)
+            m_out_f.write(str(monthnum+1))
+            m_out_f.write('\n\n\n Used features \n')
+            m_out_f.write(str(featt[monthnum][4]))
+            m_out_f.write('\n\n BEST SCORE adjusted R squared \n')
+            m_out_f.write(str(featt[monthnum][1]))
+            m_out_f.write('\n\n BEST SCORE R squared \n')
+            m_out_f.write(str(featt[monthnum][5]))
+            m_out_f.write('\n\n F REGRESSION \n')
+            m_out_f.write(str(featt[monthnum][3][0]))
             m_out_f.write('\n')
-        else:
-            m_out_f.write("Not possible to calculate mutual. Possibly not enough data")
+            m_out_f.write(str(featt[monthnum][3][1]))
+            m_out_f.write('\n\n MUTUAL INFORMATION REGRESSION \n')
+            m_out_f.write(str(featt[monthnum][2]))
+            m_out_f.write('\n\n BEST ESTIMATOR \n')
+            m_out_f.write(str(featt[monthnum][0]))
+            m_out_f.write('\n\nlog(1 + x)? \n')
+            m_out_f.write(str(featt[monthnum][-1]))
             m_out_f.write('\n')
-
-            
-        
-    m_out_f.close()
-
-###########################################################
+            m_out_f.write("########################################################\n")
+        m_out_f.write('\n"########################################################\n')
+        cnt=cnt+1  
+    m_out_f.close() 
+    return       

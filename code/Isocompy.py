@@ -87,19 +87,19 @@ class model(object):
         #RAIN
         temp_rain_hum="Mean_Value_rain"
         model_type="rain"
-        self.rain_bests,self.rain_preds_real=rfmethod(self.tunedpars_rain,self.gridsearch_dictionary_rain,newmatdframe_rain,temp_rain_hum,model_type,meteo_or_iso,inputs,self.apply_on_log,self.direc)
+        self.rain_bests,self.rain_preds_real_dic,self.rain_bests_dic=rfmethod(self.tunedpars_rain,self.gridsearch_dictionary_rain,newmatdframe_rain,temp_rain_hum,model_type,meteo_or_iso,inputs,self.apply_on_log,self.direc)
         #self.rain_bests=best_estimator_all,best_score_all,mutual_info_regression_value,f_regression_value,used_features,rsquared,x_scaler,y_scaler,didlog
         #self.rain_preds_real=Y_preds,Y_temp_fin,X_temp
         ###########################################
         #TEMP
         temp_rain_hum="Mean_Value_temp"
         model_type="temp"
-        self.temp_bests,self.temp_preds_real=rfmethod(self.tunedpars_temp,self.gridsearch_dictionary_temp,newmatdframe_temp,temp_rain_hum,model_type,meteo_or_iso,inputs,self.apply_on_log,self.direc)
+        self.temp_bests,self.temp_preds_real_dic,self.temp_bests_dic=rfmethod(self.tunedpars_temp,self.gridsearch_dictionary_temp,newmatdframe_temp,temp_rain_hum,model_type,meteo_or_iso,inputs,self.apply_on_log,self.direc)
         ##########################################
         #Humidity
         temp_rain_hum="Mean_Value_hum"
         model_type="humid"
-        self.hum_bests,self.hum_preds_real=rfmethod(self.tunedpars_hum,self.gridsearch_dictionary_hum,newmatdframe_hum,temp_rain_hum,model_type,meteo_or_iso,inputs,self.apply_on_log,self.direc)
+        self.hum_bests,self.hum_preds_real_dic,self.hum_bests_dic=rfmethod(self.tunedpars_hum,self.gridsearch_dictionary_hum,newmatdframe_hum,temp_rain_hum,model_type,meteo_or_iso,inputs,self.apply_on_log,self.direc)
         #############################################################     
 
     ##########################################################################################
@@ -123,16 +123,16 @@ class model(object):
         ####################################
         temp_rain_hum="iso_18"
         model_type="iso_18"
-        self.iso18_bests,self.iso18_preds_real=rfmethod(self.tunedpars_iso18,self.gridsearch_dictionary_iso18,newmatdframe_iso18,temp_rain_hum,model_type,meteo_or_iso,inputs,self.apply_on_log,self.direc)
+        self.iso18_bests,self.iso18_preds_real_dic,self.iso18_bests_dic=rfmethod(self.tunedpars_iso18,self.gridsearch_dictionary_iso18,newmatdframe_iso18,temp_rain_hum,model_type,meteo_or_iso,inputs,self.apply_on_log,self.direc)
         ####################################
         temp_rain_hum="iso_2h"
         model_type="iso_2h"
-        self.iso2h_bests,self.iso2h_preds_real=rfmethod(self.tunedpars_iso2h,self.gridsearch_dictionary_iso2h,newmatdframe_iso2h,temp_rain_hum,model_type,meteo_or_iso,inputs,self.apply_on_log,self.direc)
+        self.iso2h_bests,self.iso2h_preds_real_dic,self.iso2h_bests_dic=rfmethod(self.tunedpars_iso2h,self.gridsearch_dictionary_iso2h,newmatdframe_iso2h,temp_rain_hum,model_type,meteo_or_iso,inputs,self.apply_on_log,self.direc)
         ####################################
         ####################################
         temp_rain_hum="iso_3h"
         model_type="iso_3h"
-        self.iso3h_bests,self.iso3h_preds_real=rfmethod(self.tunedpars_iso3h,self.gridsearch_dictionary_iso3h,newmatdframe_iso3h,temp_rain_hum,model_type,meteo_or_iso,inputs,self.apply_on_log,self.direc)
+        self.iso3h_bests,self.iso3h_preds_real_dic,self.iso3h_bests_dic=rfmethod(self.tunedpars_iso3h,self.gridsearch_dictionary_iso3h,newmatdframe_iso3h,temp_rain_hum,model_type,meteo_or_iso,inputs,self.apply_on_log,self.direc)
         ####################################
         if output_report==True:
             #self.rain_bests=best_estimator_all,best_score_all,mutual_info_regression_value,f_regression_value,used_features,rsquared,x_scaler,y_scaler,didlog
@@ -175,8 +175,10 @@ class model(object):
         for mn in all_preds_month:
             all_preds_temp=model_cls_obj.all_preds[model_cls_obj.all_preds["month"]==mn]
             Path(os.path.join(model_cls_obj.direc,"mensual_statistics")).mkdir(parents=True, exist_ok=True)
-            file_name= os.path.join(model_cls_obj.direc,"monthly_f_test","month_"+str(mn)+"mensual_statistics_f_test_MI.txt")
+            file_name= os.path.join(model_cls_obj.direc,"mensual_statistics","month_"+str(mn)+"mensual_statistics_f_test_MI.txt")
             f_reg_mutual(file_name,all_preds_temp,list_of_dics_for_stats)
+
+
 class tools(object):
 
     @staticmethod
@@ -198,4 +200,30 @@ class tools(object):
         with open(filename, 'wb') as filee:
             dill.dump(obj=model_cls_obj,file=filee)
         print ("\n\n pkl saved session directory: \n\n",filename)
-##########################################################################################
+    ##########################################################################################
+    def predict():
+        #############################################################
+        #read points for contour
+        data_file = r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\inputs\x_y_z.xls"
+        x_y_z_=pd.read_excel(data_file,sheet_name=0,header=0,index_col=False,keep_default_na=True)
+        #here and iso_prediction, identifying the month should be nicer!
+        column_name="predicted_iso18"
+        monthly_iso18_output=predict_points(used_features_iso18,x_y_z_,iso_model_month_list,temp_bests,rain_bests,hum_bests,x_scaler_iso18,y_scaler_iso18,didlog_iso18,best_estimator_all_iso18,column_name,trajectory_features_list=col_for_f_reg)
+        column_name="predicted_iso2h"
+        monthly_iso2h_output=predict_points(used_features_iso2h,x_y_z_,iso_model_month_list,temp_bests,rain_bests,hum_bests,x_scaler_iso2h,y_scaler_iso2h,didlog_iso2h,best_estimator_all_iso2h,column_name,trajectory_features_list=col_for_f_reg)
+    ############################################################
+    def regional_mensual_plot():
+        #regional_mensual_plot
+        #regional_mensual_plot(x_y_z_,monthly_iso18_output,monthly_iso2h_output)
+        ############################################################
+    def new_inp_compare():   
+        #new_data_prediction_comparison
+        data_fl=r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\inputs\new_measured.xlsx"
+        newd=pd.read_excel(data_fl,sheet_name=0,header=0,index_col=False,keep_default_na=True)
+        new_data_prediction=new_data_prediction_comparison(newd,iso_model_month_list,temp_bests,rain_bests,hum_bests,didlog_iso18,didlog_iso2h,x_scaler_iso18,x_scaler_iso2h,used_features_iso18,used_features_iso2h,best_estimator_all_iso18,best_estimator_all_iso2h,y_scaler_iso18,y_scaler_iso2h)
+        #time
+        t_total_end=time.time()
+        print ("#################################\n######Total run time:\n", t_total_end-t_total_start)
+        #writing isotope predictions into a file
+        pd.concat([all_preds,Y_preds_iso18,Y_preds_iso2h],axis=1).to_excel(r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\output\isotope_main_data_predictions.xlsx")
+        #return Y_preds_iso18,Y_preds_iso2h,rain_preds_real,hum_preds_real,temp_preds_real,temp_bests,rain_bests,hum_bests,monthly_iso2h_output,monthly_iso18_output,x_scaler_iso18,y_scaler_iso18,didlog_iso18,used_features_iso18,rsquared_iso18,best_estimator_all_iso18,best_score_all_iso18,x_scaler_iso2h,y_scaler_iso2h,didlog_iso2h,used_features_iso2h,rsquared_iso2h,best_estimator_all_iso2h,best_score_all_iso2h,predictions_monthly_list, all_preds,month_grouped_list_with_zeros_iso_18,month_grouped_list_with_zeros_iso_2h,month_grouped_list_with_zeros_iso_3h,month_grouped_list_with_zeros_hum,month_grouped_list_with_zeros_rain,month_grouped_list_with_zeros_temp,rain,temp,hum,elnino,lanina,iso_18,iso_2h,iso_3h
