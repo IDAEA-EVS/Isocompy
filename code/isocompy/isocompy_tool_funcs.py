@@ -58,6 +58,7 @@ def predict_points(dir,used_features_iso18,x_y_z_org,iso_model_month_list,temp_b
             iso_model_input=x_scaler_iso18.transform(iso_model_input[used_features_iso18])
             if didlog_iso18==True:
                 iso_model_input=np.log1p(iso_model_input)
+                iso_model_input=iso_model_input[~np.isnan(iso_model_input).any(axis=1)]
             #predicting
             each_month_iso_predict=best_estimator_all_iso18.predict(iso_model_input)
             #inverse transform
@@ -337,40 +338,26 @@ def f_reg_mutual(file_name,all_preds,list_of_dics):
                 f_reg[0][jj]/= mxx
         except:
             print ("f test all zeross!!")
-        m_out_f.write("########################################################")
-        m_out_f.write('\n')
-        m_out_f.write("########################################################")
-        m_out_f.write('\n\n')
-        m_out_f.write('inputs:')
+        m_out_f.write("########################################################\n\n\n########################################################\n\n\ninputs:\n")
         m_out_f.write(str(sets["inputs"]))
-        m_out_f.write('\n')
-        m_out_f.write('output:')
+        m_out_f.write('\n\noutput:')
         m_out_f.write(str(sets["outputs"]))
-        m_out_f.write('\n\n\n')
-        m_out_f.write("f_regression ")
-        m_out_f.write('\n')
+        m_out_f.write('\n\n\n\n f_regression \n\n')
         m_out_f.write(str(f_reg[0]))
         m_out_f.write('\n')
         m_out_f.write(str(f_reg[1]))
-        m_out_f.write('\n\n')
-        m_out_f.write("mutual_info_standard ")
-        m_out_f.write('\n')
+        m_out_f.write('\n\n\n mutual_info_standard\n\n')
         if st_exist==True:
             m_out_f.write(str(mutual_info_st))
         else:
             m_out_f.write("Not possible to calculate the STANDARD mutual, possibly division by zero problem!") 
-        m_out_f.write('\n\n')
-        m_out_f.write("mutual_info ")
-        m_out_f.write('\n')     
+        m_out_f.write('\n\n\n mutual_info \n \n')     
         if st_exist_m==True:
             m_out_f.write(str(mutual_info))
             m_out_f.write('\n')
         else:
-            m_out_f.write("Not possible to calculate mutual. Possibly not enough data")
-            m_out_f.write('\n')
+            m_out_f.write("Not possible to calculate mutual. Possibly not enough data \n\n")
 
-            
-        
     m_out_f.close()
 
 ###########################################################

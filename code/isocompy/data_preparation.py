@@ -1,5 +1,6 @@
 from isocompy.data_prep import data_preparation_func
-
+from pathlib import Path
+import os
 class preprocess(object):
 
     def __init__(self,direc,meteo_input_type="daily_remove_outliers",write_outliers_input=True,year_type="all",
@@ -21,9 +22,10 @@ class preprocess(object):
         self.q1=q1
         self.q3=q3
         self.direc=direc
-    
-    def fit(self,rain,temp,hum,iso_18,iso_2h,iso_3h,elnino=None,lanina=None):
+        Path(self.direc).mkdir(parents=True, exist_ok=True)
 
+    def fit(self,rain,temp,hum,iso_18,iso_2h,iso_3h,elnino=None,lanina=None):
+        Path(self.direc).mkdir(parents=True, exist_ok=True)
         if elnino==None: elnino=[]
         if lanina==None: lanina=[]
         self.iso_18=iso_18

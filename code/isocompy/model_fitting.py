@@ -17,6 +17,9 @@ import os
 from pathlib import Path
 import dill
 from datetime import datetime
+from sklearn.linear_model import LinearRegression
+
+
 
 def warn(*args, **kwargs):
     pass
@@ -187,43 +190,46 @@ warnings.filterwarnings(action='ignore', category=DataConversionWarning)
 ##########################################################################################
 ##########################################################################################
 #model!
-def rfmethod(tunedpars_rfr,tunedpars_svr,tunedpars_nusvr,gridsearch_dictionary,newmatdframe,meteo_or_iso,inputs,apply_on_log,direc,cv):
+def rfmethod(tunedpars_rfr,tunedpars_svr,tunedpars_nusvr,tunedpars_mlp,newmatdframe,meteo_or_iso,inputs,apply_on_log,direc,cv,which_regs,vif_threshold,p_val):
     ########################################################################
 
     #regression functions
-    def regressionfunctions(X_temp,Y_temp):
-        #OrthogonalMatchingPursuitCV
-        reg =OrthogonalMatchingPursuitCV(cv,n_jobs=-1).fit(X_temp, Y_temp)
-        print ("OMP")
+    def regressionfunctions(X_temp,Y_temp,which_regs):
+        #LinearRegression
+        reg =LinearRegression().fit(X_temp, Y_temp)
+        print ("LinearRegression")
         print ("SCORE:\n",adj_r_sqrd(reg.score(X_temp, Y_temp)) )
         best_score_all=adj_r_sqrd(reg.score(X_temp, Y_temp))
         best_estimator_all=reg
         rsquared=reg.score(X_temp, Y_temp)
-        '''
-        ########################################################################    
+        
+        ########################################################################  
         #RandomForestRegressor
-        estrandomfor_temp=GridSearchCV(RandomForestRegressor(random_state =0), tunedpars_rfr, cv,n_jobs=-1)
-        estrandomfor_temp.fit(X_temp, Y_temp.ravel())
-        if adj_r_sqrd(estrandomfor_temp.best_score_)>best_score_all:
-            best_score_all=adj_r_sqrd(estrandomfor_temp.best_score_)
-            best_estimator_all=estrandomfor_temp.best_estimator_
-            rsquared=estrandomfor_temp.best_score_
+        if which_regs["rfr"]==True:  
+            estrandomfor_temp=GridSearchCV(RandomForestRegressor(random_state =0), tunedpars_rfr, cv=cv,n_jobs=-1)
+            estrandomfor_temp.fit(X_temp, Y_temp.ravel())
+            if adj_r_sqrd(estrandomfor_temp.best_score_)>best_score_all:
+                best_score_all=adj_r_sqrd(estrandomfor_temp.best_score_)
+                best_estimator_all=estrandomfor_temp.best_estimator_
+                rsquared=estrandomfor_temp.best_score_
         ########################################################################
         #NEURAL NETWORK
-        mlp_temp=GridSearchCV( MLPRegressor(learning_rate="adaptive"), gridsearch_dictionary, cv,n_jobs=-1) 
-        mlp_temp.fit(X_temp, Y_temp.ravel())
-        if adj_r_sqrd(mlp_temp.best_score_)>best_score_all:
-            best_score_all=adj_r_sqrd(mlp_temp.best_score_)
-            best_estimator_all=mlp_temp.best_estimator_
-            rsquared=mlp_temp.best_score_
+        if which_regs["mlp"]==True:  
+            mlp_temp=GridSearchCV( MLPRegressor(learning_rate="adaptive"), tunedpars_mlp, cv=cv,n_jobs=-1) 
+            mlp_temp.fit(X_temp, Y_temp.ravel())
+            if adj_r_sqrd(mlp_temp.best_score_)>best_score_all:
+                best_score_all=adj_r_sqrd(mlp_temp.best_score_)
+                best_estimator_all=mlp_temp.best_estimator_
+                rsquared=mlp_temp.best_score_
         ########################################################################
         #(MULTI TASK) ELASTIC NET CV
         #elastic net on standardized data
-        reg_n = MultiTaskElasticNetCV(l1_ratio=[.1, .5, .7,.9,.99],n_jobs =-1,cv,normalize=False ).fit(X_temp, Y_temp)
-        if adj_r_sqrd(reg_n.score(X_temp, Y_temp))>best_score_all:
-            best_score_all=adj_r_sqrd(reg_n.score(X_temp, Y_temp))
-            best_estimator_all=reg_n
-            rsquared=reg_n.score(X_temp, Y_temp)
+        if which_regs["elnet"]==True:  
+            reg_n = MultiTaskElasticNetCV(l1_ratio=[.1, .5, .7,.9,.99],n_jobs =-1,normalize=False,cv=cv ).fit(X_temp, Y_temp)
+            if adj_r_sqrd(reg_n.score(X_temp, Y_temp))>best_score_all:
+                best_score_all=adj_r_sqrd(reg_n.score(X_temp, Y_temp))
+                best_estimator_all=reg_n
+                rsquared=reg_n.score(X_temp, Y_temp)
         #################################################################################
         #OrthogonalMatchingPursuitCV
         reg =OrthogonalMatchingPursuitCV(cv,n_jobs=-1).fit(X_temp, Y_temp)
@@ -235,51 +241,52 @@ def rfmethod(tunedpars_rfr,tunedpars_svr,tunedpars_nusvr,gridsearch_dictionary,n
             rsquared=reg.score(X_temp, Y_temp)
         ####################################################################
         #BayesianRidge
-        reg =BayesianRidge(normalize=True).fit(X_temp, Y_temp)
-        #cross validation
-        scores = cross_val_score(reg, X_temp, Y_temp.ravel(), cv,n_jobs =-1)
-        print ("BayesianRidge")
-        print ("cross - validation cv scores:\n", scores)
-        print("Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
-        #print ("SCORE:\n",adj_r_sqrd(reg.score(X_temp, Y_temp) ))
-        if adj_r_sqrd(scores.mean())>best_score_all:
-            best_score_all=adj_r_sqrd(scores.mean())
-            best_estimator_all=reg
-            rsquared=scores.mean()
+        if which_regs["br"]==True:  
+            reg =BayesianRidge(normalize=True).fit(X_temp, Y_temp)
+            #cross validation
+            scores = cross_val_score(reg, X_temp, Y_temp.ravel(), cv=cv,n_jobs =-1)
+            print ("BayesianRidge")
+            print ("cross - validation cv scores:\n", scores)
+            print("Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
+            #print ("SCORE:\n",adj_r_sqrd(reg.score(X_temp, Y_temp) ))
+            if adj_r_sqrd(scores.mean())>best_score_all:
+                best_score_all=adj_r_sqrd(scores.mean())
+                best_estimator_all=reg
+                rsquared=scores.mean()
         ####################################################################
         #ARDRegression
-        reg =ARDRegression().fit(X_temp, Y_temp)
-        #cross validation
-        scores = cross_val_score(reg, X_temp, Y_temp.ravel(), cv,n_jobs =-1)
-        print ("ARDRegression")
-        print ("cross - validation cv scores:\n", scores)
-        print("Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
-        #print ("SCORE:\n",adj_r_sqrd(reg.score(X_temp, Y_temp) ))
-        if adj_r_sqrd(scores.mean())>best_score_all:
-            best_score_all=adj_r_sqrd(scores.mean())
-            best_estimator_all=reg
-            rsquared=scores.mean()
+        if which_regs["ard"]==True:  
+            reg =ARDRegression().fit(X_temp, Y_temp)
+            #cross validation
+            scores = cross_val_score(reg, X_temp, Y_temp.ravel(), cv=cv,n_jobs =-1)
+            print ("ARDRegression")
+            print ("cross - validation cv scores:\n", scores)
+            print("Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
+            #print ("SCORE:\n",adj_r_sqrd(reg.score(X_temp, Y_temp) ))
+            if adj_r_sqrd(scores.mean())>best_score_all:
+                best_score_all=adj_r_sqrd(scores.mean())
+                best_estimator_all=reg
+                rsquared=scores.mean()
         ####################################################################
-        '''
         #svr
-        
-
-        reg=GridSearchCV(SVR(cache_size=4000), tunedpars_svr, cv,n_jobs=-1).fit(X_temp, Y_temp.ravel())
-        print ("SVR")
-        print ("SCORE:\n",adj_r_sqrd(reg.best_score_ ))
-        if adj_r_sqrd(reg.best_score_)>best_score_all:
-            best_score_all=adj_r_sqrd(reg.best_score_)
-            best_estimator_all=reg
-            rsquared=reg.best_score_
+        if which_regs["svr"]==True:  
+            reg=GridSearchCV(SVR(cache_size=8000), tunedpars_svr, cv=cv,n_jobs=-1).fit(X_temp, Y_temp.ravel())
+            print ("SVR")
+            print ("SCORE:\n",adj_r_sqrd(reg.best_score_ ))
+            if adj_r_sqrd(reg.best_score_)>best_score_all:
+                best_score_all=adj_r_sqrd(reg.best_score_)
+                best_estimator_all=reg
+                rsquared=reg.best_score_
         ####################################################################    
-        '''#NuSVR    
-        reg=GridSearchCV(NuSVR(), tunedpars_nusvr, cv,n_jobs=-1).fit(X_temp, Y_temp.ravel())
-        print ("NuSVR")
-        print ("SCORE:\n",adj_r_sqrd(reg.best_score_ ))
-        if adj_r_sqrd(reg.best_score_  )>best_score_all:
-            best_score_all=adj_r_sqrd(reg.best_score_ )
-            best_estimator_all=reg
-            rsquared=reg.best_score_'''
+        #NuSVR    
+        if which_regs["nusvr"]==True:  
+            reg=GridSearchCV(NuSVR(), tunedpars_nusvr, cv=cv,n_jobs=-1).fit(X_temp, Y_temp.ravel())
+            print ("NuSVR")
+            print ("SCORE:\n",adj_r_sqrd(reg.best_score_ ))
+            if adj_r_sqrd(reg.best_score_  )>best_score_all:
+                best_score_all=adj_r_sqrd(reg.best_score_ )
+                best_estimator_all=reg
+                rsquared=reg.best_score_
         #################################################################### 
         return  best_score_all,best_estimator_all,rsquared
     ########################################################################    
@@ -291,7 +298,7 @@ def rfmethod(tunedpars_rfr,tunedpars_svr,tunedpars_nusvr,gridsearch_dictionary,n
         colmnss=["CooX","CooY","CooZ"]
         rangee=range(1,13)
     ##################################################
-    if meteo_or_iso=="iso":
+    else:
         
         num_var=len(inputs)
         colmnss=inputs
@@ -299,10 +306,10 @@ def rfmethod(tunedpars_rfr,tunedpars_svr,tunedpars_nusvr,gridsearch_dictionary,n
     for monthnum in rangee:    
         if meteo_or_iso=="meteo":
             newmatdf_temp=newmatdframe[monthnum-1]
-            X_temp=newmatdf_temp[["CooX","CooY","CooZ"]].copy().astype(float)
+            X_temp=newmatdf_temp[colmnss].copy().astype(float)
         else:    
             newmatdf_temp=newmatdframe
-            X_temp=newmatdframe[inputs].copy().astype(float)
+            X_temp=newmatdframe[colmnss].copy().astype(float)
         Y_temp=newmatdf_temp[["Value"]].copy()
         X_train_temp, X_test_temp, y_train_temp, y_test_temp = train_test_split(X_temp, Y_temp)    
         ##################################################
@@ -310,6 +317,39 @@ def rfmethod(tunedpars_rfr,tunedpars_svr,tunedpars_nusvr,gridsearch_dictionary,n
         sam_size=newmatdf_temp.shape[0]
         adj_r_sqrd=lambda r2,sam_size=sam_size,num_var=num_var: 1-(1-r2)*(sam_size-1)/(sam_size-num_var-1)
         ##################################################
+        #correlation coefficient    
+        correl_mat=X_temp.corr()
+        ##################################################
+        #VIF checking
+        if vif_threshold !=None:
+            from statsmodels.stats.outliers_influence import variance_inflation_factor
+            from statsmodels.tools.tools import add_constant
+            X = add_constant(X_temp)
+            vif_df=pd.DataFrame([variance_inflation_factor(X.values, i) 
+                        for i in range(X.shape[1])], 
+                        index=X.columns).rename(columns={0:'VIF'}).drop('const')
+            print (vif_df)                   
+            more_than_thres=vif_df[vif_df["VIF"]>vif_threshold].index
+
+            X=X.drop('const', axis=1)
+            vif_df_ommited=vif_df.copy()
+            if ("CooZ" and "temp") in more_than_thres:
+                X=X.drop('temp', axis=1)
+                more_than_thres=more_than_thres.drop(['temp',"CooZ"])
+                vif_df_ommited=vif_df_ommited.drop(['temp',"CooZ"])
+            print(more_than_thres)    
+            if len(more_than_thres)==1:
+                X=X.drop(more_than_thres,axis=1)
+                more_than_thres=more_than_thres.drop(more_than_thres)
+                vif_df_ommited=vif_df_ommited.drop(more_than_thres)
+            elif len(more_than_thres)>1:
+                num_to_omit=len(more_than_thres)//2
+                more_than_thres=more_than_thres.drop(vif_df_ommited.sort_values("VIF",ascending=False)[0:num_to_omit].index)
+                X=X.drop(more_than_thres, axis=1)
+            X_temp=X  
+        else:
+            vif_df="Not Calculated"  
+        #################################################
         #some tests:
         mutual_info_regression_value = mutual_info_regression(X_temp, Y_temp)
         mutual_info_regression_value /= np.max(mutual_info_regression_value)
@@ -320,7 +360,7 @@ def rfmethod(tunedpars_rfr,tunedpars_svr,tunedpars_nusvr,gridsearch_dictionary,n
         print (f_regression_value)
         ##################################################
         #just using the significant variables!
-        f_less_ind=list(np.where(f_regression_value[1]<=0.05)[0])
+        f_less_ind=list(np.where(f_regression_value[1]<=p_val)[0])
         if len(f_less_ind)<2:
             f_regression_value_sor=sorted(f_regression_value[1])[:2]
             f_less_ind1=list(
@@ -331,12 +371,14 @@ def rfmethod(tunedpars_rfr,tunedpars_svr,tunedpars_nusvr,gridsearch_dictionary,n
             f_less_ind2=list((np.where
                 (f_regression_value[1]==f_regression_value_sor[1])
                                 )[0]   
-            )                
+            ) 
             f_less_ind=f_less_ind1+f_less_ind2
-        used_features=[colmnss[i] for i in f_less_ind]
+        used_features=[X_temp.columns[i] for i in f_less_ind]
+
         X_temp=X_temp[used_features]
         X_train_temp=X_train_temp[used_features]
         X_test_temp=X_test_temp[used_features]
+        print ("used_features",used_features)
         ########################################################################
         #scaling
         x_scaler = MinMaxScaler()
@@ -351,13 +393,13 @@ def rfmethod(tunedpars_rfr,tunedpars_svr,tunedpars_nusvr,gridsearch_dictionary,n
         Y_temp=y_scaler.transform(Y_temp)
 
         #applying regression function on normal data
-        best_score_all_normal,best_estimator_all_normal,rsquared_normal=regressionfunctions(X_temp,Y_temp)
+        best_score_all_normal,best_estimator_all_normal,rsquared_normal=regressionfunctions(X_temp,Y_temp,which_regs)
         ########################################################################
         #applying regression function on log data
         if apply_on_log==True:
             X_temp1=np.log1p(X_temp)
             Y_temp1=np.log1p(Y_temp)
-            best_score_all_log,best_estimator_all_log,rsquared_log=regressionfunctions(X_temp1,Y_temp1)
+            best_score_all_log,best_estimator_all_log,rsquared_log=regressionfunctions(X_temp1,Y_temp1,which_regs)
             ########################################################################
             #comparison between normal and log model
             if best_score_all_normal > best_score_all_log:
@@ -430,10 +472,9 @@ def rfmethod(tunedpars_rfr,tunedpars_svr,tunedpars_nusvr,gridsearch_dictionary,n
         list_bests.append([best_estimator_all,best_score_all,mutual_info_regression_value,f_regression_value,used_features,rsquared,x_scaler,y_scaler,didlog])
         list_preds_real_dic.append({"Y_preds":Y_preds,"Y_temp_fin":Y_measured,"X_temp":X_temp})  
         list_bests_dic.append({"best_estimator":best_estimator_all,"best_score":best_score_all,"mutual_info_regression":mutual_info_regression_value,
-        "f_regression":f_regression_value,"used_features":used_features,"rsquared":rsquared,"didlog":didlog})
+        "f_regression":f_regression_value,"used_features":used_features,"rsquared":rsquared,"didlog":didlog,"vif":vif_df,"correlation":correl_mat})
     return list_bests,list_preds_real_dic,list_bests_dic
 
-        #some old lines
     
 ##########################################################################################
 def iso_prediction(iso_db1,month_grouped_list_with_zeros_iso_2h,month_grouped_list_with_zeros_iso_3h,temp_bests,rain_bests,hum_bests,iso_18,dates_db,trajectories,iso_model_month_list,run_iso_whole_year,direc):
