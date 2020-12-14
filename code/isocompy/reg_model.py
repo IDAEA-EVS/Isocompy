@@ -11,46 +11,46 @@ class model(object):
     tunedpars_svr_rain={"kernel":[ "poly", "rbf", "sigmoid"],"C":np.logspace(-1, 1, 3),"gamma":np.logspace(-3, 1, 3) },
     tunedpars_nusvr_rain={"kernel":["linear", "poly", "rbf", "sigmoid"] },
     tunedpars_mlp_rain={"activation" : [ "logistic", "tanh"],"solver" : ["lbfgs", "sgd", "adam"],"alpha":[0.0001,0.0003],"hidden_layer_sizes":[(50,)*2,(50,)*3,(50,)*4,(100,)*2,(100,)*3,(100,)*4],"max_iter":[1000],"n_iter_no_change":[10]},
-    which_regs_rain={"rfr":True,"mlp":True,"elnet":True,"omp":True,"br":True,"ard":True,"svr":True,"nusvr":False},
+    which_regs_rain={"muelnet":True,"rfr":True,"mlp":True,"elnet":True,"omp":True,"br":True,"ard":True,"svr":True,"nusvr":False},
     vif_threshold_rain=None,
 
     tunedpars_rfr_temp={"min_weight_fraction_leaf":[0,0.02,0.04],"n_estimators":[50,100,150,200,250,300],"criterion": ["mse","mae"],"min_samples_split":[2,5] },
     tunedpars_svr_temp={"kernel":[ "poly", "rbf", "sigmoid"],"C":np.logspace(-1, 1, 3),"gamma":np.logspace(-3, 1, 3) },
     tunedpars_nusvr_temp={"kernel":["linear", "poly", "rbf", "sigmoid"] },
     tunedpars_mlp_temp={"activation" : [ "logistic", "tanh"],"solver" : ["lbfgs", "sgd", "adam"],"alpha":[0.0001,0.0003],"hidden_layer_sizes":[(50,)*2,(50,)*3,(50,)*4,(100,)*2,(100,)*3,(100,)*4],"max_iter":[1000],"n_iter_no_change":[10]},
-    which_regs_temp={"rfr":True,"mlp":True,"elnet":True,"omp":True,"br":True,"ard":True,"svr":True,"nusvr":False},
+    which_regs_temp={"muelnet":True,"rfr":True,"mlp":True,"elnet":True,"omp":True,"br":True,"ard":True,"svr":True,"nusvr":False},
     vif_threshold_temp=None,
 
     tunedpars_rfr_hum={"min_weight_fraction_leaf":[0,0.02,0.04],"n_estimators":[50,100,150,200,250,300],"criterion": ["mse","mae"],"min_samples_split":[2,5] },
     tunedpars_svr_hum={"kernel":[ "poly", "rbf", "sigmoid"],"C":np.logspace(-1, 1, 3),"gamma":np.logspace(-3, 1, 3) },
     tunedpars_nusvr_hum={"kernel":["linear", "poly", "rbf", "sigmoid"] },
     tunedpars_mlp_hum={"activation" : [ "logistic", "tanh"],"solver" : ["lbfgs", "sgd", "adam"],"alpha":[0.0001,0.0003],"hidden_layer_sizes":[(50,)*2,(50,)*3,(50,)*4,(100,)*2,(100,)*3,(100,)*4],"max_iter":[1000],"n_iter_no_change":[10]},
-    which_regs_hum={"rfr":True,"mlp":True,"elnet":True,"omp":True,"br":True,"ard":True,"svr":True,"nusvr":False},
+    which_regs_hum={"muelnet":True,"rfr":True,"mlp":True,"elnet":True,"omp":True,"br":True,"ard":True,"svr":True,"nusvr":False},
     vif_threshold_hum=None,
 
     tunedpars_rfr_iso18={"min_weight_fraction_leaf":[0,0.01,0.02,0.03,0.04],"n_estimators":[25,50,75,100,150,200,250,300],"criterion": ["mse","mae"],"min_samples_split":[2,5,7] },
     tunedpars_svr_iso18={"kernel":[ "poly", "rbf", "sigmoid"],"C":np.logspace(-1, 1, 3),"gamma":np.logspace(-3, 1, 3) },
     tunedpars_nusvr_iso18={"kernel":["linear", "poly", "rbf", "sigmoid"] },
     tunedpars_mlp_iso18={"activation" : [ "logistic", "tanh"],"solver" : ["lbfgs", "sgd", "adam"],"alpha":[0.0001,0.0003],"hidden_layer_sizes":[(50,)*2,(50,)*3,(50,)*4,(100,)*2,(100,)*3,(100,)*4],"max_iter":[1000],"n_iter_no_change":[10]},
-    which_regs_iso18={"rfr":True,"mlp":True,"elnet":True,"omp":True,"br":True,"ard":True,"svr":True,"nusvr":False},
+    which_regs_iso18={"muelnet":True,"rfr":True,"mlp":True,"elnet":True,"omp":True,"br":True,"ard":True,"svr":True,"nusvr":False},
     vif_threshold_iso18=20,
 
     tunedpars_rfr_iso2h={"min_weight_fraction_leaf":[0,0.01,0.02,0.03,0.04],"n_estimators":[25,50,75,100,150,200,250,300],"criterion": ["mse","mae"],"min_samples_split":[2,5,7] },
     tunedpars_svr_iso2h={"kernel":[ "poly", "rbf", "sigmoid"],"C":np.logspace(-1, 1, 3),"gamma":np.logspace(-3, 1, 3) },
     tunedpars_nusvr_iso2h={"kernel":["linear", "poly", "rbf", "sigmoid"] },
     tunedpars_mlp_iso2h={"activation" : [ "logistic", "tanh"],"solver" : ["lbfgs", "sgd", "adam"],"alpha":[0.0001,0.0003],"hidden_layer_sizes":[(50,)*2,(50,)*3,(50,)*4,(100,)*2,(100,)*3,(100,)*4],"max_iter":[1000],"n_iter_no_change":[10]},
-    which_regs_iso2h={"rfr":True,"mlp":True,"elnet":True,"omp":True,"br":True,"ard":True,"svr":True,"nusvr":False},
+    which_regs_iso2h={"muelnet":True,"rfr":True,"mlp":True,"elnet":True,"omp":True,"br":True,"ard":True,"svr":True,"nusvr":False},
     vif_threshold_iso2h=20,
 
     tunedpars_rfr_iso3h={"min_weight_fraction_leaf":[0,0.01,0.02,0.03,0.04],"n_estimators":[25,50,75,100,150,200,250,300],"criterion": ["mse","mae"],"min_samples_split":[2,5,7] },
     tunedpars_svr_iso3h={"kernel":[ "poly", "rbf", "sigmoid"],"C":np.logspace(-1, 1, 3),"gamma":np.logspace(-3, 1, 3) },
     tunedpars_nusvr_iso3h={"kernel":["linear", "poly", "rbf", "sigmoid"] },
     tunedpars_mlp_iso3h={"activation" : [ "logistic", "tanh"],"solver" : ["lbfgs", "sgd", "adam"],"alpha":[0.0001,0.0003],"hidden_layer_sizes":[(50,)*2,(50,)*3,(50,)*4,(100,)*2,(100,)*3,(100,)*4],"max_iter":[1000],"n_iter_no_change":[10]},
-    which_regs_iso3h={"rfr":True,"mlp":True,"elnet":True,"omp":True,"br":True,"ard":True,"svr":True,"nusvr":False},
+    which_regs_iso3h={"muelnet":True,"rfr":True,"mlp":True,"elnet":True,"omp":True,"br":True,"ard":True,"svr":True,"nusvr":False},
     vif_threshold_iso3h=20,
 
     apply_on_log=True,
-    cv=10):
+    cv="auto"):
 
         self.tunedpars_rfr_rain=tunedpars_rfr_rain
         self.tunedpars_svr_rain=tunedpars_svr_rain
@@ -99,25 +99,37 @@ class model(object):
         self.cv=cv
     ##########################################################################################
 
-    def meteo_fit(self,prepcls,p_val=0.05):
+    def meteo_fit(self,prepcls,p_val=0.05,temp_fit=True,rain_fit=True,hum_fit=True):
         newmatdframe_rain=prepcls.month_grouped_rain
         newmatdframe_temp=prepcls.month_grouped_temp
         newmatdframe_hum=prepcls.month_grouped_hum
         self.direc=prepcls.direc
+        self.temp_fit=temp_fit
+        self.rain_fit=rain_fit
+        self.hum_fit=hum_fit
         Path(prepcls.direc).mkdir(parents=True, exist_ok=True)
         meteo_or_iso="meteo"
         inputs=None
+        best_dics=dict()
         ############################################################
         #RAIN
-        self.rain_bests,self.rain_preds_real_dic,self.rain_bests_dic=rfmethod(self.tunedpars_rfr_rain,self.tunedpars_svr_rain,self.tunedpars_nusvr_rain,self.tunedpars_mlp_rain,newmatdframe_rain,meteo_or_iso,inputs,self.apply_on_log,self.direc,self.cv,self.which_regs_rain,self.vif_threshold_rain,p_val)
+        if self.rain_fit==True:
+            self.rain_bests,self.rain_preds_real_dic,self.rain_bests_dic=rfmethod(self.tunedpars_rfr_rain,self.tunedpars_svr_rain,self.tunedpars_nusvr_rain,self.tunedpars_mlp_rain,newmatdframe_rain,meteo_or_iso,inputs,self.apply_on_log,self.direc,self.cv,self.which_regs_rain,self.vif_threshold_rain,p_val)
+            best_dics["PRECIPITATION"]=self.rain_bests
         ###########################################
         #TEMP
-        self.temp_bests,self.temp_preds_real_dic,self.temp_bests_dic=rfmethod(self.tunedpars_rfr_temp,self.tunedpars_svr_temp,self.tunedpars_nusvr_temp,self.tunedpars_mlp_temp,newmatdframe_temp,meteo_or_iso,inputs,self.apply_on_log,self.direc,self.cv,self.which_regs_temp,self.vif_threshold_temp,p_val)
+        if self.temp_fit==True:
+            self.temp_bests,self.temp_preds_real_dic,self.temp_bests_dic=rfmethod(self.tunedpars_rfr_temp,self.tunedpars_svr_temp,self.tunedpars_nusvr_temp,self.tunedpars_mlp_temp,newmatdframe_temp,meteo_or_iso,inputs,self.apply_on_log,self.direc,self.cv,self.which_regs_temp,self.vif_threshold_temp,p_val)
+            best_dics["TEMPERATURE"]=self.temp_bests
+
         ##########################################
         #Humidity
-        self.hum_bests,self.hum_preds_real_dic,self.hum_bests_dic=rfmethod(self.tunedpars_rfr_hum,self.tunedpars_svr_hum,self.tunedpars_nusvr_hum,self.tunedpars_mlp_hum,newmatdframe_hum,meteo_or_iso,inputs,self.apply_on_log,self.direc,self.cv,self.which_regs_hum,self.vif_threshold_hum,p_val)
+        if self.hum_fit==True:
+            self.hum_bests,self.hum_preds_real_dic,self.hum_bests_dic=rfmethod(self.tunedpars_rfr_hum,self.tunedpars_svr_hum,self.tunedpars_nusvr_hum,self.tunedpars_mlp_hum,newmatdframe_hum,meteo_or_iso,inputs,self.apply_on_log,self.direc,self.cv,self.which_regs_hum,self.vif_threshold_hum,p_val)
+            best_dics["HUMIDITY"]=self.hum_bests
+
         #############################################################     
-        print_to_file( os.path.join(self.direc,"meteo_model_temp_rain_hum_12_month_stats.txt"), self.temp_bests, self.rain_bests, self.hum_bests)
+        print_to_file( os.path.join(self.direc,"meteo_model_temp_rain_hum_12_month_stats.txt"),best_dics )
 
     ##########################################################################################
 
@@ -162,9 +174,10 @@ class model(object):
         if output_report==True:
             #self.rain_bests=best_estimator_all,best_score_all,mutual_info_regression_value,f_regression_value,used_features,rsquared,x_scaler,y_scaler,didlog
             #writing isotope results to a txt file
-            if self.iso18_fit==True: pr_is_18="\n################\n\n best_estimator_all_iso18\n"+str(self.iso18_bests[0][0])+"\n\n################\n\n used_features_iso18 \n"+str(self.iso18_bests[0][4])+"\n\n################\n\n best_score_all_iso18 \n"+str(self.iso18_bests[0][1])+"\n\n################\n\n rsquared_iso18 \n"+str(self.iso18_bests[0][5])+"\n\n################\n\n didlog_iso18 \n"+str(self.iso18_bests[0][-1])+"\n\n################\n\n VIF_iso18 \n"+str(self.iso18_bests_dic[0]["vif"])+"\n\n################\n\n f_regression_iso18 \n"+str(self.iso18_bests_dic[0]["f_regression"])+"\n\n################\n\n correlation_iso18 \n"+str(self.iso18_bests_dic[0]["correlation"])+"\n\n#########################\n#########################\n#########################\n"
-            if self.iso2h_fit==True:pr_is_2h="\n################\n\n best_estimator_all_iso2h\n"+str(self.iso2h_bests[0][0])+"\n\n################\n\n used_features_iso2h \n"+str(self.iso2h_bests[0][4])+"\n\n################\n\n best_score_all_iso2h \n"+str(self.iso2h_bests[0][1])+"\n\n################\n\n rsquared_iso2h \n"+str(self.iso2h_bests[0][5])+"\n\n################\n\n didlog_iso2h \n"+str(self.iso2h_bests[0][-1])+"\n\n################\n\n VIF_iso2h \n"+str(self.iso2h_bests_dic[0]["vif"])+"\n\n################\n\n f_regression_iso2h \n"+str(self.iso2h_bests_dic[0]["f_regression"])+"\n\n################\n\n correlation_iso2h \n"+str(self.iso2h_bests_dic[0]["correlation"])+"\n\n#########################\n#########################\n#########################\n"
-            if self.iso3h_fit==True:pr_is_3h="\n################\n\n best_estimator_all_iso3h\n"+str(self.iso3h_bests[0][0])+"\n\n################\n\n used_features_iso3h \n"+str(self.iso3h_bests[0][4])+"\n\n################\n\n best_score_all_iso3h \n"+str(self.iso3h_bests[0][1])+"\n\n################\n\n rsquared_iso3h \n"+str(self.iso3h_bests[0][5])+"\n\n################\n\n didlog_iso3h \n"+str(self.iso3h_bests[0][-1])+"\n\n################\n\n VIF_iso3h \n"+str(self.iso3h_bests_dic[0]["vif"])+"\n\n################\n\n f_regression_iso3h \n"+str(self.iso3h_bests_dic[0]["f_regression"])+"\n\n################\n\n correlation_iso3h \n"+str(self.iso3h_bests_dic[0]["correlation"])+"\n\n#########################\n#########################\n#########################\n"
+            from tabulate import tabulate
+            if self.iso18_fit==True: pr_is_18="\n################\n\n best_estimator_all_iso18\n"+str(self.iso18_bests[0][0])+"\n\n################\n\n used_features_iso18 \n"+str(self.iso18_bests[0][4])+"\n\n################\n\n best_score_all_iso18 \n"+str(self.iso18_bests[0][1])+"\n\n################\n\n rsquared_iso18 \n"+str(self.iso18_bests[0][5])+"\n\n################\n\n didlog_iso18 \n"+str(self.iso18_bests[0][-1])+"\n\n################\n\n VIF_iso18 \n"+tabulate(self.iso18_bests_dic[0]["vif"])+"\n\n################\n\n vif_chosen_features \n"+str(self.iso18_bests_dic[0]["vif_chosen_features"])+"\n\n################\n\n f_regression_iso18 \n"+tabulate(self.iso18_bests_dic[0]["f_regression"])+"\n\n################\n\n correlation_iso18 \n"+tabulate(self.iso18_bests_dic[0]["correlation"])+"\n\n#########################\n#########################\n#########################\n"
+            if self.iso2h_fit==True:pr_is_2h="\n################\n\n best_estimator_all_iso2h\n"+str(self.iso2h_bests[0][0])+"\n\n################\n\n used_features_iso2h \n"+str(self.iso2h_bests[0][4])+"\n\n################\n\n best_score_all_iso2h \n"+str(self.iso2h_bests[0][1])+"\n\n################\n\n rsquared_iso2h \n"+str(self.iso2h_bests[0][5])+"\n\n################\n\n didlog_iso2h \n"+str(self.iso2h_bests[0][-1])+"\n\n################\n\n VIF_iso2h \n"+tabulate(self.iso2h_bests_dic[0]["vif"])+"\n\n################\n\n f_regression \n"+tabulate(self.iso2h_bests_dic[0]["f_regression"],headers='firstrow')+"\n\n################\n\n correlation_iso2h \n"+tabulate(self.iso2h_bests_dic[0]["correlation"])+"\n\n#########################\n#########################\n#########################\n"
+            if self.iso3h_fit==True:pr_is_3h="\n################\n\n best_estimator_all_iso3h\n"+str(self.iso3h_bests[0][0])+"\n\n################\n\n used_features_iso3h \n"+str(self.iso3h_bests[0][4])+"\n\n################\n\n best_score_all_iso3h \n"+str(self.iso3h_bests[0][1])+"\n\n################\n\n rsquared_iso3h \n"+str(self.iso3h_bests[0][5])+"\n\n################\n\n didlog_iso3h \n"+str(self.iso3h_bests[0][-1])+"\n\n################\n\n VIF_iso3h \n"+tabulate(self.iso3h_bests_dic[0]["vif"])+"\n\n################\n\n f_regression \n"+tabulate(self.iso3h_bests_dic[0]["f_regression"],headers='firstrow')+"\n\n################\n\n correlation_iso3h \n"+tabulate(self.iso3h_bests_dic[0]["correlation"])+"\n\n#########################\n#########################\n#########################\n"
             file_name=os.path.join(self.direc,"isotope_modeling_output_report_18_2h_3h.txt")
             m_out_f=open(file_name,'w')
             if self.iso18_fit==True:m_out_f.write(pr_is_18)

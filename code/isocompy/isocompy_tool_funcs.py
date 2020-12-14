@@ -1,3 +1,4 @@
+from matplotlib.pyplot import legend
 from sklearn.feature_selection import f_regression, mutual_info_regression
 import numpy as np
 import pandas as pd
@@ -6,11 +7,12 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 from sklearn.inspection import plot_partial_dependence
 import itertools
+from sklearn.linear_model import LinearRegression
+
 ###########################################################
 #predict points for contouring
 def predict_points(dir,used_features_iso18,x_y_z_org,iso_model_month_list,temp_bests,rain_bests,hum_bests,x_scaler_iso18,y_scaler_iso18,didlog_iso18,best_estimator_all_iso18,column_name,trajectory_features_list,run_iso_whole_year):
     
-    x_y_z_copy=x_y_z_org.copy()
     monthly_iso_output=list()
     iso_model_month_list_min_one=[n-1 for n in iso_model_month_list]
     if run_iso_whole_year==True:
@@ -18,29 +20,46 @@ def predict_points(dir,used_features_iso18,x_y_z_org,iso_model_month_list,temp_b
     for month in range(0,12):
         if month in iso_model_month_list_min_one:
             counterr=0
+            x_y_z_copy=x_y_z_org.copy()
             #################################################
             #meteo prediction
+            #needs debugging!!
             for meteopredict,colname in zip([temp_bests,rain_bests,hum_bests],["temp","rain","hum"]):
-                x_y_z=x_y_z_org[meteopredict[month][4]].copy()
+                #just used features
+                x_y_z=x_y_z_copy[meteopredict[month][4]].copy()
                 counterr=counterr+1
                 #general standard
                 x_y_z=meteopredict[month][-3].transform(x_y_z)
                 #transform if there is log in input
                 if meteopredict[month][-1]==True:
                     x_y_z=np.log1p(x_y_z)
+                    x_y_z_copy=x_y_z_copy[~np.isnan(x_y_z).any(axis=1)]
+                    x_y_z=x_y_z[~np.isnan(x_y_z).any(axis=1)]
+
                 #predicting    
                 meteopredict_res=meteopredict[month][0].predict(x_y_z)
                 #inverse transform
                 #log
                 if meteopredict[month][-1]==True:
-                    meteopredict_res=np.expm1(meteopredict_res)
+                    meteopredict_res=pd.DataFrame(np.expm1(meteopredict_res))
+                    x_y_z_copy=x_y_z_copy[~np.isnan(meteopredict_res).any(axis=1)]
+                    meteopredict_res=meteopredict_res[~np.isnan(meteopredict_res).any(axis=1)]
+                
                 #general
-                meteopredict_res=pd.DataFrame(meteopredict[month][-2].inverse_transform(pd.DataFrame(meteopredict_res)),columns=[colname])
+                meteopredict_res=pd.DataFrame(meteopredict_res)
+                meteopredict_res=pd.DataFrame(meteopredict[month][-2].inverse_transform(meteopredict_res),columns=[colname])
+                meteopredict_res=pd.concat([meteopredict_res,x_y_z_copy],axis=1)
+                meteopredict_res=meteopredict_res.set_index(["CooX","CooY"],drop=False)
                 #making the dataframe
                 if counterr==1:
                     meteopredict_res_per_month=meteopredict_res
                 else:
-                    meteopredict_res_per_month=pd.concat([meteopredict_res_per_month,meteopredict_res],axis=1)
+                    meteopredict_res_per_month=pd.concat([meteopredict_res_per_month,meteopredict_res[colname]],axis=1)
+                #print ("len each month  ",meteopredict_res_per_month.shape   ) 
+            #indexed,contain xyz        
+            meteopredict_res_per_month=meteopredict_res_per_month[~np.isnan(pd.DataFrame(meteopredict_res_per_month[colname])).any(axis=1)]
+            #print ("len each month all  ",meteopredict_res_per_month.shape )    
+
             #################################################
             #trajectories prediction
 
@@ -53,23 +72,33 @@ def predict_points(dir,used_features_iso18,x_y_z_org,iso_model_month_list,temp_b
                 pass #(?????) 
             #################################################
             #Iso prediction
-            iso_model_input=pd.concat([x_y_z_copy,meteopredict_res_per_month],axis=1)
+            #print (meteopredict_res_per_month)
+            iso_model_input=meteopredict_res_per_month.reset_index(level=["CooX","CooY"],drop=True)
+            #print (iso_model_input)
+
             #transforming
-            iso_model_input=x_scaler_iso18.transform(iso_model_input[used_features_iso18])
+            iso_model_input_us=x_scaler_iso18.transform(iso_model_input[used_features_iso18])
             if didlog_iso18==True:
-                iso_model_input=np.log1p(iso_model_input)
-                iso_model_input=iso_model_input[~np.isnan(iso_model_input).any(axis=1)]
+                iso_model_input_us=np.log1p(iso_model_input_us)
+                iso_model_input=iso_model_input[~np.isnan(iso_model_input_us).any(axis=1)]
+                iso_model_input_us=iso_model_input_us[~np.isnan(iso_model_input_us).any(axis=1)]
+
             #predicting
-            each_month_iso_predict=best_estimator_all_iso18.predict(iso_model_input)
+            each_month_iso_predict=best_estimator_all_iso18.predict(iso_model_input_us)
             #inverse transform
             #log
             if didlog_iso18==True:
-                each_month_iso_predict=np.expm1(each_month_iso_predict)
+                each_month_iso_predict=pd.DataFrame(np.expm1(each_month_iso_predict))
+                iso_model_input=iso_model_input.reset_index(drop=True)
+                iso_model_input_us=pd.DataFrame(iso_model_input_us).reset_index(drop=True)
+                iso_model_input=iso_model_input[~np.isnan(each_month_iso_predict).any(axis=1)].reset_index(drop=True)
+                iso_model_input_us=iso_model_input_us[~np.isnan(each_month_iso_predict).any(axis=1)].reset_index(drop=True)
+                each_month_iso_predict=each_month_iso_predict[~np.isnan(each_month_iso_predict).any(axis=1)].reset_index(drop=True)
             #general
             each_month_iso_predict=pd.DataFrame(y_scaler_iso18.inverse_transform(pd.DataFrame(each_month_iso_predict)),columns=[column_name])
+            df_to_excel=pd.concat([iso_model_input,each_month_iso_predict],axis=1)
+            print (df_to_excel)
 
-            df_to_excel=pd.concat([x_y_z_copy,meteopredict_res_per_month,each_month_iso_predict],axis=1)
-            
             addd=os.path.join(dir,str(month+1)+"_"+column_name+".xls")
             Path(dir).mkdir(parents=True,exist_ok=True)
             df_to_excel.to_excel(addd)
@@ -385,30 +414,33 @@ def best_estimator_and_partial_dep(
             #########################################################################################################
             #Estimator plots
             if estimator_plot==True:
-                pltname=os.path.join(direc,"model_plots",model_type,"best_estimators",pltttl+'.pdf')
+                pltname=os.path.join(direc,"model_plots",model_type,"best_estimators",pltttl+'.png')
                 #folder making and checking:
                 Path(os.path.join(direc,"model_plots",model_type,"best_estimators")).mkdir(parents=True,exist_ok=True)
                 clnm=model_type+"_"+str(monthnum)
                 #Y_preds=pd.DataFrame(Y_preds,columns=[clnm])
                 plt.scatter(Y_preds,Y_measured)
-                plt.title(pltttl)
                 plt.xlabel("Prediction")
                 plt.ylabel("Real Value")
                 left, right = plt.xlim()
                 left1, right1 = plt.ylim()
                 a = np.linspace(min(left,left1),max(right,right1),100)
                 b=a
-                plt.plot(a,b)
+                reg = LinearRegression().fit(a.reshape(-1,1),b.reshape(-1,1))
+                plt.title(pltttl+"|R2: "+str( round( reg.score(Y_preds,Y_measured) , 2 )))
+                plt.plot(a,b,label="y="+str(round(reg.coef_[0][0],2))+"x+"+str(round(reg.intercept_[0],2)))
+                plt.legend()
                 plt.savefig(pltname,dpi=300)
                 plt.close()
             #########################################################################################################
             #########################################################################################################
             #partial dependency plots
             if partial_dep_plot==True:
-                pltnamepardep=os.path.join(direc,"model_plots",model_type,"partial_dependency",'_partial_dependence'+pltttl+'.pdf')
+                pltnamepardep=os.path.join(direc,"model_plots",model_type,"partial_dependency",'_partial_dependence'+pltttl+'.png')
                 #folder making and checking:
                 Path(os.path.join(direc,"model_plots",model_type,"partial_dependency")).mkdir(parents=True,exist_ok=True)
                 if didlog==False:
+
                     plot_partial_dependence(best_estimator_all, X_temp, features=list(range(0,lens)),feature_names=used_features)
                 else:
 
@@ -421,23 +453,24 @@ def best_estimator_and_part_plots(cls,meteo_plot,iso_plot,estimator_plot,partial
 
     #check if meteo models exists
     if meteo_plot==True:
-        try:
-            cls.rain_bests
-            cls.temp_bests
-            cls.hum_bests
-            meteo_or_iso="meteo"
-            rangee=range(0,12)
-            for monthnum in rangee:
-                zip_of_lists=zip(
-                    [cls.rain_bests_dic[monthnum]["used_features"],cls.temp_bests_dic[monthnum]["used_features"],cls.hum_bests_dic[monthnum]["used_features"]],
-                    ["rain","temp","humid"],
-                    [cls.rain_preds_real_dic[monthnum]["Y_preds"],cls.temp_preds_real_dic[monthnum]["Y_preds"],cls.hum_preds_real_dic[monthnum]["Y_preds"]],
-                    [cls.rain_preds_real_dic[monthnum]["Y_temp_fin"],cls.temp_preds_real_dic[monthnum]["Y_temp_fin"],cls.hum_preds_real_dic[monthnum]["Y_temp_fin"]],
-                    [cls.rain_bests[monthnum][-1],cls.temp_bests[monthnum][-1],cls.hum_bests[monthnum][-1]], #didlog
-                    [cls.rain_preds_real_dic[monthnum]["X_temp"],cls.temp_preds_real_dic[monthnum]["X_temp"],cls.hum_preds_real_dic[monthnum]["X_temp"]],
-                    [cls.rain_bests_dic[monthnum]["best_estimator"],cls.temp_bests_dic[monthnum]["best_estimator"],cls.hum_bests_dic[monthnum]["best_estimator"]])
+        #try:
+        #cls.rain_bests
+        #cls.temp_bests
+        #cls.hum_bests
+        meteo_or_iso="meteo"
+        rangee=range(0,12)
+        for monthnum in rangee:
+            zip_of_lists=zip(
+                [cls.rain_bests_dic[monthnum]["used_features"],cls.temp_bests_dic[monthnum]["used_features"],cls.hum_bests_dic[monthnum]["used_features"]],
+                ["rain","temp","humid"],
+                [cls.rain_preds_real_dic[monthnum]["Y_preds"],cls.temp_preds_real_dic[monthnum]["Y_preds"],cls.hum_preds_real_dic[monthnum]["Y_preds"]],
+                [cls.rain_preds_real_dic[monthnum]["Y_temp_fin"],cls.temp_preds_real_dic[monthnum]["Y_temp_fin"],cls.hum_preds_real_dic[monthnum]["Y_temp_fin"]],
+                [cls.rain_bests[monthnum][-1],cls.temp_bests[monthnum][-1],cls.hum_bests[monthnum][-1]], #didlog
+                [cls.rain_preds_real_dic[monthnum]["X_temp"],cls.temp_preds_real_dic[monthnum]["X_temp"],cls.hum_preds_real_dic[monthnum]["X_temp"]],
+                [cls.rain_bests_dic[monthnum]["best_estimator"],cls.temp_bests_dic[monthnum]["best_estimator"],cls.hum_bests_dic[monthnum]["best_estimator"]])
 
-                for (used_features,model_type,Y_preds,Y_measured,didlog,X_temp,best_estimator_all) in zip_of_lists:
+            for (used_features,model_type,Y_preds,Y_measured,didlog,X_temp,best_estimator_all) in zip_of_lists:
+                if None not in [used_features,didlog,best_estimator_all]:
                     best_estimator_and_partial_dep(    
                         used_features,
                         meteo_or_iso,
@@ -451,9 +484,9 @@ def best_estimator_and_part_plots(cls,meteo_plot,iso_plot,estimator_plot,partial
                         best_estimator_all,
                         estimator_plot,
                         partial_dep_plot)
-        except:
-            print ("There is no meteo model in the class")
-            pass
+        #except:
+        #    print ("There is no meteo model in the class")
+        #    pass
     if iso_plot==True:
 
         try:
@@ -471,19 +504,20 @@ def best_estimator_and_part_plots(cls,meteo_plot,iso_plot,estimator_plot,partial
                 [cls.iso18_bests_dic[0]["best_estimator"],cls.iso2h_bests_dic[0]["best_estimator"],cls.iso3h_bests_dic[0]["best_estimator"]])
                 
             for (used_features,model_type,Y_preds,Y_measured,didlog,X_temp,best_estimator_all) in zip_of_lists:
-                best_estimator_and_partial_dep(    
-                    used_features,
-                    meteo_or_iso,
-                    1,
-                    model_type,
-                    cls.direc,
-                    Y_preds,
-                    Y_measured,
-                    didlog,
-                    X_temp,
-                    best_estimator_all,
-                    estimator_plot,
-                    partial_dep_plot)
+                if None not in [used_features,didlog,best_estimator_all]:
+                    best_estimator_and_partial_dep(    
+                        used_features,
+                        meteo_or_iso,
+                        1,
+                        model_type,
+                        cls.direc,
+                        Y_preds,
+                        Y_measured,
+                        didlog,
+                        X_temp,
+                        best_estimator_all,
+                        estimator_plot,
+                        partial_dep_plot)
         except:
             print ("There is no iso model in the class")
             pass
