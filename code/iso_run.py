@@ -27,7 +27,7 @@ rain=pd.read_excel(r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_
 #############################################################    
 
 #isotope files
-data_file_iso = r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\inputs\Isotopes_16_11_2020.xls"
+data_file_iso = r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\inputs\Isotopes_16_11_2020_sorted.xls"
 iso_18 = pd.read_excel(data_file_iso,sheet_name="ISOT18O",header=0,index_col=False,keep_default_na=True)
 iso_2h=pd.read_excel(data_file_iso,sheet_name="ISOT2H",header=0,index_col=False,keep_default_na=True)
 iso_3h=pd.read_excel(data_file_iso,sheet_name="ISOT3",header=0,index_col=False,keep_default_na=True)
@@ -49,7 +49,7 @@ pred_inputs=pd.read_excel(data_file,sheet_name=0,header=0,index_col=False,keep_d
 #iso_meteo_model_exc_outliers.which_regs_hum={"rfr":False,"mlp":False,"elnet":False,"omp":False,"br":False,"ard":False,"svr":False,"nusvr":False}
 
 #data preparation
-preped_dataset_exc_outliers=data_preparation.preprocess(meteo_input_type="monthly",direc=r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\new_output_09_dec_2020_new_iso") #your working folder
+preped_dataset_exc_outliers=data_preparation.preprocess(meteo_input_type="monthly",direc=r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\new_output_14_dec_2020_new_iso") #your working folder
 preped_dataset_exc_outliers.fit(rain,temp,hum,iso_18,iso_2h,iso_3h)
 #meteo model
 
@@ -60,14 +60,14 @@ tools.plots.partial_dep_plots(iso_meteo_model_exc_outliers,iso_plot=False)
 ex_meteo_exc_outliers=tools.session.save(iso_meteo_model_exc_outliers,name='iso_meteo_model_exc_outliers') #optional. prints the directory
 ex_prep_exc_outliers=tools.session.save(preped_dataset_exc_outliers,name='preped_dataset_exc_outliers') #optional. prints the directory
 ##########################################################################################################################
-
 ##########################################################################################################################
 #load meteo
 iso_meteo_model=tools.session.load(ex_meteo_exc_outliers)
+#preped_dataset=tools.session.load(r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\new_output_09_dec_2020_new_iso\iso_meteo_model_exc_outliers_09_Dec_2020_16_59_meteoTrue_isoFalse.pkl")
 preped_dataset=tools.session.load(ex_prep_exc_outliers)
 
 #change directory
-preped_dataset.direc=r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\new_output_09_dec_2020_new_iso\iso_models\allyear_output_exc_outliers" 
+preped_dataset.direc=r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\new_output_14_dec_2020_new_iso\iso_models\allyear_output_exc_outliers" 
 #iso model all year
 iso_meteo_model.iso_predic(preped_dataset,run_iso_whole_year=True,iso_model_month_list=[])
 iso_meteo_model.iso_fit()
@@ -383,16 +383,16 @@ fff=vif_df[vif_df["VIF"]>20].index
  '''
  ##########################################################################################################################
 #load meteo
-iso_meteo_model=tools.session.load(meteo_inc_outliers)
-preped_dataset=tools.session.load(prep_inc_outliers)   
+iso_meteo_model=tools.session.load(r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\new_output_09_dec_2020_new_iso\iso_meteo_model_exc_outliers_09_Dec_2020_16_59_meteoTrue_isoFalse.pkl")
+preped_dataset=tools.session.load(r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\new_output_14_dec_2020_new_iso\preped_dataset_exc_outliers_15_Dec_2020_07_17_meteoFalse_isoFalse.pkl")   
+#iso_meteo_model.cv=3  
 
 #change directory
-preped_dataset.direc=r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\new_output\12312_output_inc_outliers_not_logged"
+preped_dataset.direc=r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\new_output_16_dec_2020_normal\12312_output_inc_outliers"
  
 
-#iso model 12312 not logged
+#iso model 12312 not
 iso_meteo_model.iso_predic(preped_dataset,run_iso_whole_year=False,iso_model_month_list=[1,2,3,12])
-iso_meteo_model.apply_on_log=False
 iso_meteo_model.iso_fit()
 tools.stats.annual_stats(iso_meteo_model)
 tools.stats.mensual_stats(iso_meteo_model)
@@ -405,34 +405,47 @@ prepdataset_final_12312_inc_outliers_not_logged=tools.session.save(preped_datase
 #calculate predictions
 ev_class_12312_inc_not_logged=tools.evaluation()
 iso_meteo_model_12312_inc_outliers_not_logged=tools.session.load(iso_meteo_model_12312_inc_outliers_not_logged)
-ev_class_12312_inc_not_logged.predict(iso_meteo_model_12312_inc_outliers_not_logged,pred_inputs,direc=r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\new_output\predictions_including_outliers\preds_12312_not_logged")
-tools.plots.isotopes_meteoline_plot(ev_class_12312_inc_not_logged,iso_meteo_model_12312_inc_outliers_not_logged)
+ev_class_12312_inc_not_logged.predict(iso_meteo_model_12312_inc_outliers_not_logged,pred_inputs,direc=r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\new_output_15_dec_2020_normal\preds_12312_for_map")
+tools.plots.isotopes_meteoline_plot(ev_class_12312_inc_not_logged,iso_meteo_model_12312_inc_outliers_not_logged,iso_18=iso_18,iso_2h=iso_2h,obs_data=False,month_data=False,id_point=False,residplot=False)
 ##########################################################################################################################
 from sklearn.preprocessing import MinMaxScaler
 import itertools
-iso_meteo_modellist=list()
+from os.path import join
+from matplotlib import pyplot as plt
+import numpy as np
+import pandas as pd
+from isocompy import data_preparation,reg_model,tools
+import os
+
+iso_meteo_modellist_=list()
 wan_mon=[8]
+#geometric
 for m in wan_mon:
     #load meteo
     iso_meteo_model=tools.session.load(r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\new_output_09_dec_2020_new_iso\iso_meteo_model_exc_outliers_09_Dec_2020_16_59_meteoTrue_isoFalse.pkl")
-    preped_dataset=tools.session.load(r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\new_output_09_dec_2020_new_iso\preped_dataset_exc_outliers_09_Dec_2020_16_59_meteoFalse_isoFalse.pkl")   
-    iso_meteo_model.cv=3
+    preped_dataset=tools.session.load(r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\new_output_14_dec_2020_new_iso_geo_mean_iso\preped_dataset_exc_outliers_15_Dec_2020_07_15_meteoFalse_isoFalse.pkl")   
+    iso_meteo_model.cv=2
     iso_meteo_model.vif_threshold_iso18=None
     iso_meteo_model.vif_threshold_iso2h=None
     iso_meteo_model.vif_threshold_iso3h=None
-    #iso_meteo_model.tunedpars_svr_iso18['gamma']=[1.e-08, 1.e-06, 1.e-04]
-    #iso_meteo_model.tunedpars_svr_iso2h['gamma']=[1.e-08, 1.e-06, 1.e-04]
-    #iso_meteo_model.tunedpars_svr_iso3h['gamma']=[1.e-08, 1.e-06, 1.e-04]
+    iso_meteo_model.tunedpars_svr_iso18['gamma']=[1.e-08, 1.e-06, 1.e-04]
+    iso_meteo_model.tunedpars_svr_iso2h['gamma']=[1.e-08, 1.e-06, 1.e-04]
+    iso_meteo_model.tunedpars_svr_iso3h['gamma']=[1.e-08, 1.e-06, 1.e-04]
     iso_meteo_model.which_regs_iso18['svr']=False
     iso_meteo_model.which_regs_iso18['elnet']=False
     iso_meteo_model.which_regs_iso2h['svr']=False
     iso_meteo_model.which_regs_iso2h['elnet']=False
     iso_meteo_model.which_regs_iso3h['svr']=False
     iso_meteo_model.which_regs_iso3h['elnet']=False
+    iso_meteo_model.which_regs_iso18['rfr']=False
+    iso_meteo_model.which_regs_iso2h['rfr']=False
+    iso_meteo_model.which_regs_iso18['mlp']=False
+    iso_meteo_model.which_regs_iso2h['mlp']=False
+
 
 
 #change directory
-    preped_dataset.direc=os.path.join(r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\new_output_09_dec_2020_indv_month_v2\iso_models",str(m)+"_output_inc_outliers")
+    preped_dataset.direc=os.path.join(r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\new_output_16_dec_2020_indv_month\iso_models",str(m)+"_output_inc_outliers")
  
 
     #iso model 2
@@ -441,21 +454,71 @@ for m in wan_mon:
     tools.stats.annual_stats(iso_meteo_model)
     tools.plots.best_estimator_plots(iso_meteo_model,meteo_plot=False)
     tools.plots.partial_dep_plots(iso_meteo_model,meteo_plot=False)
-    iso_meteo_model_inc_outliers=tools.session.save(iso_meteo_model,name='iso_meteo_model_'+str(m)+'_exc_outliers') #optional prints the directory
-    prepdataset_final_inc_outliers=tools.session.save(preped_dataset,name='prepdataset_final_'+str(m)+'_exc_outliers') #optional prints the directory
-    iso_meteo_modellist.append(iso_meteo_model)
+    #iso_meteo_model_inc_outliers=tools.session.save(iso_meteo_model,name='iso_meteo_model_'+str(m)+'_exc_outliers') #optional prints the directory
+    #prepdataset_final_inc_outliers=tools.session.save(preped_dataset,name='prepdataset_final_'+str(m)+'_exc_outliers') #optional prints the directory
+    iso_meteo_modellist_.append(iso_meteo_model)
     #########
 
-for (iso_meteo_model_inc_outliers,m) in zip(iso_meteo_modellist,wan_mon):
+for (iso_meteo_model_inc_outliers,m) in zip(iso_meteo_modellist_,wan_mon):
+    tools.plots.best_estimator_plots(iso_meteo_model_inc_outliers,meteo_plot=False)
+    tools.plots.partial_dep_plots(iso_meteo_model_inc_outliers,meteo_plot=False)
     #calculate predictions
     ev_class_1_inc=tools.evaluation()
     #iso_meteo_model_inc_outliers=tools.session.load(iso_meteo_model_inc_outliers)
     pred_inputs=iso_meteo_model_inc_outliers.all_preds[["CooX","CooY","CooZ","month",'ID_MeteoPoint']]
-    ev_class_1_inc.predict(iso_meteo_model_inc_outliers,pred_inputs,direc=os.path.join(r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\new_output_09_dec_2020_indv_month_v2","preds_"+str(m)))
+    ev_class_1_inc.predict(iso_meteo_model_inc_outliers,pred_inputs,direc=os.path.join(r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\new_output_16_dec_2020_indv_month","preds_"+str(m)))
     tools.plots.isotopes_meteoline_plot(ev_class_1_inc,iso_meteo_model_inc_outliers,iso_18,iso_2h,month_data=True,obs_data=False,id_point=True,residplot=True)
     ##########################################################
+
+iso_meteo_modellist=list()
+wan_mon=[1,2,3,12]
+#normal
+for m in wan_mon:
+    #load meteo
+    iso_meteo_model=tools.session.load(r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\new_output_09_dec_2020_new_iso\iso_meteo_model_exc_outliers_09_Dec_2020_16_59_meteoTrue_isoFalse.pkl")
+    preped_dataset=tools.session.load(r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\new_output_14_dec_2020_new_iso\preped_dataset_exc_outliers_15_Dec_2020_07_17_meteoFalse_isoFalse.pkl")   
+    #iso_meteo_model.cv=3
+    #iso_meteo_model.vif_threshold_iso18=None
+    #iso_meteo_model.vif_threshold_iso2h=None
+    #iso_meteo_model.vif_threshold_iso3h=None
+    #iso_meteo_model.tunedpars_svr_iso18['gamma']=[1.e-08, 1.e-06, 1.e-04]
+    #iso_meteo_model.tunedpars_svr_iso2h['gamma']=[1.e-08, 1.e-06, 1.e-04]
+    #iso_meteo_model.tunedpars_svr_iso3h['gamma']=[1.e-08, 1.e-06, 1.e-04]
+    #iso_meteo_model.which_regs_iso18['svr']=False
+    #iso_meteo_model.which_regs_iso18['elnet']=False
+    #iso_meteo_model.which_regs_iso2h['svr']=False
+    #iso_meteo_model.which_regs_iso2h['elnet']=False
+    #iso_meteo_model.which_regs_iso3h['svr']=False
+    #iso_meteo_model.which_regs_iso3h['elnet']=False
+
+
+#change directory
+    preped_dataset.direc=os.path.join(r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\new_output_15_dec_2020_indv_month\iso_models",str(m)+"_output_inc_outliers")
+ 
+
+    #iso model 2
+    iso_meteo_model.iso_predic(preped_dataset,run_iso_whole_year=False,iso_model_month_list=[m])
+    iso_meteo_model.iso_fit()
+    tools.stats.annual_stats(iso_meteo_model)
+    tools.plots.best_estimator_plots(iso_meteo_model,meteo_plot=False)
+    tools.plots.partial_dep_plots(iso_meteo_model,meteo_plot=False)
+    #iso_meteo_model_inc_outliers=tools.session.save(iso_meteo_model,name='iso_meteo_model_'+str(m)+'_exc_outliers') #optional prints the directory
+    #prepdataset_final_inc_outliers=tools.session.save(preped_dataset,name='prepdataset_final_'+str(m)+'_exc_outliers') #optional prints the directory
+    iso_meteo_modellist.append(iso_meteo_model)
+    #########
+
+for (iso_meteo_model_inc_outliers,m) in zip(iso_meteo_modellist,wan_mon):
+    tools.plots.best_estimator_plots(iso_meteo_model_inc_outliers,meteo_plot=False)
+    tools.plots.partial_dep_plots(iso_meteo_model_inc_outliers,meteo_plot=False)
+    #calculate predictions
+    ev_class_1_inc=tools.evaluation()
+    #iso_meteo_model_inc_outliers=tools.session.load(iso_meteo_model_inc_outliers)
+    pred_inputs=iso_meteo_model_inc_outliers.all_preds[["CooX","CooY","CooZ","month",'ID_MeteoPoint']]
+    ev_class_1_inc.predict(iso_meteo_model_inc_outliers,pred_inputs,direc=os.path.join(r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\new_output_14_dec_2020_indv_month","preds_"+str(m)))
+    tools.plots.isotopes_meteoline_plot(ev_class_1_inc,iso_meteo_model_inc_outliers,iso_18,iso_2h,month_data=True,obs_data=False,id_point=True,residplot=True)
+    ##########################################################    
     ######################################################
-    iso='iso_18'
+    """iso='iso_18'
     fig, axs =plt.subplots(1,len(iso_meteo_model_inc_outliers.iso18_bests_dic[0]["used_features"]))
     for count,fes in enumerate(iso_meteo_model_inc_outliers.iso18_bests_dic[0]["used_features"]):
         scaler1 = MinMaxScaler()
@@ -465,7 +528,7 @@ for (iso_meteo_model_inc_outliers,m) in zip(iso_meteo_modellist,wan_mon):
 
         axs[count].scatter(x,y)
         axs[count].set_title(str(m)+"_"+iso+"_"+fes)
-    fig.savefig(os.path.join(r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\new_output_09_dec_2020_indv_month_v2","preds_"+str(m),str(m)+"_"+iso+'.png'))
+    #fig.savefig(os.path.join(r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\new_output_09_dec_2020_indv_month_v2","preds_"+str(m),str(m)+"_"+iso+'.png'))
     plt.close()
     iso='iso_2h'
     fig, axs =plt.subplots(1,len(iso_meteo_model_inc_outliers.iso2h_bests_dic[0]["used_features"]))
@@ -476,12 +539,12 @@ for (iso_meteo_model_inc_outliers,m) in zip(iso_meteo_modellist,wan_mon):
 
         axs[count].scatter(scaler1.fit_transform(iso_meteo_model_inc_outliers.all_preds[[iso]]),scaler2.fit_transform(iso_meteo_model_inc_outliers.all_preds[[fes]]))
         axs[count].set_title(str(m)+"_"+iso+"_"+fes)
-    fig.savefig(os.path.join(r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\new_output_09_dec_2020_indv_month_v2","preds_"+str(m),str(m)+"_"+iso+".png"))
-    plt.close()
+    #fig.savefig(os.path.join(r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\new_output_09_dec_2020_indv_month_v2","preds_"+str(m),str(m)+"_"+iso+".png"))
+    plt.close()"""
 
 
 import dill
-dill.dump_session(r'C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\new_output_09_dec_2020_indv_month_v2\whole_dump.pkl')
+dill.load_session(r'C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\new_output_14_dec_2020_indv_month\whole_dump_with_ind_month_lists_geo_and_normal.pkl')
 
 
 #test sorting problem
@@ -509,6 +572,12 @@ from isocompy import data_preparation,reg_model,tools
 import os
 
 
+#isotope files
+data_file_iso = r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\inputs\Isotopes_16_11_2020_sorted.xls"
+iso_18 = pd.read_excel(data_file_iso,sheet_name="ISOT18O",header=0,index_col=False,keep_default_na=True)
+iso_2h=pd.read_excel(data_file_iso,sheet_name="ISOT2H",header=0,index_col=False,keep_default_na=True)
+iso_3h=pd.read_excel(data_file_iso,sheet_name="ISOT3",header=0,index_col=False,keep_default_na=True)
+############
 #######################
 #importing data
 #temp=pd.read_excel(r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\inputs\T_Daily.xlsx",sheet_name="T_Daily",header=0,index_col=False,keep_default_na=True)

@@ -1,13 +1,19 @@
 import pandas as pd
 import os
+import numpy as np
+from sklearn.preprocessing import MinMaxScaler
 
                                       
 ##########################################################################################
 ##########################################################################################
 
-
+def geo_mean(iterable):
+    scaler = MinMaxScaler()
+    a=scaler.fit_transform(np.array(iterable).reshape(-1, 1))
+    a=a.prod()**(1.0/len(a))
+    return float(scaler.inverse_transform(a.reshape(-1, 1)))
 #grouping data
-def grouping_data(rain,elnino,lanina,filter_avraged,month=None,zeross=True):
+def grouping_data(rain,elnino,lanina,filter_avraged,mean_mode,month=None,zeross=True):
     if zeross==False:
         rain=rain[rain["Value"]!=0]
     if month !=None:
@@ -29,45 +35,40 @@ def grouping_data(rain,elnino,lanina,filter_avraged,month=None,zeross=True):
         tempp=rainmeteoindex.loc[row['ID_MeteoPoint']]
         if len(tempp.shape)!= 1:
             #print (tempp)
-            sum_elnino=None
-            cnt_elnino=None
-            sum_lanina=None
-            cnt_lanina=None
-            sum_norm=None
-            cnt_norm=None
+            sum_elnino=list()
+            sum_lanina=list()
+            sum_norm=list()
             for index2, row2 in tempp.iterrows():
                 if pd.to_datetime(row2["Date"]).year in elnino:
-                    if sum_elnino==None:
-                        sum_elnino=row2["Value"]
-                        cnt_elnino=1
-                    else:
-                        sum_elnino=sum_elnino+row2["Value"]
-                        cnt_elnino=cnt_elnino+1
+                    sum_elnino.append(row2["Value"])
 
                 elif pd.to_datetime(row2["Date"]).year in lanina:
-                    if sum_lanina==None:
-                        sum_lanina=row2["Value"]
-                        cnt_lanina=1
-                    else:
-                        sum_lanina=sum_lanina+row2["Value"]
-                        cnt_lanina=cnt_lanina+1
-                
+                    sum_lanina.append(row2["Value"])
                 else:
-                    if sum_norm==None:
-                        sum_norm=row2["Value"]
-                        cnt_norm=1
-                    else:
-                        sum_norm=sum_norm+row2["Value"]
-                        cnt_norm=cnt_norm+1
+                    sum_norm.append(row2["Value"])
 
-            if  sum_elnino !=None:       
-                Mean_Value_elnino=sum_elnino/cnt_elnino
+            if  len(sum_elnino)!=0:  
+                if mean_mode=="geometric": 
+                    Mean_Value_elnino=geo_mean(sum_elnino)
+                else:        
+                    Mean_Value_elnino=sum(sum_elnino)/len(sum_elnino)
+
                 newmat_elnino.append({"ID_MeteoPoint":row['ID_MeteoPoint'], "CooX":tempp["CooX"].iat[0], "CooY":tempp["CooY"].iat[0], "CooZ":tempp["CooZ"].iat[0], "Date":tempp["Date"], "Value":Mean_Value_elnino})
-            if sum_lanina !=None:
-                Mean_Value_lanina=sum_lanina/cnt_lanina
+            
+            if len(sum_lanina) !=0:
+                if mean_mode=="geometric": 
+                    Mean_Value_lanina=geo_mean(sum_lanina)
+                else:        
+                    Mean_Value_lanina=sum(sum_lanina)/len(sum_lanina)
+
                 newmat_lanina.append({"ID_MeteoPoint":row['ID_MeteoPoint'], "CooX":tempp["CooX"].iat[0], "CooY":tempp["CooY"].iat[0], "CooZ":tempp["CooZ"].iat[0], "Value":Mean_Value_lanina})
-            if sum_norm !=None:
-                Mean_Value_norm=sum_norm/cnt_norm
+            
+            if len(sum_norm) !=0:
+                if mean_mode=="geometric": 
+                    Mean_Value_norm=geo_mean(sum_norm)
+                else:        
+                    Mean_Value_norm=sum(sum_norm)/len(sum_norm)
+                    
                 newmat_norm.append({"ID_MeteoPoint":row['ID_MeteoPoint'], "CooX":tempp["CooX"].iat[0], "CooY":tempp["CooY"].iat[0], "CooZ":tempp["CooZ"].iat[0], "Value":Mean_Value_norm})
         else:
             #print ("tempp in len 1:")
@@ -85,14 +86,14 @@ def grouping_data(rain,elnino,lanina,filter_avraged,month=None,zeross=True):
     return newmatdf_rain_elnino,newmatdf_rain_lanina,newmatdf_rain_norm
 ###########################################
 #function for monthly procedure
-def monthly_uniting(datab,elnino,lanina,filter_avraged):
+def monthly_uniting(datab,elnino,lanina,filter_avraged,mean_mode):
 
     month_grouped_list_with_zeros=list()
     month_grouped_list_with_zeros_elnino=list()
     month_grouped_list_with_zeros_lanina=list()
     for month in range(1,13):
         rain_cop=datab.copy()
-        newmatdf_rain_elnino,newmatdf_rain_lanina,newmatdf_rain_all=grouping_data(rain_cop,elnino,lanina,filter_avraged,month=month,zeross=True)
+        newmatdf_rain_elnino,newmatdf_rain_lanina,newmatdf_rain_all=grouping_data(rain_cop,elnino,lanina,filter_avraged,mean_mode=mean_mode,month=month,zeross=True)
         month_grouped_list_with_zeros.append(newmatdf_rain_all)
         month_grouped_list_with_zeros_elnino.append(newmatdf_rain_elnino)
         month_grouped_list_with_zeros_lanina.append(newmatdf_rain_lanina)
@@ -141,22 +142,23 @@ def remove_outliers(rain,q1,q3,IQR,inc_zeros,IQR_rat): #inc_zeros_remove zeros t
     return rain_main,rain_df_station_outliers
 ###########################################################
 #importing_preprocess
-def data_preparation_func(rain,temp,hum,iso_18,iso_2h,iso_3h,direc,meteo_input_type,q1,q3,IQR_rain,IQR_temp,IQR_hum,inc_zeros_rain,inc_zeros_temp,inc_zeros_hum,write_outliers_input,write_integrated_data,IQR_rat_rain,IQR_rat_temp,IQR_rat_hum,year_type,elnino,lanina):
+def data_preparation_func(rain,temp,hum,iso_18,iso_2h,iso_3h,direc,meteo_input_type_rain,meteo_input_type_temp,meteo_input_type_hum,q1,q3,IQR_rain,IQR_temp,IQR_hum,inc_zeros_rain,inc_zeros_temp,inc_zeros_hum,write_outliers_input,write_integrated_data,IQR_rat_rain,IQR_rat_temp,IQR_rat_hum,year_type,elnino,lanina,mean_mode_rain,mean_mode_temp,mean_mode_hum,mean_mode_iso_18,mean_mode_iso_2h,mean_mode_iso_3h):
     #main is q1 &q3. less than 0.25 more than .75 are outliers.
-    if meteo_input_type=="daily_remove_outliers":
+    if meteo_input_type_rain=="daily_remove_outliers":
         #to remove the outliers
         rain,rain_df_station_outliers=remove_outliers(rain,q1,q3,IQR_rain,inc_zeros_rain,IQR_rat_rain)
         rain=rain[rain['outlier']==True]
-
+        rain.to_csv(os.path.join(direc,"rain_daily_outliers_removed_1.csv"))
+    if meteo_input_type_temp=="daily_remove_outliers":
         temp,temp_df_station_outliers=remove_outliers(temp,q1,q3,IQR_temp,inc_zeros_temp,IQR_rat_temp)
         temp=temp[temp['outlier']==True]
+        temp.to_csv(os.path.join(direc,"temp_daily_outliers_removed_1.csv"))
 
+    if meteo_input_type_hum=="daily_remove_outliers":
         hum,hum_df_station_outliers=remove_outliers(hum,q1,q3,IQR_hum,inc_zeros_hum,IQR_rat_hum)
         hum=hum[hum['outlier']==True]
-        #raw data before grouping after outlier processing
-        rain.to_csv(os.path.join(direc,"rain_daily_outliers_removed_1.csv"))
-        temp.to_csv(os.path.join(direc,"temp_daily_outliers_removed_1.csv"))
         hum.to_csv(os.path.join(direc,"hum_daily_outliers_removed_1.csv"))
+
     ###########################################################
     rain['Date'] = pd.to_datetime(rain['Date'])#,format=date_format)
     rain = rain.groupby(['ID_MeteoPoint','CooX','CooY','Month', pd.Grouper(key='Date', freq='m')]).agg({"CooZ":'mean', 'Value':'sum'})
@@ -176,21 +178,23 @@ def data_preparation_func(rain,temp,hum,iso_18,iso_2h,iso_3h,direc,meteo_input_t
         rain.to_csv(os.path.join(direc,"rain_monthly_2.csv"))
         temp.to_csv(os.path.join(direc,"temp_monthly_2.csv"))
         hum.to_csv(os.path.join(direc,"hum_monthly_2.csv"))
-        if meteo_input_type=="daily_remove_outliers":
+        if meteo_input_type_rain=="daily_remove_outliers":
             rain_df_station_outliers.to_excel(os.path.join(direc,"rain_df_station_outliers.xlsx"))
+        if meteo_input_type_temp=="daily_remove_outliers":
             temp_df_station_outliers.to_excel(os.path.join(direc,"temp_df_station_outliers.xlsx"))
+        if meteo_input_type_hum=="daily_remove_outliers":
             hum_df_station_outliers.to_excel(os.path.join(direc,"hum_df_station_outliers.xlsx"))
     ###########################################################
     #Group the rain data to average of each station
     #rain
     datab=rain
-    month_grouped_list_with_zeros_rain_all,month_grouped_list_with_zeros_rain_elnino,month_grouped_list_with_zeros_rain_lanina=monthly_uniting(datab,elnino,lanina,filter_avraged=False)
+    month_grouped_list_with_zeros_rain_all,month_grouped_list_with_zeros_rain_elnino,month_grouped_list_with_zeros_rain_lanina=monthly_uniting(datab,elnino,lanina,mean_mode=mean_mode_rain, filter_avraged=False)
     #Group the temperature data to average of each station
     datab=temp
-    month_grouped_list_with_zeros_temp_all,month_grouped_list_with_zeros_temp_elnino,month_grouped_list_with_zeros_temp_lanina=monthly_uniting(datab,elnino,lanina,filter_avraged=False)
+    month_grouped_list_with_zeros_temp_all,month_grouped_list_with_zeros_temp_elnino,month_grouped_list_with_zeros_temp_lanina=monthly_uniting(datab,elnino,lanina,mean_mode=mean_mode_temp,filter_avraged=False)
     #Group the humidity data to average of each station
     datab=hum
-    month_grouped_list_with_zeros_hum_all,month_grouped_list_with_zeros_hum_elnino,month_grouped_list_with_zeros_hum_lanina=monthly_uniting(datab,elnino,lanina,filter_avraged=False)
+    month_grouped_list_with_zeros_hum_all,month_grouped_list_with_zeros_hum_elnino,month_grouped_list_with_zeros_hum_lanina=monthly_uniting(datab,elnino,lanina,mean_mode=mean_mode_hum,filter_avraged=False)
     if year_type=="all":
         month_grouped_list_with_zeros_rain=month_grouped_list_with_zeros_rain_all
         month_grouped_list_with_zeros_temp=month_grouped_list_with_zeros_temp_all
@@ -210,15 +214,15 @@ def data_preparation_func(rain,temp,hum,iso_18,iso_2h,iso_3h,direc,meteo_input_t
     #############################################################
     datab=iso_18
     #newmatdf_iso_18_elnino,newmatdf_iso_18_lanina,newmatdf_iso_18_norm=grouping_data(iso_18,which_value,elnino,lanina)
-    month_grouped_list_with_zeros_iso_18_allyear,month_grouped_list_with_zeros_iso_18_elnino,month_grouped_list_with_zeros_iso_18_lanina=monthly_uniting(datab,elnino,lanina,filter_avraged=False)
+    month_grouped_list_with_zeros_iso_18_allyear,month_grouped_list_with_zeros_iso_18_elnino,month_grouped_list_with_zeros_iso_18_lanina=monthly_uniting(datab,elnino,lanina,mean_mode=mean_mode_iso_18,filter_avraged=False)
     
     datab=iso_2h
     #newmatdf_iso_2h_elnino,newmatdf_iso_2h_lanina,newmatdf_iso_2h_norm=grouping_data(iso_2h,which_value,elnino,lanina)
-    month_grouped_list_with_zeros_iso_2h_allyear,month_grouped_list_with_zeros_iso_2h_elnino,month_grouped_list_with_zeros_iso_2h_lanina=monthly_uniting(datab,elnino,lanina,filter_avraged=False)
+    month_grouped_list_with_zeros_iso_2h_allyear,month_grouped_list_with_zeros_iso_2h_elnino,month_grouped_list_with_zeros_iso_2h_lanina=monthly_uniting(datab,elnino,lanina,mean_mode=mean_mode_iso_2h,filter_avraged=False)
     
     datab=iso_3h
     #newmatdf_iso_3h_elnino,newmatdf_iso_3h_lanina,newmatdf_iso_3h_norm=grouping_data(iso_3h,which_value,elnino,lanina)
-    month_grouped_list_with_zeros_iso_3h_allyear,month_grouped_list_with_zeros_iso_3h_elnino,month_grouped_list_with_zeros_iso_3h_lanina=monthly_uniting(datab,elnino,lanina,filter_avraged=False)
+    month_grouped_list_with_zeros_iso_3h_allyear,month_grouped_list_with_zeros_iso_3h_elnino,month_grouped_list_with_zeros_iso_3h_lanina=monthly_uniting(datab,elnino,lanina,mean_mode=mean_mode_iso_3h,filter_avraged=False)
     #return month_grouped_list_with_zeros_rain,month_grouped_list_without_zeros_rain,month_grouped_list_with_zeros_temp,month_grouped_list_without_zeros_temp,rain,temper,elnino,lanina,newmatdf_rain_elnino,newmatdf_rain_lanina,newmatdf_temp_elnino,newmatdf_temp_lanina,newmatdf_temp_norm,iso_18,iso_2h,iso_3h,newmatdf_iso_18_elnino,newmatdf_iso_18_lanina,newmatdf_iso_18_norm,newmatdf_iso_2h_elnino,newmatdf_iso_2h_lanina,newmatdf_iso_2h_norm,newmatdf_iso_3h_elnino,newmatdf_iso_3h_lanina,newmatdf_iso_3h_norm
     
     if year_type=="all":

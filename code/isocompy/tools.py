@@ -2,6 +2,8 @@ import os
 import dill
 from pathlib import Path
 from datetime import datetime
+
+from matplotlib import cm
 from isocompy import isocompy_tool_funcs
 from isocompy.isocompy_tool_funcs import new_data_prediction_comparison,regional_mensual_plot,f_reg_mutual,best_estimator_and_part_plots
 import pandas as pd
@@ -56,7 +58,7 @@ class session(object):
 
 class evaluation(object):
     
-    def predict(self,cls,pred_inputs,direc=None):
+    def predict(self,cls,pred_inputs,direc=None,write_to_file_iso_18=True,write_to_file_iso_2h=True,write_to_file_iso_3h=True):
         if direc==None: self.direc=cls.direc
         else: self.direc=direc
         Path(self.direc).mkdir(parents=True, exist_ok=True)
@@ -64,11 +66,11 @@ class evaluation(object):
         self.pred_inputs=pred_inputs
         #here and iso_prediction, identifying the month should be nicer!
         column_name="predicted_iso18"
-        self.monthly_iso18_output=isocompy_tool_funcs.predict_points(self.direc,cls.iso18_bests_dic[0]["used_features"],self.pred_inputs,cls.iso_model_month_list,cls.temp_bests,cls.rain_bests,cls.hum_bests,cls.iso18_bests[0][6],cls.iso18_bests[0][7],cls.iso18_bests_dic[0]["didlog"],cls.iso18_bests_dic[0]["best_estimator"],column_name,trajectory_features_list=cls.col_for_f_reg,run_iso_whole_year=cls.run_iso_whole_year)
+        self.monthly_iso18_output=isocompy_tool_funcs.predict_points(self.direc,write_to_file_iso_18,cls.iso18_bests_dic[0]["used_features"],self.pred_inputs,cls.iso_model_month_list,cls.temp_bests,cls.rain_bests,cls.hum_bests,cls.iso18_bests[0][6],cls.iso18_bests[0][7],cls.iso18_bests_dic[0]["didlog"],cls.iso18_bests_dic[0]["best_estimator"],column_name,trajectory_features_list=cls.col_for_f_reg,run_iso_whole_year=cls.run_iso_whole_year)
         column_name="predicted_iso2h"
-        self.monthly_iso2h_output=isocompy_tool_funcs.predict_points(self.direc,cls.iso2h_bests_dic[0]["used_features"],self.pred_inputs,cls.iso_model_month_list,cls.temp_bests,cls.rain_bests,cls.hum_bests,cls.iso2h_bests[0][6],cls.iso2h_bests[0][7],cls.iso2h_bests_dic[0]["didlog"],cls.iso2h_bests_dic[0]["best_estimator"],column_name,trajectory_features_list=cls.col_for_f_reg,run_iso_whole_year=cls.run_iso_whole_year)
+        self.monthly_iso2h_output=isocompy_tool_funcs.predict_points(self.direc,write_to_file_iso_2h,cls.iso2h_bests_dic[0]["used_features"],self.pred_inputs,cls.iso_model_month_list,cls.temp_bests,cls.rain_bests,cls.hum_bests,cls.iso2h_bests[0][6],cls.iso2h_bests[0][7],cls.iso2h_bests_dic[0]["didlog"],cls.iso2h_bests_dic[0]["best_estimator"],column_name,trajectory_features_list=cls.col_for_f_reg,run_iso_whole_year=cls.run_iso_whole_year)
         column_name="predicted_iso3h"
-        self.monthly_iso3h_output=isocompy_tool_funcs.predict_points(self.direc,cls.iso3h_bests_dic[0]["used_features"],self.pred_inputs,cls.iso_model_month_list,cls.temp_bests,cls.rain_bests,cls.hum_bests,cls.iso3h_bests[0][6],cls.iso3h_bests[0][7],cls.iso3h_bests_dic[0]["didlog"],cls.iso3h_bests_dic[0]["best_estimator"],column_name,trajectory_features_list=cls.col_for_f_reg,run_iso_whole_year=cls.run_iso_whole_year)
+        self.monthly_iso3h_output=isocompy_tool_funcs.predict_points(self.direc,write_to_file_iso_3h,cls.iso3h_bests_dic[0]["used_features"],self.pred_inputs,cls.iso_model_month_list,cls.temp_bests,cls.rain_bests,cls.hum_bests,cls.iso3h_bests[0][6],cls.iso3h_bests[0][7],cls.iso3h_bests_dic[0]["didlog"],cls.iso3h_bests_dic[0]["best_estimator"],column_name,trajectory_features_list=cls.col_for_f_reg,run_iso_whole_year=cls.run_iso_whole_year)
     ############################################################
     def regional_mensual_plot():
         pass
@@ -142,13 +144,15 @@ class plots(object):
         best_estimator_and_part_plots(cls,meteo_plot,iso_plot,estimator_plot,partial_dep_plot)
     
     @staticmethod
-    def isotopes_meteoline_plot(ev_class,iso_class,iso_18,iso_2h,a=8,b=10,month_data=False,obs_data=True,id_point=True,residplot=True):
+    def isotopes_meteoline_plot(ev_class,iso_class,iso_18,iso_2h,a=8,b=10,month_data=True,obs_data=True,id_point=True,residplot=True):
         """
         docstring
         """
         tot=list()
         Path(os.path.join(ev_class.direc,"isotopes_meteoline_plots")).mkdir(parents=True,exist_ok=True)
         for (i,j,k) in zip(ev_class.monthly_iso18_output,ev_class.monthly_iso2h_output,iso_class.iso_model_month_list):
+            if i.shape[0]==0 or j.shape[0]==0:
+                continue
             mpl.style.use("seaborn")
             if id_point==True and month_data==True:
                 merged_i1_2h=pd.merge(i,j,on=["CooX","CooY",'CooZ', 'month','ID_MeteoPoint'])
@@ -167,12 +171,112 @@ class plots(object):
                 tot.append(i)
             else:
                 tot.append(merged_i1_2h)
-
-            plt.scatter(i.predicted_iso18,j.predicted_iso2h,marker=".",c="b",label="Predicted",s=70)
+            plt.close("all")
+            fig, ax = plt.subplots()
             reg = LinearRegression().fit(i.predicted_iso18.to_frame().values,j.predicted_iso2h.to_frame().values)
+
             if obs_data==True:
-                plt.scatter(iso_18[iso_18["month"]==k]["Value"],iso_2h[iso_2h["month"]==k]["Value"],marker="x",c="g",label="Original",s=18)
-            plt.scatter(iso_class.all_preds[iso_class.all_preds["month"]==k]["iso_18"],iso_class.all_preds[iso_class.all_preds["month"]==k]["iso_2h"],marker="^",c="c",label="Monthly",s=18)
+                ax.scatter(iso_18[iso_18["month"]==k]["Value"],iso_2h[iso_2h["month"]==k]["Value"],marker="x",c="g",label="Original",s=18)
+            if id_point==True and month_data==True:
+                merged_all=pd.merge(i,iso_class.all_preds[iso_class.all_preds["month"]==k],on=["CooX","CooY",'CooZ', 'month','ID_MeteoPoint'])
+                evenly_spaced_interval = np.linspace(0, 1, merged_all.shape[0] )
+                colors = [cm.rainbow(x) for x in evenly_spaced_interval]
+                for st, color in enumerate(colors):
+                    ax.scatter(merged_all.predicted_iso18[st],merged_all.predicted_iso2h[st],marker=".",c=np.array([color]),s=90)
+                    ax.scatter(merged_all.iso_18[st],merged_all.iso_2h[st],marker="^",c=np.array([color]),s=20)
+
+            else:
+                ax.scatter(i.predicted_iso18,j.predicted_iso2h,marker=".",c="b",label="Predicted",s=70)
+                ax.scatter(iso_class.all_preds[iso_class.all_preds["month"]==k]["iso_18"],iso_class.all_preds[iso_class.all_preds["month"]==k]["iso_2h"],marker="^",c="c",label="Monthly",s=18)
+            left, right = ax.get_xlim()
+            left1, right1 = ax.get_ylim()
+            met_x = np.linspace(min(left,left1),max(right,right1),100)
+            met_y= a*met_x+b
+            met_y_preds=reg.coef_*met_x+reg.intercept_
+            ax.plot(met_x,met_y,color="red",label="Met.Line="+str(a)+"x+"+str(b))
+            ax.plot(met_x,met_y_preds.reshape(-1,1),linestyle='dashed',c="brown",label="Pred. Met. Line="+str(round(reg.coef_[0][0],1))+"x+"+str(round(reg.intercept_[0],1)))
+            reg2=LinearRegression().fit(iso_class.all_preds[iso_class.all_preds["month"]==k]["iso_18"].to_frame(),iso_class.all_preds[iso_class.all_preds["month"]==k]["iso_2h"].to_frame())
+            met_y_preds_2=reg2.coef_*met_x+reg2.intercept_
+            ax.plot(met_x,met_y_preds_2.reshape(-1,1),linestyle='dashdot',c="yellow",label="Mean monthly obs. Line="+str(round(reg2.coef_[0][0],1))+"x+"+str(round(reg2.intercept_[0],1)))
+
+            y_true = a * i.predicted_iso18 + b
+            y_pred = j.predicted_iso2h
+            #plt.plot(a,y_true,color="red")
+            ax.set_xlim(left,right)
+            ax.set_ylim(left1,right1)
+            ax.set_title("M: " + str(k)+ " |R2 org: " +str(round(iso_class.iso18_bests_dic[0]["best_score"],2))+" |R2 Pred. to Met.: " +str(round(r2_score(y_true, y_pred),2))+ " |R2 Mean monthly obs.: " +str(round(reg.score(i.predicted_iso18.to_frame().values,j.predicted_iso2h.to_frame().values),2))+ " |R2 Pred. to New Met. Line: " +str(round(reg2.score(iso_class.all_preds[iso_class.all_preds["month"]==k]["iso_18"].to_frame(),iso_class.all_preds[iso_class.all_preds["month"]==k]["iso_2h"].to_frame()),2)) )
+            ax.set_xlabel("iso_18")
+            ax.set_ylabel("iso_2H")
+            ax.legend()
+            fig.savefig(os.path.join(ev_class.direc,"isotopes_meteoline_plots","Month_" + str(k)+"_plot.png"),dpi=300)
+            plt.close(fig)
+            #residuals plot
+            if id_point==True and residplot==True and month_data==True:
+                resds_df=merged_all
+                resds_df["residual_18"]=resds_df['iso_18' ] - resds_df["predicted_iso18"] 
+                resds_df=resds_df.sort_values(by="residual_18")
+                plt.scatter(np.arange(len(resds_df['ID_MeteoPoint'])),  resds_df["residual_18"] )
+                ax = plt.gca()
+                ax.set_xticks(np.arange(len(resds_df['ID_MeteoPoint'])))
+                ax.xaxis.set_ticklabels(resds_df['ID_MeteoPoint'], rotation=90)
+                
+                mean_obs=round(resds_df['iso_18' ].mean() ,2)
+                mean_pred=round(resds_df["predicted_iso18"].mean(),2)
+                mean_resids=round(resds_df["residual_18"].mean(),2)
+
+                std_obs=round(resds_df['iso_18' ].std(),2)
+                std_pred=round(resds_df["predicted_iso18"].std(),2)
+                std_resids=round(resds_df["residual_18"].std(),2)
+                tit="ISO18| mn_resid: {} std_resid: {} mn_obs: {} std_obs: {} mn_pred: {} std_pred:{}".format(mean_resids, std_resids, mean_obs, std_obs, mean_pred, std_pred)
+                plt.title(tit)
+                fig = plt.gcf()
+                fig.savefig(os.path.join(ev_class.direc,"isotopes_meteoline_plots","Residuals_iso18_Month_" + str(k)+"_plot.png"))
+                plt.close("all")
+
+                '''
+                #residuals ~ iso18 plot
+                plt.scatter(resds_df['iso_18' ],resds_df["residual_18"])
+                plt.xlabel("iso_18")
+                plt.ylabel("residual_18")
+                plt.title("residuals & iso_18 month:" + str(k))
+                fig = plt.gcf()
+                fig.savefig(os.path.join(ev_class.direc,"isotopes_meteoline_plots","iso18_Residuals_iso18_Month_" + str(k)+"_plot.png"))
+                plt.close("all")'''
+
+                resds_df["residual_2h"]=resds_df['iso_2h' ] - resds_df["predicted_iso2h"]
+                plt.scatter(np.arange(len(resds_df['ID_MeteoPoint'])),  resds_df["residual_2h"] )
+                ax = plt.gca()
+                ax.set_xticks(np.arange(len(resds_df['ID_MeteoPoint'])))
+                ax.xaxis.set_ticklabels(resds_df['ID_MeteoPoint'], rotation=90)
+                mean_obs=round(resds_df['iso_2h' ].mean() ,2)
+                mean_pred=round(resds_df["predicted_iso2h"].mean(),2)
+                mean_resids=round(resds_df["residual_2h"].mean(),2)
+
+                std_obs=round(resds_df['iso_2h' ].std(),2)
+                std_pred=round(resds_df["predicted_iso2h"].std(),2)
+                std_resids=round(resds_df["residual_2h"].std(),2)
+                tit="ISO2h| mn_resid: {} std_resid: {} mn_obs: {} std_obs: {} mn_pred: {} std_pred:{}".format(mean_resids, std_resids, mean_obs, std_obs, mean_pred, std_pred)
+                plt.title(tit)
+                fig = plt.gcf()
+                fig.savefig(os.path.join(ev_class.direc,"isotopes_meteoline_plots","Residuals_iso2h_Month_" + str(k)+"_plot.png"))
+                plt.close("all")
+
+
+
+
+
+        if len(tot)!=0:
+            
+
+            vv=pd.concat(tot)
+            vv2=pd.concat(tot)
+            mpl.style.use("seaborn")
+
+            plt.scatter(vv.predicted_iso18,vv2.predicted_iso2h,marker=".",c="b",label="Predicted",s=70)
+            reg = LinearRegression().fit(vv.predicted_iso18.to_frame().values,vv2.predicted_iso2h.to_frame().values)
+            if obs_data==True:
+                plt.scatter(iso_18[iso_18["month"].isin(iso_class.iso_model_month_list)]["Value"],iso_2h[iso_2h["month"].isin(iso_class.iso_model_month_list)]["Value"],marker="x",c="g",label="Original",s=18)
+            plt.scatter(iso_class.all_preds[iso_class.all_preds["month"].isin(iso_class.iso_model_month_list)]["iso_18"],iso_class.all_preds[iso_class.all_preds["month"].isin(iso_class.iso_model_month_list)]["iso_2h"],marker="^",c="c",label="Monthly",s=18)
             left, right = plt.xlim()
             left1, right1 = plt.ylim()
             met_x = np.linspace(min(left,left1),max(right,right1),100)
@@ -180,74 +284,14 @@ class plots(object):
             met_y_preds=reg.coef_*met_x+reg.intercept_
             plt.plot(met_x,met_y,color="red",label="Met.Line="+str(a)+"x+"+str(b))
             plt.plot(met_x,met_y_preds.reshape(-1,1),linestyle='dashed',c="brown",label="Pred. Met. Line="+str(round(reg.coef_[0][0],1))+"x+"+str(round(reg.intercept_[0],1)))
-            reg2=LinearRegression().fit(iso_class.all_preds[iso_class.all_preds["month"]==k]["iso_18"].to_frame(),iso_class.all_preds[iso_class.all_preds["month"]==k]["iso_2h"].to_frame())
+            reg2 = LinearRegression().fit(iso_class.all_preds[iso_class.all_preds["month"].isin(iso_class.iso_model_month_list)]["iso_18"].to_frame(),iso_class.all_preds[iso_class.all_preds["month"].isin(iso_class.iso_model_month_list)]["iso_2h"].to_frame())
             met_y_preds_2=reg2.coef_*met_x+reg2.intercept_
             plt.plot(met_x,met_y_preds_2.reshape(-1,1),linestyle='dashdot',c="yellow",label="Mean monthly obs. Line="+str(round(reg2.coef_[0][0],1))+"x+"+str(round(reg2.intercept_[0],1)))
-
-            y_true = a * i.predicted_iso18 + b
-            y_pred = j.predicted_iso2h
-            #plt.plot(a,y_true,color="red")
             plt.xlim(left,right)
             plt.ylim(left1,right1)
-            plt.title("M: " + str(k)+ " |R2 org: " +str(round(iso_class.iso18_bests_dic[0]["best_score"],2))+" |R2 Pred. to Met.: " +str(round(r2_score(y_true, y_pred),2))+ " |R2 Mean monthly obs.: " +str(round(reg.score(i.predicted_iso18.to_frame().values,j.predicted_iso2h.to_frame().values),2))+ " |R2 Pred. to New Met. Line: " +str(round(reg2.score(iso_class.all_preds[iso_class.all_preds["month"]==k]["iso_18"].to_frame(),iso_class.all_preds[iso_class.all_preds["month"]==k]["iso_2h"].to_frame()),2)) )
             plt.xlabel("iso_18")
             plt.ylabel("iso_2H")
+            plt.title("All Range | R2 Pred. to Met. Line: " +str(round(r2_score(8*vv.predicted_iso18 + 10, vv2.predicted_iso2h),2))+ " | R2 Pred. to New Met. Line: " +str(round(reg.score(vv.predicted_iso18.to_frame().values,vv2.predicted_iso2h.to_frame().values),2))+ " |  R2 Pred. to New Met. Line: " +str(round(reg2.score(iso_class.all_preds[iso_class.all_preds["month"].isin(iso_class.iso_model_month_list)]["iso_18"].to_frame(),iso_class.all_preds[iso_class.all_preds["month"].isin(iso_class.iso_model_month_list)]["iso_2h"].to_frame()),2) ))
             plt.legend()
-            plt.savefig(os.path.join(ev_class.direc,"isotopes_meteoline_plots","Month_" + str(k)+"_plot.png"),dpi=300)
-            plt.close()
-            #residuals plot
-            if id_point==True and residplot==True:
-                resds_df=pd.merge(i,iso_class.all_preds[iso_class.all_preds["month"]==k],on=['ID_MeteoPoint'])
-                resds_df["residual_18"]=resds_df['iso_18' ] - resds_df["predicted_iso18"] 
-                print (resds_df['ID_MeteoPoint'])
-                resds_df=resds_df.sort_values(by="residual_18")
-                plt.scatter(np.arange(len(resds_df['ID_MeteoPoint'])),  resds_df["residual_18"] )
-                ax = plt.gca()
-                ax.set_xticks(np.arange(len(resds_df['ID_MeteoPoint'])))
-                ax.xaxis.set_ticklabels(resds_df['ID_MeteoPoint'], rotation=90)
-                plt.savefig(os.path.join(ev_class.direc,"isotopes_meteoline_plots","Residuals_iso18_Month_" + str(k)+"_plot.png"))
-                plt.title("Residuals_iso18_Month_" + str(k))
-                plt.close()
-
-
-                resds_df["residual_2h"]=resds_df['iso_2h' ] - resds_df["predicted_iso2h"]
-                plt.scatter(np.arange(len(resds_df['ID_MeteoPoint'])),  resds_df["residual_2h"] )
-                ax = plt.gca()
-                ax.set_xticks(np.arange(len(resds_df['ID_MeteoPoint'])))
-                ax.xaxis.set_ticklabels(resds_df['ID_MeteoPoint'], rotation=90)
-                plt.savefig(os.path.join(ev_class.direc,"isotopes_meteoline_plots","Residuals_iso2h_Month_" + str(k)+"_plot.png"))
-                plt.title("Residuals_iso2h_Month_" + str(k))
-                plt.close()
-
-
-
-
-
-
-
-        vv=pd.concat(tot)
-        vv2=pd.concat(tot)
-        mpl.style.use("seaborn")
-        plt.scatter(vv.predicted_iso18,vv2.predicted_iso2h,marker=".",c="b",label="Predicted",s=70)
-        reg = LinearRegression().fit(vv.predicted_iso18.to_frame().values,vv2.predicted_iso2h.to_frame().values)
-        if obs_data==True:
-            plt.scatter(iso_18[iso_18["month"].isin(iso_class.iso_model_month_list)]["Value"],iso_2h[iso_2h["month"].isin(iso_class.iso_model_month_list)]["Value"],marker="x",c="g",label="Original",s=18)
-        plt.scatter(iso_class.all_preds[iso_class.all_preds["month"].isin(iso_class.iso_model_month_list)]["iso_18"],iso_class.all_preds[iso_class.all_preds["month"].isin(iso_class.iso_model_month_list)]["iso_2h"],marker="^",c="c",label="Monthly",s=18)
-        left, right = plt.xlim()
-        left1, right1 = plt.ylim()
-        met_x = np.linspace(min(left,left1),max(right,right1),100)
-        met_y= a*met_x+b
-        met_y_preds=reg.coef_*met_x+reg.intercept_
-        plt.plot(met_x,met_y,color="red",label="Met.Line="+str(a)+"x+"+str(b))
-        plt.plot(met_x,met_y_preds.reshape(-1,1),linestyle='dashed',c="brown",label="Pred. Met. Line="+str(round(reg.coef_[0][0],1))+"x+"+str(round(reg.intercept_[0],1)))
-        reg2 = LinearRegression().fit(iso_class.all_preds[iso_class.all_preds["month"].isin(iso_class.iso_model_month_list)]["iso_18"].to_frame(),iso_class.all_preds[iso_class.all_preds["month"].isin(iso_class.iso_model_month_list)]["iso_2h"].to_frame())
-        met_y_preds_2=reg2.coef_*met_x+reg2.intercept_
-        plt.plot(met_x,met_y_preds_2.reshape(-1,1),linestyle='dashdot',c="yellow",label="Mean monthly obs. Line="+str(round(reg2.coef_[0][0],1))+"x+"+str(round(reg2.intercept_[0],1)))
-        plt.xlim(left,right)
-        plt.ylim(left1,right1)
-        plt.xlabel("iso_18")
-        plt.ylabel("iso_2H")
-        plt.title("All Range | R2 Pred. to Met. Line: " +str(round(r2_score(8*vv.predicted_iso18 + 10, vv2.predicted_iso2h),2))+ " | R2 Pred. to New Met. Line: " +str(round(reg.score(vv.predicted_iso18.to_frame().values,vv2.predicted_iso2h.to_frame().values),2))+ " |  R2 Pred. to New Met. Line: " +str(round(reg2.score(iso_class.all_preds[iso_class.all_preds["month"].isin(iso_class.iso_model_month_list)]["iso_18"].to_frame(),iso_class.all_preds[iso_class.all_preds["month"].isin(iso_class.iso_model_month_list)]["iso_2h"].to_frame()),2) ))
-        plt.legend()
-        plt.savefig(os.path.join(ev_class.direc,"isotopes_meteoline_plots","all_range_plot.png"),dpi=300)
-        plt.close()
+            plt.savefig(os.path.join(ev_class.direc,"isotopes_meteoline_plots","all_range_plot.png"),dpi=300)
+            plt.close("all")

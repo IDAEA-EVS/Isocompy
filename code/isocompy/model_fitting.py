@@ -20,6 +20,7 @@ from datetime import datetime
 from sklearn.linear_model import LinearRegression
 import itertools
 import sys
+import copy 
 import warnings
 if not sys.warnoptions:
     warnings.simplefilter("ignore")
@@ -30,7 +31,11 @@ def warn(*args, **kwargs):
 warnings.warn = warn
 warnings.filterwarnings(action='ignore', category=DataConversionWarning)
 ##########################################################################################
-          
+#search a dic by keys
+def search_keys(dic,needed_value):
+    for k,v in dic.items():
+        if v == needed_value:
+            return k   
 ##########################################################################################
 #model!
 def rfmethod(tunedpars_rfr,tunedpars_svr,tunedpars_nusvr,tunedpars_mlp,newmatdframe,meteo_or_iso,inputs,apply_on_log,direc,cv,which_regs,vif_threshold,p_val):
@@ -65,13 +70,11 @@ def rfmethod(tunedpars_rfr,tunedpars_svr,tunedpars_nusvr,tunedpars_mlp,newmatdfr
             "elnet":tunedpars_elnet,
             "muelnet":tunedpars_muelnet,
             "omp":tunedpars_omp}
-
+        models_output_dic=dict()
         model_dic=dict()
         for key in which_regs.keys():
             if which_regs[key]==True:
-                new_v=tunedpars_dic[key]
-                new_k=reg_ref_dic[key]
-                model_dic[new_k]=new_v
+                model_dic[key]=[tunedpars_dic[key],reg_ref_dic[key]]
 
 
 
@@ -84,18 +87,23 @@ def rfmethod(tunedpars_rfr,tunedpars_svr,tunedpars_nusvr,tunedpars_mlp,newmatdfr
         rsquared=reg.score(X_temp, Y_temp)
         best_score_all=adj_r_sqrd(reg.score(X_temp, Y_temp)) 
         best_estimator_all=reg
+        models_output_dic["lr"]={"model": reg,"mod_score":rsquared, "predicted_Y": reg.predict(X_temp)}
 
         for ttm in model_dic.items(): 
-            tunedpars=ttm[1]
-            models=ttm[0]
+            tunedpars=ttm[1][0]
+            models=ttm[1][1]
+            mod_name=ttm[0]
             reg =GridSearchCV(models, tunedpars, cv=cv,n_jobs=-1)
             try:
                 reg.fit(X_temp, Y_temp.ravel())
-                if adj_r_sqrd(reg.score(X_temp, Y_temp))>best_score_all:
+                mod_score=reg.score(X_temp, Y_temp)
+                models_output_dic[mod_name]={"model": reg,"mod_score":mod_score, "predicted_Y": reg.predict(X_temp) }
+                if adj_r_sqrd(mod_score)>best_score_all:
                     #rsquared=reg.best_score_  
-                    rsquared=reg.score(X_temp, Y_temp)
+                    rsquared=mod_score
                     best_score_all=adj_r_sqrd(rsquared)
                     best_estimator_all=reg
+
             except:
                 print("####In except: ",ttm)
                 pass        
@@ -104,37 +112,21 @@ def rfmethod(tunedpars_rfr,tunedpars_svr,tunedpars_nusvr,tunedpars_mlp,newmatdfr
         #rsquared=best_estimator_all.score(X_temp, Y_temp)      
         #best_score_all=adj_r_sqrd(rsquared)        
         #################################################################################
-        #(MULTI TASK) ELASTIC NET CV
-        #elastic net on standardized data
-        '''print (which_regs)
-        if which_regs["elnet"]==True: 
-            reg = MultiTaskElasticNet(n_jobs =-1,normalize=False,cv=cv ).fit(X_temp, Y_temp)
-            if adj_r_sqrd(reg.score(X_temp, Y_temp))>best_score_all:
-                best_score_all=adj_r_sqrd(reg.score(X_temp, Y_temp))
-                best_estimator_all=reg
-                rsquared=reg.score(X_temp, Y_temp)
-        #################################################################################
-        #OrthogonalMatchingPursuitCV
-        if which_regs["omp"]==True:
-            reg =OrthogonalMatchingPursuitCV(cv,n_jobs=-1).fit(X_temp, Y_temp)
-            if adj_r_sqrd(reg.score(X_temp, Y_temp))>best_score_all:
-                best_score_all=adj_r_sqrd(reg.score(X_temp, Y_temp))
-                best_estimator_all=reg
-                rsquared=reg.score(X_temp, Y_temp)'''        
+
         #################################################################### 
-        return  best_score_all,best_estimator_all,rsquared
+        return  best_score_all,best_estimator_all,rsquared,models_output_dic
     ########################################################################    
     list_bests=list()
     list_preds_real_dic=list()
     list_bests_dic=list()
     if meteo_or_iso=="meteo":
-        num_var=3
+        #num_var=3
         colmnss=["CooX","CooY","CooZ"]
         rangee=range(1,13)
     ##################################################
     else:
         
-        num_var=len(inputs)
+        #num_var=len(inputs)
         colmnss=inputs
         rangee=range(1,2)
     for monthnum in rangee:
@@ -154,10 +146,7 @@ def rfmethod(tunedpars_rfr,tunedpars_svr,tunedpars_nusvr,tunedpars_mlp,newmatdfr
             
             Y_temp=newmatdf_temp[["Value"]].copy()
             X_train_temp, X_test_temp, y_train_temp, y_test_temp = train_test_split(X_temp, Y_temp)    
-            ##################################################
-            #adjusted r squared
-            sam_size=newmatdf_temp.shape[0]
-            adj_r_sqrd=lambda r2,sam_size=sam_size,num_var=num_var: 1-(1-r2)*(sam_size-1)/(sam_size-num_var-1)
+
             ##################################################
             #correlation coefficient    
             correl_mat=X_temp.corr()
@@ -210,8 +199,11 @@ def rfmethod(tunedpars_rfr,tunedpars_svr,tunedpars_nusvr,tunedpars_mlp,newmatdfr
             #################################################
             #some tests:
             print ("X_temp.columns",X_temp.columns)
-            mutual_info_regression_value = mutual_info_regression(X_temp, Y_temp)
-            mutual_info_regression_value /= np.max(mutual_info_regression_value)
+            try:
+                mutual_info_regression_value = mutual_info_regression(X_temp, Y_temp)
+                mutual_info_regression_value /= np.max(mutual_info_regression_value)
+            except:
+                mutual_info_regression_value=None
             f_regression_value=f_regression(X_temp, Y_temp)
             ##################################################
             #just using the significant variables!
@@ -234,6 +226,11 @@ def rfmethod(tunedpars_rfr,tunedpars_svr,tunedpars_nusvr,tunedpars_mlp,newmatdfr
             X_train_temp=X_train_temp[used_features]
             X_test_temp=X_test_temp[used_features]
             print ("used_features",used_features)
+            ##################################################
+            num_var=len(used_features)
+            #adjusted r squared
+            sam_size=newmatdf_temp.shape[0]
+            adj_r_sqrd=lambda r2,sam_size=sam_size,num_var=num_var: 1-(1-r2)*(sam_size-1)/(sam_size-num_var-1)
             ########################################################################
             #scaling
             x_scaler = MinMaxScaler()
@@ -248,13 +245,16 @@ def rfmethod(tunedpars_rfr,tunedpars_svr,tunedpars_nusvr,tunedpars_mlp,newmatdfr
             Y_temp=y_scaler.transform(Y_temp)
 
             #applying regression function on normal data
-            best_score_all_normal,best_estimator_all_normal,rsquared_normal=regressionfunctions(X_temp,Y_temp,which_regs)
+            best_score_all_normal,best_estimator_all_normal,rsquared_normal,models_output_dic_normal=regressionfunctions(X_temp,Y_temp,which_regs)
             ########################################################################
             #applying regression function on log data
+            models_output_dic_log=dict()
             if apply_on_log==True:
                 X_temp1=np.log1p(X_temp)
                 Y_temp1=np.log1p(Y_temp)
-                best_score_all_log,best_estimator_all_log,rsquared_log=regressionfunctions(X_temp1,Y_temp1,which_regs)
+                best_score_all_log,best_estimator_all_log,rsquared_log,models_output_dic_tl=regressionfunctions(X_temp1,Y_temp1,which_regs)
+                for k,v in models_output_dic_tl.items():
+                    models_output_dic_log["log_"+k]=v
                 ########################################################################
                 #comparison between normal and log model
                 if best_score_all_normal > best_score_all_log:
@@ -284,18 +284,18 @@ def rfmethod(tunedpars_rfr,tunedpars_svr,tunedpars_nusvr,tunedpars_mlp,newmatdfr
             Y_measured=y_scaler.inverse_transform( Y_temp.reshape(-1, 1) )
             Y_preds=y_scaler.inverse_transform( Y_preds.reshape(-1, 1) )    
             ######################################################################## 
-
+            models_output_dic={**models_output_dic_normal,**models_output_dic_log}
             Y_preds=pd.DataFrame(Y_preds,columns=["Value"])
             list_bests.append([best_estimator_all,best_score_all,mutual_info_regression_value,f_regression_value,used_features,rsquared,x_scaler,y_scaler,didlog])
             list_preds_real_dic.append({"Y_preds":Y_preds,"Y_temp_fin":Y_measured,"X_temp":X_temp})  
             list_bests_dic.append({"best_estimator":best_estimator_all,"best_score":best_score_all,"mutual_info_regression":mutual_info_regression_value,
-            "f_regression":f_regression_value,"used_features":used_features,"rsquared":rsquared,"didlog":didlog,"vif":vif_df,"correlation":correl_mat,"vif_chosen_features":vif_chosen_features})
+            "f_regression":f_regression_value,"used_features":used_features,"rsquared":rsquared,"didlog":didlog,"vif":vif_df,"correlation":correl_mat,"vif_chosen_features":vif_chosen_features,"models_output_dic":models_output_dic})
         else:
             Y_preds=pd.DataFrame()
             list_bests.append([None,None,None,None,None,None,None,None,None])
             list_preds_real_dic.append({"Y_preds":pd.DataFrame(),"Y_temp_fin":pd.DataFrame(),"X_temp":pd.DataFrame()})  
             list_bests_dic.append({"best_estimator":None,"best_score":None,"mutual_info_regression":None,
-            "f_regression":None,"used_features":[],"rsquared":None,"didlog":None,"vif":None,"correlation":None,"vif_chosen_features":None})
+            "f_regression":None,"used_features":[],"rsquared":None,"didlog":None,"vif":None,"correlation":None,"vif_chosen_features":None,"models_output_dic":{}})
     return list_bests,list_preds_real_dic,list_bests_dic
 
     
@@ -467,3 +467,251 @@ def print_to_file(file_name,best_dics):
         cnt=cnt+1  
     m_out_f.close() 
     return       
+
+
+
+def isotope_model_selection_by_meteo_line(thresh,a,b,selection_method,report,direc,all_preds,iso18_bests_dic,iso2h_bests_dic,iso18_preds_real_dic,iso2h_preds_real_dic,iso18_bests,iso2h_bests):
+    """
+    selection_method:
+        independent: old (default)
+        local_line
+        global_line
+        point_to_point
+    """
+    #adj_r_sqrd=lambda r2,sam_size=sam_size,num_var=num_var: 1-(1-r2)*(sam_size-1)/(sam_size-num_var-1)
+    #list_bests.append([best_estimator_all,best_score_all,mutual_info_regression_value,f_regression_value,used_features,rsquared,x_scaler,y_scaler,didlog])
+    y_scaler_18=iso18_bests[0][7]
+    y_scaler_2h=iso2h_bests[0][7]
+
+
+    #transform allpreds isos:
+    all_preds_=copy.deepcopy(all_preds)
+    all_preds_.iso_18=y_scaler_18.transform(np.array(all_preds_.iso_18).reshape(-1,1))
+    all_preds_.iso_2h=y_scaler_2h.transform(np.array(all_preds_.iso_2h).reshape(-1,1))
+
+
+    all_preds_=round(all_preds_,5)
+    iso_18_obs=all_preds_.iso_18
+    iso_2h_obs=all_preds_.iso_2h
+    ################
+    #to just choose between good scores!
+    iso18_models_=iso18_bests_dic[0]["models_output_dic"]
+    iso2h_models_=iso2h_bests_dic[0]["models_output_dic"]
+
+    def choose_high_score(isotopemodels_,thresh,selection_method):
+        listt = [(k, v["mod_score"]) for k, v in isotopemodels_.items()]
+        from operator import itemgetter
+        listt=sorted(listt, key = itemgetter(1))
+
+        listt_vals=np.array([x[1] for x in listt])
+        if thresh==None or (thresh != "point_to_point" and thresh>=1):
+            thresh=listt_vals.mean()+listt_vals.std()/3
+            print ("threshold:",thresh)
+ 
+        if selection_method=="independent":
+            key_list=[listt[-1][0]]
+        else:
+            key_list=list()
+            for i in listt:
+                if i[1]>=thresh:
+                    key_list.append(i[0]) 
+        print ("models to choose: ", key_list)     
+        isotopemodels=copy.deepcopy(isotopemodels_)
+        topop=list(isotopemodels.keys()-key_list)
+        for i in topop:
+            del isotopemodels[i]
+        return isotopemodels    
+    
+    def set_vals(v_18,log_18_t,predicted_18):
+        return v_18["model"],log_18_t,v_18["mod_score"],predicted_18
+
+    iso18_models=choose_high_score(iso18_models_,thresh,selection_method)
+    iso2h_models=choose_high_score(iso2h_models_,thresh,selection_method)
+
+    #to make resid report:
+    x_transformed_18=iso18_bests[0][6].inverse_transform(iso18_preds_real_dic[0]["X_temp"])
+    x_transformed_18=round(pd.DataFrame(x_transformed_18,columns=iso18_bests_dic[0]["used_features"]), 5)
+    x_transformed_2h=iso2h_bests[0][6].inverse_transform(iso2h_preds_real_dic[0]["X_temp"])
+    x_transformed_2h=round(pd.DataFrame(x_transformed_2h,columns=iso2h_bests_dic[0]["used_features"]), 5)
+    used_feats=list(set(iso18_bests_dic[0]["used_features"]).intersection(iso2h_bests_dic[0]["used_features"]))
+    x_transformed=x_transformed_18[used_feats]
+    ##########################################################################
+
+    if selection_method=="local_line":
+        reg = LinearRegression().fit(np.array(iso_18_obs).reshape(-1, 1),np.array(iso_2h_obs).reshape(-1, 1))
+    elif selection_method=="global_line":
+        reg = LinearRegression().fit(np.array([0,-b/a]).reshape(-1, 1),np.array([b,0]).reshape(-1, 1)) #meteo line
+    '''elif selection_method=="point_to_point":
+        x_transformed_18=iso18_bests[0][6].inverse_transform(iso18_preds_real_dic[0]["X_temp"])
+        x_transformed_18=round(pd.DataFrame(x_transformed_18,columns=iso18_bests_dic[0]["used_features"]), 5)
+        x_transformed_2h=iso2h_bests[0][6].inverse_transform(iso2h_preds_real_dic[0]["X_temp"])
+        x_transformed_2h=round(pd.DataFrame(x_transformed_2h,columns=iso2h_bests_dic[0]["used_features"]), 5)
+        used_feats=list(set(iso18_bests_dic[0]["used_features"]).intersection(iso2h_bests_dic[0]["used_features"]))
+        x_transformed=x_transformed_18[used_feats]'''
+        
+    best_mod_score_to_meteo=None
+    sam_size=all_preds.shape[0]
+    for k_18,v_18 in iso18_models.items():
+        predicted_18=v_18["predicted_Y"]
+        log_18_t=False
+        if "log" in k_18:
+            predicted_18=np.expm1(predicted_18) #it comes already logged! we exp it
+            log_18_t=True
+
+        for k_2h,v_2h in iso2h_models.items():
+            predicted_2h=v_2h["predicted_Y"]
+            log_2h_t=False
+            if "log" in k_2h :
+                predicted_2h=np.expm1(predicted_2h) #it comes already logged! we exp it
+                log_2h_t=True
+            ########################
+            #to make resid report:
+            df_18=pd.DataFrame(predicted_18,columns=["pred_18"])
+            df_2h=pd.DataFrame(predicted_2h,columns=["pred_2h"])
+            preds_df=pd.concat([x_transformed,df_18,df_2h],axis=1)
+            merged_df=pd.merge(preds_df,all_preds_,on=used_feats)
+            merged_df["score_"]=((merged_df.pred_18-merged_df.iso_18)**2 + (merged_df.pred_2h-merged_df.iso_2h)**2)**0.5
+            score_for_report=merged_df.score_.mean()
+
+
+            ########################
+            if selection_method in ["local_line","global_line"]:
+                mod_score_to_meteo=reg.score(predicted_18.reshape(-1,1),predicted_2h.reshape(-1,1))
+
+            elif selection_method=="point_to_point":
+                '''df_18=pd.DataFrame(predicted_18,columns=["pred_18"])
+                df_2h=pd.DataFrame(predicted_2h,columns=["pred_2h"])
+                preds_df=pd.concat([x_transformed,df_18,df_2h],axis=1)
+                merged_df=pd.merge(preds_df,all_preds_,on=used_feats)
+                merged_df["score_"]=((merged_df.pred_18-merged_df.iso_18)**2 + (merged_df.pred_2h-merged_df.iso_2h)**2)**0.5
+                mod_score_to_meteo=merged_df.score_.mean()'''
+                mod_score_to_meteo=score_for_report
+                #print (mod_score_to_meteo)
+            if (best_mod_score_to_meteo==None and selection_method in ["local_line","global_line","point_to_point"]):
+
+                best_mod_score_to_meteo=mod_score_to_meteo
+                best_model_18,log_18,mod_score_18,predicted_18_final=set_vals(v_18,log_18_t,predicted_18)
+                best_model_2h,log_2h,mod_score_2h,predicted_2h_final=set_vals(v_2h,log_2h_t,predicted_2h)
+                best_score_for_report,best_k_18,best_k_2h=score_for_report,k_18,k_2h
+            elif (selection_method in ["local_line","global_line"] and mod_score_to_meteo>best_mod_score_to_meteo) or (selection_method=="point_to_point" and mod_score_to_meteo<best_mod_score_to_meteo):
+
+                best_mod_score_to_meteo=mod_score_to_meteo
+                best_model_18,log_18,mod_score_18,predicted_18_final=set_vals(v_18,log_18_t,predicted_18)
+                best_model_2h,log_2h,mod_score_2h,predicted_2h_final=set_vals(v_2h,log_2h_t,predicted_2h)
+                best_score_for_report,best_k_18,best_k_2h=score_for_report,k_18,k_2h
+                print ("changed!",k_18,k_2h)
+            ####################################################
+            #independent
+            if selection_method=="independent":
+                print (" in independent")
+
+                best_model_18,log_18,mod_score_18,predicted_18_final=set_vals(v_18,log_18_t,predicted_18)
+                best_model_2h,log_2h,mod_score_2h,predicted_2h_final=set_vals(v_2h,log_2h_t,predicted_2h)
+                best_score_for_report,best_k_18,best_k_2h=score_for_report,k_18,k_2h
+
+                
+            
+
+
+    ##############################################################
+    #generate report
+    if report==True:
+        Path(direc).mkdir(parents=True, exist_ok=True)
+        file_name=os.path.join(direc,"isotope_modeling_scoring_function_report_18_2h.txt")
+        str_to_write="Formula= Argmin( mean( sqrt(Resid_iso18^2 + Resid_iso2h^2) ) )\n\n selection_method: " +selection_method+"\n\nModels:\n\nIso_18: "+best_k_18+"\n\n adjrsquared_18: " + str(mod_score_18)+"\n\nIso_2h: "+best_k_2h+"\n\n adjrsquared_2h: " + str(mod_score_2h)+"\n\nScore: \n (Less is better)\n\n" + str(best_score_for_report)
+        m_out_f=open(file_name,'w')
+        m_out_f.write(str_to_write)
+        m_out_f.close()
+
+    ##############################################################
+    #update data: iso18
+    iso18_bests[0][0]=best_model_18
+    num_var=len(iso18_bests_dic[0]["used_features"])
+    iso18_bests[0][5]=mod_score_18 #rsquared
+    iso18_bests[0][-1]=log_18
+    iso18_bests[0][1]=1-(1-mod_score_18)*(sam_size-1)/(sam_size-num_var-1) #bestestimator (adjrsquared)
+
+    iso18_preds_real_dic[0]["Y_preds"]=pd.DataFrame(y_scaler_18.inverse_transform( predicted_18_final.reshape(-1, 1)),columns=["Value"])
+    iso18_bests_dic[0]["best_estimator"]=best_model_18
+    iso18_bests_dic[0]["best_score"]=1-(1-mod_score_18)*(sam_size-1)/(sam_size-num_var-1) #best_score_all (adjrsquared)
+    iso18_bests_dic[0]["rsquared"]=mod_score_18
+    iso18_bests_dic[0]["didlog"]=log_18
+
+    #update data: iso2h
+    iso2h_bests[0][0]=best_model_2h
+    num_var=len(iso2h_bests_dic[0]["used_features"])
+    iso2h_bests[0][5]=mod_score_2h #best_score_all
+    iso2h_bests[0][-1]=log_2h
+    iso2h_bests[0][1]=1-(1-mod_score_2h)*(sam_size-1)/(sam_size-num_var-1) 
+
+    iso2h_preds_real_dic[0]["Y_preds"]=pd.DataFrame(y_scaler_2h.inverse_transform( predicted_2h_final.reshape(-1, 1) ),columns=["Value"])
+    
+    iso2h_bests_dic[0]["best_estimator"]=best_model_2h
+    iso2h_bests_dic[0]["best_score"]=1-(1-mod_score_2h)*(sam_size-1)/(sam_size-num_var-1) #best_score_all
+    iso2h_bests_dic[0]["rsquared"]=mod_score_2h
+    iso2h_bests_dic[0]["didlog"]=log_2h
+    
+    return iso18_bests,iso18_preds_real_dic,iso18_bests_dic,iso2h_bests,iso2h_preds_real_dic,iso2h_bests_dic
+
+                
+def iso_output_report(iso18_fit,iso2h_fit,iso3h_fit,iso18_bests,iso2h_bests,iso3h_bests,iso18_bests_dic,iso2h_bests_dic,iso3h_bests_dic,direc):
+    #writing isotope results to a txt file
+    from tabulate import tabulate
+    pr_is_18=""
+    pr_is_2h=""
+    pr_is_3h=""
+    if iso18_fit==True: pr_is_18="\n################\n\n best_estimator_all_iso18\n"+str(iso18_bests[0][0])+"\n\n################\n\n used_features_iso18 \n"+str(iso18_bests[0][4])+"\n\n################\n\n best_score_all_iso18 \n"+str(iso18_bests[0][1])+"\n\n################\n\n rsquared_iso18 \n"+str(iso18_bests[0][5])+"\n\n################\n\n didlog_iso18 \n"+str(iso18_bests[0][-1])+"\n\n################\n\n VIF_iso18 \n"+tabulate(iso18_bests_dic[0]["vif"])+"\n\n################\n\n vif_chosen_features \n"+str(iso18_bests_dic[0]["vif_chosen_features"])+"\n\n################\n\n f_regression_iso18 \n"+tabulate(iso18_bests_dic[0]["f_regression"])+"\n\n################\n\n correlation_iso18 \n"+tabulate(iso18_bests_dic[0]["correlation"])+"\n\n#########################\n#########################\n#########################\n"
+    if iso2h_fit==True:pr_is_2h="\n################\n\n best_estimator_all_iso2h\n"+str(iso2h_bests[0][0])+"\n\n################\n\n used_features_iso2h \n"+str(iso2h_bests[0][4])+"\n\n################\n\n best_score_all_iso2h \n"+str(iso2h_bests[0][1])+"\n\n################\n\n rsquared_iso2h \n"+str(iso2h_bests[0][5])+"\n\n################\n\n didlog_iso2h \n"+str(iso2h_bests[0][-1])+"\n\n################\n\n VIF_iso2h \n"+tabulate(iso2h_bests_dic[0]["vif"])+"\n\n################\n\n f_regression \n"+tabulate(iso2h_bests_dic[0]["f_regression"],headers='firstrow')+"\n\n################\n\n correlation_iso2h \n"+tabulate(iso2h_bests_dic[0]["correlation"])+"\n\n#########################\n#########################\n#########################\n"
+    if iso3h_fit==True:pr_is_3h="\n################\n\n best_estimator_all_iso3h\n"+str(iso3h_bests[0][0])+"\n\n################\n\n used_features_iso3h \n"+str(iso3h_bests[0][4])+"\n\n################\n\n best_score_all_iso3h \n"+str(iso3h_bests[0][1])+"\n\n################\n\n rsquared_iso3h \n"+str(iso3h_bests[0][5])+"\n\n################\n\n didlog_iso3h \n"+str(iso3h_bests[0][-1])+"\n\n################\n\n VIF_iso3h \n"+tabulate(iso3h_bests_dic[0]["vif"])+"\n\n################\n\n f_regression \n"+tabulate(iso3h_bests_dic[0]["f_regression"],headers='firstrow')+"\n\n################\n\n correlation_iso3h \n"+tabulate(iso3h_bests_dic[0]["correlation"])+"\n\n#########################\n#########################\n#########################\n"
+    Path(direc).mkdir(parents=True, exist_ok=True)
+    file_name=os.path.join(direc,"isotope_modeling_output_report_18_2h_3h.txt")
+    m_out_f=open(file_name,'w')
+    if iso18_fit==True:m_out_f.write(pr_is_18)
+    if iso2h_fit==True:m_out_f.write(pr_is_2h)
+    if iso3h_fit==True:m_out_f.write(pr_is_3h)
+    m_out_f.close()
+
+
+    #################
+    #all models report
+    prr_is_18=""
+    prr_is_2h=""
+    prr_is_3h=""
+    if iso18_fit==True: 
+        tp_is=str()
+        for k,v in iso18_bests_dic[0]["models_output_dic"].items():
+            try:
+                tw="\n\n"+k+":\n\nmodel:\n"+str(v['model'])+"\n\nmod_score:\n"+str(v["mod_score"])+"\n\nmod_cv_score:\n"+str(v["model"].best_score_)+"\n\n########################"
+                tp_is=tp_is+tw
+            except: pass
+        prr_is_18="\n\n################\n\n models_output_dic_iso_18 \n################\n"+tp_is+"\n\n#########################\n#########################\n#########################\n"
+    
+    if iso2h_fit==True:
+        tp_is=str()
+        for k,v in iso2h_bests_dic[0]["models_output_dic"].items():
+            try:
+                tw="\n\n"+k+":\n\nmodel:\n"+str(v['model'])+"\n\nmod_score:\n"+str(v["mod_score"])+"\n\nmod_cv_score:\n"+str(v["model"].best_score_)+"\n\n########################"
+                tp_is=tp_is+tw   
+            except: pass
+
+        prr_is_2h="\n\n################\n\n models_output_dic_iso_2h  \n################\n"+tp_is+"\n\n#########################\n#########################\n#########################\n"
+    
+    if iso3h_fit==True:
+        tp_is=str()
+        for k,v in iso3h_bests_dic[0]["models_output_dic"].items():
+            try:
+                tw="\n\n"+k+":\n\nmodel:\n"+str(v['model'])+"\n\nmod_score:\n"+str(v["mod_score"])+"\n\nmod_cv_score:\n"+str(v["model"].best_score_)+"\n\n########################"
+                tp_is=tp_is+tw  
+            except: pass
+
+        prr_is_3h="\n\n################\n\n models_output_dic_iso_3h  \n################\n"+tp_is+"\n\n#########################\n#########################\n#########################\n"
+    
+    file_name=os.path.join(direc,"isotope_all_models_18_2h_3h.txt")
+    m_out_f=open(file_name,'w')
+    if iso18_fit==True:m_out_f.write(prr_is_18)
+    if iso2h_fit==True:m_out_f.write(prr_is_2h)
+    if iso3h_fit==True:m_out_f.write(prr_is_3h)
+    m_out_f.close()
+
+
+

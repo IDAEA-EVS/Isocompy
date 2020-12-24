@@ -1,8 +1,9 @@
 from pathlib import Path
-from isocompy.model_fitting import rfmethod, iso_prediction,print_to_file
+
+from pandas.io.parquet import FastParquetImpl
+from isocompy.model_fitting import rfmethod, iso_prediction,print_to_file,isotope_model_selection_by_meteo_line,iso_output_report
 import os
 import numpy as np
-
 #class for isotope and meteorology modeling and prediction
 class model(object):
     
@@ -145,7 +146,7 @@ class model(object):
 
     ##########################################################################################
 
-    def iso_fit(self,iso18_fit=True,iso3h_fit=True,iso2h_fit=True,output_report=True,p_val=0.05):
+    def iso_fit(self,iso18_fit=True,iso3h_fit=True,iso2h_fit=True,output_report=True,p_val=0.05,dependent_model_selection=False,meteo_coef=8,meteo_intercept=10,selection_method="point_to_point",thresh=None,model_selection_report=True):
         newmatdframe_iso18=self.all_preds
         newmatdframe_iso2h=self.all_preds
         newmatdframe_iso3h=self.all_preds
@@ -153,6 +154,12 @@ class model(object):
         self.iso3h_fit=iso3h_fit
         self.iso2h_fit=iso2h_fit
         meteo_or_iso="iso"
+        self.dependent_model_selection=dependent_model_selection
+        self.meteo_coef=meteo_coef
+        self.meteo_intercept=meteo_intercept
+        self.selection_method=selection_method
+        self.thresh=thresh
+        self.model_selection_report=model_selection_report
         inputs=["CooX","CooY","CooZ","temp","rain","hum"]+self.col_for_f_reg
         Path(self.direc).mkdir(parents=True, exist_ok=True)
         ####################################
@@ -164,6 +171,7 @@ class model(object):
         #iso2h
         if self.iso2h_fit==True:
             newmatdframe_iso2h=newmatdframe_iso2h.rename(columns={"iso_2h": "Value"})
+            print ("input to rfmethod 2h",newmatdframe_iso2h)
             self.iso2h_bests,self.iso2h_preds_real_dic,self.iso2h_bests_dic=rfmethod(self.tunedpars_rfr_iso2h,self.tunedpars_svr_iso2h,self.tunedpars_nusvr_iso2h,self.tunedpars_mlp_iso2h,newmatdframe_iso2h,meteo_or_iso,inputs,self.apply_on_log,self.direc,self.cv,self.which_regs_iso2h,self.vif_threshold_iso2h,p_val)
         ####################################
         #iso3h
@@ -171,16 +179,26 @@ class model(object):
             newmatdframe_iso3h=newmatdframe_iso3h.rename(columns={"iso_3h": "Value"})
             self.iso3h_bests,self.iso3h_preds_real_dic,self.iso3h_bests_dic=rfmethod(self.tunedpars_rfr_iso3h,self.tunedpars_svr_iso3h,self.tunedpars_nusvr_iso3h,self.tunedpars_mlp_iso3h,newmatdframe_iso3h,meteo_or_iso,inputs,self.apply_on_log,self.direc,self.cv,self.which_regs_iso3h,self.vif_threshold_iso3h,p_val)
         ####################################
+        if self.dependent_model_selection==True:
+            self.iso18_bests,self.iso18_preds_real_dic,self.iso18_bests_dic,self.iso2h_bests,self.iso2h_preds_real_dic,self.iso2h_bests_dic=isotope_model_selection_by_meteo_line(self.thresh,self.meteo_coef,self.meteo_intercept,self.selection_method,self.model_selection_report,self.direc,self.all_preds,self.iso18_bests_dic,self.iso2h_bests_dic,self.iso18_preds_real_dic,self.iso2h_preds_real_dic,self.iso18_bests,self.iso2h_bests)
+        ####################################
         if output_report==True:
-            #self.rain_bests=best_estimator_all,best_score_all,mutual_info_regression_value,f_regression_value,used_features,rsquared,x_scaler,y_scaler,didlog
-            #writing isotope results to a txt file
-            from tabulate import tabulate
-            if self.iso18_fit==True: pr_is_18="\n################\n\n best_estimator_all_iso18\n"+str(self.iso18_bests[0][0])+"\n\n################\n\n used_features_iso18 \n"+str(self.iso18_bests[0][4])+"\n\n################\n\n best_score_all_iso18 \n"+str(self.iso18_bests[0][1])+"\n\n################\n\n rsquared_iso18 \n"+str(self.iso18_bests[0][5])+"\n\n################\n\n didlog_iso18 \n"+str(self.iso18_bests[0][-1])+"\n\n################\n\n VIF_iso18 \n"+tabulate(self.iso18_bests_dic[0]["vif"])+"\n\n################\n\n vif_chosen_features \n"+str(self.iso18_bests_dic[0]["vif_chosen_features"])+"\n\n################\n\n f_regression_iso18 \n"+tabulate(self.iso18_bests_dic[0]["f_regression"])+"\n\n################\n\n correlation_iso18 \n"+tabulate(self.iso18_bests_dic[0]["correlation"])+"\n\n#########################\n#########################\n#########################\n"
-            if self.iso2h_fit==True:pr_is_2h="\n################\n\n best_estimator_all_iso2h\n"+str(self.iso2h_bests[0][0])+"\n\n################\n\n used_features_iso2h \n"+str(self.iso2h_bests[0][4])+"\n\n################\n\n best_score_all_iso2h \n"+str(self.iso2h_bests[0][1])+"\n\n################\n\n rsquared_iso2h \n"+str(self.iso2h_bests[0][5])+"\n\n################\n\n didlog_iso2h \n"+str(self.iso2h_bests[0][-1])+"\n\n################\n\n VIF_iso2h \n"+tabulate(self.iso2h_bests_dic[0]["vif"])+"\n\n################\n\n f_regression \n"+tabulate(self.iso2h_bests_dic[0]["f_regression"],headers='firstrow')+"\n\n################\n\n correlation_iso2h \n"+tabulate(self.iso2h_bests_dic[0]["correlation"])+"\n\n#########################\n#########################\n#########################\n"
-            if self.iso3h_fit==True:pr_is_3h="\n################\n\n best_estimator_all_iso3h\n"+str(self.iso3h_bests[0][0])+"\n\n################\n\n used_features_iso3h \n"+str(self.iso3h_bests[0][4])+"\n\n################\n\n best_score_all_iso3h \n"+str(self.iso3h_bests[0][1])+"\n\n################\n\n rsquared_iso3h \n"+str(self.iso3h_bests[0][5])+"\n\n################\n\n didlog_iso3h \n"+str(self.iso3h_bests[0][-1])+"\n\n################\n\n VIF_iso3h \n"+tabulate(self.iso3h_bests_dic[0]["vif"])+"\n\n################\n\n f_regression \n"+tabulate(self.iso3h_bests_dic[0]["f_regression"],headers='firstrow')+"\n\n################\n\n correlation_iso3h \n"+tabulate(self.iso3h_bests_dic[0]["correlation"])+"\n\n#########################\n#########################\n#########################\n"
-            file_name=os.path.join(self.direc,"isotope_modeling_output_report_18_2h_3h.txt")
-            m_out_f=open(file_name,'w')
-            if self.iso18_fit==True:m_out_f.write(pr_is_18)
-            if self.iso2h_fit==True:m_out_f.write(pr_is_2h)
-            if self.iso3h_fit==True:m_out_f.write(pr_is_3h)
-            m_out_f.close()
+            iso_output_report(self.iso18_fit,self.iso2h_fit,self.iso3h_fit,self.iso18_bests,self.iso2h_bests,self.iso3h_bests,self.iso18_bests_dic,self.iso2h_bests_dic,self.iso3h_bests_dic,self.direc)
+
+
+
+    def choose_estimator_by_meteo_line(self,selection_method="point_to_point",model_selection_report=True,thresh=None,meteo_coef=8,meteo_intercept=10):
+        self.meteo_coef=meteo_coef
+        self.meteo_intercept=meteo_intercept
+        self.thresh=thresh
+        self.selection_method=selection_method
+        self.model_selection_report=model_selection_report
+        self.iso18_bests,self.iso18_preds_real_dic,self.iso18_bests_dic,self.iso2h_bests,self.iso2h_preds_real_dic,self.iso2h_bests_dic=isotope_model_selection_by_meteo_line(self.thresh,self.meteo_coef,self.meteo_intercept,self.selection_method,self.model_selection_report,self.direc,self.all_preds,self.iso18_bests_dic,self.iso2h_bests_dic,self.iso18_preds_real_dic,self.iso2h_preds_real_dic,self.iso18_bests,self.iso2h_bests)
+
+    
+
+    def isotope_output_report(self,direc=None):
+        if direc==None: direc=self.direc
+
+
+        iso_output_report(self.iso18_fit,self.iso2h_fit,self.iso3h_fit,self.iso18_bests,self.iso2h_bests,self.iso3h_bests,self.iso18_bests_dic,self.iso2h_bests_dic,self.iso3h_bests_dic,direc)
