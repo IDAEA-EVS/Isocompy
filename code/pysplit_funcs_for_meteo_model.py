@@ -13,7 +13,7 @@ import numpy as np
 
 def gen_trajs(iso_18,xy_df_for_hysplit,month_real,altitude,points_all_in_water_report,points_origin_not_detected_report,error_in_meteo_file,traj_shorter_than_runtime_report,input_pass_to_bulkrajfun_report,Sampling_date_db=False):
     working_dir = r'C:/hysplit4/working'
-    meteo_dir = r'C:/Users/Ash kan/Documents/meteo_iso_model/meteo_iso_model_input_code_and_results/inputs/meteo_for_trajs_pysplit/meteo_for_traj_new_name' #.gbl files : ex: RPapr1973.gbl format basename+3 letter month + year
+    meteo_dir = r'C:/Users/Ash kan/Documents/meteo_iso_model/meteo_iso_model_input_code_and_results/inputs_sonia_paper/meteo_for_trajs_pysplit/meteo_for_traj_new_name' #.gbl files : ex: RPapr1973.gbl format basename+3 letter month + year
     basename = 'RP'
     hours = [12]
     altitudes = [altitude]
@@ -78,8 +78,7 @@ def gen_trajs(iso_18,xy_df_for_hysplit,month_real,altitude,points_all_in_water_r
                                 get_reverse=False,
                                 get_clipped=False)
         elif Sampling_date_db==True: 
-            dates_for_daily_trajs=temp["Date_Meas_real"]
-            dates_for_daily_trajs = pd.concat([temp["Date"],dates_for_daily_trajs,temp["day_type"]], names=["Date","Date_Meas_real","day_type"],axis=1) 
+            dates_for_daily_trajs = pd.concat([temp["Date"],temp["Date_Meas_real"],temp["day_type"]], names=["Date","Date_Meas_real","day_type"],axis=1) 
             dates_for_daily_trajs=dates_for_daily_trajs[pd.DatetimeIndex(dates_for_daily_trajs["Date"]).month.isin([month_real])]
             dates_general=pd.DatetimeIndex(dates_for_daily_trajs["Date"])
             dates_measured=pd.DatetimeIndex(dates_for_daily_trajs["Date_Meas_real"])
@@ -102,7 +101,7 @@ def gen_trajs(iso_18,xy_df_for_hysplit,month_real,altitude,points_all_in_water_r
                                 get_reverse=False,
                                 get_clipped=False)
 
-            else:
+            else: #day_type="daily"
                 date_measured_done_list=list() 
                 for date in dates_measured:
                     if date not in date_measured_done_list:
@@ -132,8 +131,11 @@ def gen_trajs(iso_18,xy_df_for_hysplit,month_real,altitude,points_all_in_water_r
             print ("remove empty folder!")
             shutil.rmtree( storage_dir) 
             continue
-        storage_dir_for_plot=storage_dir
-        storage_dir =os.path.join(storage_dir,'*')                       
+        storage_dir_for_plot =os.path.join(storage_dir,'plots')
+        if not os.path.isdir(storage_dir_for_plot):
+            os.mkdir(storage_dir_for_plot)
+        storage_dir =os.path.join(storage_dir,'*') 
+        print ("storage_dir",storage_dir)                      
         umn_tg = pysplit.make_trajectorygroup(storage_dir)
         bm = Basemap()   # default: projection='cyl'
         real_traj_dist_list_all_years_all_hours=list()

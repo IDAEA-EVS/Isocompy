@@ -1,27 +1,21 @@
-from math import gamma
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
-import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.feature_selection import f_regression, mutual_info_regression
-from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import GridSearchCV,KFold
 from sklearn.exceptions import DataConversionWarning
-from sklearn.model_selection import cross_val_score
 from sklearn.neural_network import MLPRegressor
 from sklearn.linear_model import LarsCV,BayesianRidge,ARDRegression,MultiTaskElasticNet,OrthogonalMatchingPursuit,ElasticNet
-from sklearn.inspection import plot_partial_dependence
 from sklearn.svm import SVR,NuSVR
 import os
 from pathlib import Path
-import dill
-from datetime import datetime
 from sklearn.linear_model import LinearRegression
 import itertools
 import sys
 import copy 
 import warnings
+from isocompy.feature_select import feature_selection
 if not sys.warnoptions:
     warnings.simplefilter("ignore")
     os.environ["PYTHONWARNINGS"] = "ignore" # Also affect subprocesses
@@ -38,38 +32,39 @@ def search_keys(dic,needed_value):
             return k   
 ##########################################################################################
 #model!
-def rfmethod(tunedpars_rfr,tunedpars_svr,tunedpars_nusvr,tunedpars_mlp,newmatdframe,meteo_or_iso,inputs,apply_on_log,direc,cv,which_regs,vif_threshold,p_val):
+def rfmethod(newmatdframe,model_pars_name_dic,stage_1_2,st1_model_month_list,args_dic,fields):
+    ########################################################################
+    apply_on_log=model_pars_name_dic["apply_on_log"]
+    cv=model_pars_name_dic["cv"]
+    which_regs=model_pars_name_dic["which_regs"]
+    vif_threshold=model_pars_name_dic["vif_threshold"]
     ########################################################################
     #regression functions
     def regressionfunctions(X_temp,Y_temp,which_regs):
-        tunedpars_lr={}
-        tunedpars_br={}
-        tunedpars_ard={}
-        tunedpars_muelnet={"l1_ratio":[.1, .5, .7,.9,.99]}
-        tunedpars_elnet={"l1_ratio":[.1, .5, .7,.9,.99]}
+        
+        tunedpars_lr=model_pars_name_dic["tunedpars_lr"]
 
-        tunedpars_omp={}
         reg_ref_dic={
             "omp":OrthogonalMatchingPursuit(),
             "muelnet":MultiTaskElasticNet(),
             "elnet":ElasticNet(),
             "rfr":RandomForestRegressor(random_state =0),
-            "mlp":MLPRegressor(learning_rate="adaptive"),
+            "mlp":MLPRegressor(learning_rate="adaptive",random_state =0),
             "br":BayesianRidge(),
             "ard":ARDRegression(),
             "svr":SVR(cache_size=8000),
             "nusvr":NuSVR()}
 
         tunedpars_dic={
-            "rfr":tunedpars_rfr,
-            "mlp":tunedpars_mlp,
-            "br":tunedpars_br,
-            "ard":tunedpars_ard,
-            "svr":tunedpars_svr,
-            "nusvr":tunedpars_nusvr,
-            "elnet":tunedpars_elnet,
-            "muelnet":tunedpars_muelnet,
-            "omp":tunedpars_omp}
+            "rfr":model_pars_name_dic["tunedpars_rfr"],
+            "mlp":model_pars_name_dic["tunedpars_mlp"],
+            "br":model_pars_name_dic["tunedpars_br"],
+            "ard":model_pars_name_dic["tunedpars_ard"],
+            "svr":model_pars_name_dic["tunedpars_svr"],
+            "nusvr":model_pars_name_dic["tunedpars_nusvr"],
+            "elnet":model_pars_name_dic["tunedpars_elnet"],
+            "muelnet":model_pars_name_dic["tunedpars_muelnet"],
+            "omp":model_pars_name_dic["tunedpars_omp"]}
         models_output_dic=dict()
         model_dic=dict()
         for key in which_regs.keys():
@@ -78,10 +73,10 @@ def rfmethod(tunedpars_rfr,tunedpars_svr,tunedpars_nusvr,tunedpars_mlp,newmatdfr
 
 
 
-    
+        cv1=KFold(n_splits=cv,shuffle=True,random_state=1)
 
         #LinearRegression
-        reg =GridSearchCV(LinearRegression(), tunedpars_lr, cv=cv,n_jobs=-1)
+        reg =GridSearchCV(LinearRegression(), tunedpars_lr, cv=cv1,n_jobs=-1,return_train_score=True)
         reg.fit(X_temp, Y_temp.ravel())
         #rsquared=reg.best_score_
         rsquared=reg.score(X_temp, Y_temp)
@@ -89,11 +84,11 @@ def rfmethod(tunedpars_rfr,tunedpars_svr,tunedpars_nusvr,tunedpars_mlp,newmatdfr
         best_estimator_all=reg
         models_output_dic["lr"]={"model": reg,"mod_score":rsquared, "predicted_Y": reg.predict(X_temp)}
 
-        for ttm in model_dic.items(): 
+        """for ttm in model_dic.items(): 
             tunedpars=ttm[1][0]
             models=ttm[1][1]
             mod_name=ttm[0]
-            reg =GridSearchCV(models, tunedpars, cv=cv,n_jobs=-1)
+            reg =GridSearchCV(models, tunedpars, cv=cv1,n_jobs=-1,return_train_score=True)
             try:
                 reg.fit(X_temp, Y_temp.ravel())
                 mod_score=reg.score(X_temp, Y_temp)
@@ -106,7 +101,7 @@ def rfmethod(tunedpars_rfr,tunedpars_svr,tunedpars_nusvr,tunedpars_mlp,newmatdfr
 
             except:
                 print("####In except: ",ttm)
-                pass        
+                pass        """
         
         #to transfer score from cv score to normal:
         #rsquared=best_estimator_all.score(X_temp, Y_temp)      
@@ -119,27 +114,28 @@ def rfmethod(tunedpars_rfr,tunedpars_svr,tunedpars_nusvr,tunedpars_mlp,newmatdfr
     list_bests=list()
     list_preds_real_dic=list()
     list_bests_dic=list()
-    if meteo_or_iso=="meteo":
-        #num_var=3
-        colmnss=["CooX","CooY","CooZ"]
+    colmnss=fields #fields
+
+    if stage_1_2==1:
         rangee=range(1,13)
     ##################################################
     else:
-        
-        #num_var=len(inputs)
-        colmnss=inputs
         rangee=range(1,2)
     for monthnum in rangee:
-        if meteo_or_iso=="meteo":
+        if stage_1_2==1:
+            if monthnum in st1_model_month_list:
                 newmatdf_temp=newmatdframe[monthnum-1]
                 X_temp=newmatdf_temp[colmnss].copy().astype(float)
+            else:
+                newmatdf_temp=pd.DataFrame()
         else:    
             newmatdf_temp=newmatdframe
             X_temp=newmatdframe[colmnss].copy().astype(float)
 
         if cv=="auto":
-            if newmatdf_temp.shape[0]<11: cv=newmatdf_temp.shape[0]-2
-            else: cv=10
+            if newmatdf_temp.shape[0]<11: cv=2
+            elif newmatdf_temp.shape[0]/10 >20 : cv=10
+            else : cv=5
 
 
         if newmatdf_temp.shape[0] > 2 and newmatdf_temp.shape[0]>cv :
@@ -147,80 +143,9 @@ def rfmethod(tunedpars_rfr,tunedpars_svr,tunedpars_nusvr,tunedpars_mlp,newmatdfr
             Y_temp=newmatdf_temp[["Value"]].copy()
             X_train_temp, X_test_temp, y_train_temp, y_test_temp = train_test_split(X_temp, Y_temp)    
 
-            ##################################################
-            #correlation coefficient    
-            correl_mat=X_temp.corr()
-            ##################################################
-            #VIF checking
-            if vif_threshold !=None:
-                from statsmodels.stats.outliers_influence import variance_inflation_factor
-                from statsmodels.tools.tools import add_constant
-                X = add_constant(X_temp)
-                vif_df=pd.DataFrame([variance_inflation_factor(X.values, i) 
-                            for i in range(X.shape[1])], 
-                            index=X.columns).rename(columns={0:'VIF'}).drop('const')
-                print (vif_df)                   
-                more_than_thres=vif_df[vif_df["VIF"]>vif_threshold].index
+            mutual_info_regression_value,f_regression_value,correl_mat,used_features,vif_df,vif_chosen_features,vif_initial=feature_selection(X_temp,Y_temp,args_dic)
 
-                X=X.drop('const', axis=1)
-                vif_df_ommited=vif_df.copy()
-                zt_omm=False
-                if ("CooZ" and "temp") in more_than_thres:
-                    X=X.drop('temp', axis=1)
-                    more_than_thres=more_than_thres.drop(['temp',"CooZ"])
-                    vif_df_ommited=vif_df_ommited.drop(['temp',"CooZ"])
-                    zt_omm=True
-                print("more_than_thres after z temp",more_than_thres)    
-                if len(more_than_thres)==1:
-                    X=X.drop(more_than_thres,axis=1)
-                    more_than_thres=more_than_thres.drop(more_than_thres)
-                    vif_df_ommited=vif_df_ommited.drop(more_than_thres)
-                if len(more_than_thres)>1:
-                    num_to_omit=len(more_than_thres)//2
-                    if np.isinf(vif_df_ommited["VIF"]).any()==False:
-                        more_than_thres=more_than_thres.drop(vif_df_ommited.sort_values("VIF",ascending=False)[0:num_to_omit].index)
-                        X=X.drop(more_than_thres, axis=1)
-                    else:
-                        for its in range(0,num_to_omit):
-                            if zt_omm==True:
-                                X_corr=X.drop('CooZ',axis=1).corr()
-                            else:    
-                                X_corr=X.corr()
-                            ind_to_omit=abs(X_corr[X_corr!=1]).unstack().sort_values(ascending=False)[0:1].index[0][0]
-                            more_than_thres=more_than_thres.drop([ind_to_omit])
-                            X=X.drop(ind_to_omit, axis=1)
 
-                print("more_than_thres after >1",more_than_thres)     
-                X_temp=X  
-                vif_chosen_features=X_temp.columns
-            else:
-                vif_df="Not Calculated"  
-                vif_chosen_features="Not Calculated"  
-            #################################################
-            #some tests:
-            print ("X_temp.columns",X_temp.columns)
-            try:
-                mutual_info_regression_value = mutual_info_regression(X_temp, Y_temp)
-                mutual_info_regression_value /= np.max(mutual_info_regression_value)
-            except:
-                mutual_info_regression_value=None
-            f_regression_value=f_regression(X_temp, Y_temp)
-            ##################################################
-            #just using the significant variables!
-            f_less_ind=list(np.where(f_regression_value[1]<=p_val)[0])
-            if len(f_less_ind)<2:
-                f_regression_value_sor=sorted(f_regression_value[1])[:2]
-                f_less_ind1=list(
-                    (np.where
-                    (f_regression_value[1]==f_regression_value_sor[0])
-                                    ) [0]
-                )
-                f_less_ind2=list((np.where
-                    (f_regression_value[1]==f_regression_value_sor[1])
-                                    )[0]   
-                ) 
-                f_less_ind=f_less_ind1+f_less_ind2
-            used_features=[X_temp.columns[i] for i in f_less_ind]
 
             X_temp=X_temp[used_features]
             X_train_temp=X_train_temp[used_features]
@@ -289,26 +214,32 @@ def rfmethod(tunedpars_rfr,tunedpars_svr,tunedpars_nusvr,tunedpars_mlp,newmatdfr
             list_bests.append([best_estimator_all,best_score_all,mutual_info_regression_value,f_regression_value,used_features,rsquared,x_scaler,y_scaler,didlog])
             list_preds_real_dic.append({"Y_preds":Y_preds,"Y_temp_fin":Y_measured,"X_temp":X_temp})  
             list_bests_dic.append({"best_estimator":best_estimator_all,"best_score":best_score_all,"mutual_info_regression":mutual_info_regression_value,
-            "f_regression":f_regression_value,"used_features":used_features,"rsquared":rsquared,"didlog":didlog,"vif":vif_df,"correlation":correl_mat,"vif_chosen_features":vif_chosen_features,"models_output_dic":models_output_dic})
+            "f_regression":f_regression_value,"used_features":used_features,"rsquared":rsquared,"didlog":didlog,"vif":vif_df,"vif_initial":vif_initial,"correlation":correl_mat,"vif_chosen_features":vif_chosen_features,"models_output_dic":models_output_dic})
         else:
             Y_preds=pd.DataFrame()
             list_bests.append([None,None,None,None,None,None,None,None,None])
             list_preds_real_dic.append({"Y_preds":pd.DataFrame(),"Y_temp_fin":pd.DataFrame(),"X_temp":pd.DataFrame()})  
             list_bests_dic.append({"best_estimator":None,"best_score":None,"mutual_info_regression":None,
-            "f_regression":None,"used_features":[],"rsquared":None,"didlog":None,"vif":None,"correlation":None,"vif_chosen_features":None,"models_output_dic":{}})
+            "f_regression":None,"used_features":[],"rsquared":None,"didlog":None,"vif":None,"correlation":None,"vif_initial":None,"vif_chosen_features":None,"models_output_dic":{}})
     return list_bests,list_preds_real_dic,list_bests_dic
 
     
 ##########################################################################################
-def iso_prediction(iso_db1,month_grouped_list_with_zeros_iso_2h,month_grouped_list_with_zeros_iso_3h,temp_bests,rain_bests,hum_bests,iso_18,dates_db,trajectories,iso_model_month_list,run_iso_whole_year,direc):
-    
+def iso_prediction(
+    cls_list, 
+    st1_model_results_dic,
+    dates_db,
+    trajectories,
+    iso_model_month_list,direc):
+
     predictions_monthly_list=list()
     col_for_f_reg=list()
     all_without_averaging=list()
     
+    iso_db1=cls_list[0].month_grouped_inp_var
     if trajectories==True:
         from pysplit_funcs_for_meteo_model import convertCoords,gen_trajs
-        altitudes=[3000,5500]
+        altitudes=[3000]
         #generating reports- removing existed files
         if os.path.exists(os.path.join(r'C:\trajectories\RP',"error_in_meteo_file.txt")):
             os.remove(os.path.join(r'C:\trajectories\RP',"error_in_meteo_file.txt"))
@@ -330,47 +261,55 @@ def iso_prediction(iso_db1,month_grouped_list_with_zeros_iso_2h,month_grouped_li
     iso_model_month_list_min_one=[n-1 for n in iso_model_month_list]
     for month_num in range(0,len(iso_db1)):
         #if (month_num not in [3,4,5,6,7,8,9,11] and run_iso_whole_year ==True) or run_iso_whole_year==False:
-        if (month_num in iso_model_month_list_min_one and run_iso_whole_year ==False) or run_iso_whole_year==True:
-            iso_db1[month_num]["ID_MeteoPoint"]=iso_db1[month_num].ID_MeteoPoint.astype(str)
-            iso_db1[month_num]=iso_db1[month_num].sort_values(by="ID_MeteoPoint").reset_index()
+        if month_num in iso_model_month_list_min_one:
+            iso_db1[month_num]["ID"]=iso_db1[month_num].ID.astype(str)
+            iso_db1[month_num]=iso_db1[month_num].sort_values(by="ID").reset_index()
             bests_of_all_preds=list()
-            col_names=["temp","rain","hum"]
-            for bests_of_all, names in zip([temp_bests,rain_bests,hum_bests],col_names):
-
+            for k,v in st1_model_results_dic.items():
+                b_o_l=v["bests"][month_num]
                 #general input transform
-                xyz=bests_of_all[month_num][-3].transform(iso_db1[month_num][bests_of_all[month_num][4]])                
+                xyz=b_o_l[-3].transform(iso_db1[month_num][b_o_l[4]])   #4=usedfeatures             
                 #transform if there is log in input
-                if bests_of_all[month_num][-1]==True:
+                if b_o_l[-1]==True:
                     xyz=np.log1p(xyz)
                 #predict temp
-                bests_pred=pd.DataFrame(data=bests_of_all[month_num][0].predict(xyz),columns=[names])
+                bests_pred=pd.DataFrame(data=b_o_l[0].predict(xyz),columns=[k])
                 #inverse transform log output
-                if bests_of_all[month_num][-1]==True:
+                if b_o_l[-1]==True:
                     bests_pred=np.expm1(bests_pred)
                 #inverse transform general
-                bests_pred=pd.DataFrame(bests_of_all[month_num][-2].inverse_transform(bests_pred),columns=[names])
-            
+                bests_pred=pd.DataFrame(b_o_l[-2].inverse_transform(bests_pred),columns=[k])
+                bests_pred=pd.concat([bests_pred,iso_db1[month_num]["ID"]],axis=1)
+                bests_pred=bests_pred.set_index("ID")
                 bests_of_all_preds.append(bests_pred)
-            
-            temp_pred=pd.concat([bests_of_all_preds[0],iso_db1[month_num]["ID_MeteoPoint"]],axis=1)
-            temp_pred=temp_pred.set_index("ID_MeteoPoint")
-            rain_pred=pd.concat([bests_of_all_preds[1],iso_db1[month_num]["ID_MeteoPoint"]],axis=1)
-            rain_pred=rain_pred.set_index("ID_MeteoPoint")
-            hum_pred=pd.concat([bests_of_all_preds[2],iso_db1[month_num]["ID_MeteoPoint"]],axis=1)
-            hum_pred=hum_pred.set_index("ID_MeteoPoint")
+            #print ("bests_of_all_preds",bests_of_all_preds)
             ###################################################################
             ######################
-            iso_db1[month_num]=iso_db1[month_num].rename(columns={"Value": "iso_18"}).set_index("ID_MeteoPoint",drop=False)
-            month_grouped_list_with_zeros_iso_2h[month_num]=month_grouped_list_with_zeros_iso_2h[month_num].sort_values(by="ID_MeteoPoint").set_index("ID_MeteoPoint").rename(columns={"Value": "iso_2h"})
-            month_grouped_list_with_zeros_iso_3h[month_num]=month_grouped_list_with_zeros_iso_3h[month_num].sort_values(by="ID_MeteoPoint").set_index("ID_MeteoPoint").rename(columns={"Value": "iso_3h"})
-            preds=pd.concat([iso_db1[month_num][["CooX","CooY","CooZ","ID_MeteoPoint","iso_18"]],month_grouped_list_with_zeros_iso_2h[month_num][["iso_2h"]],month_grouped_list_with_zeros_iso_3h[month_num][["iso_3h"]],temp_pred,rain_pred,hum_pred],axis=1,ignore_index =False,join="inner").reset_index(drop=True)   
+            #to find the common features for second stage
+            temp_used_f=list()
+            for cls in cls_list:
+                temp_used_f.extend(cls.db_input_args_dics["fields"])
+            temp_used_f = list(set(temp_used_f)) + ["ID"]
+            ######################  
+            preds=iso_db1[month_num][temp_used_f].set_index("ID")
+            #print (iso_db1, month_num, temp_used_f)
+            #print ("preds 375\n",preds)
+            for cls in cls_list:
+                name=cls.db_input_args_dics["var_name"]
+                n=cls.month_grouped_inp_var[month_num].rename(columns={"Value":name }).sort_values(by="ID").set_index("ID",drop=False)
+                #print (name,n)
+                preds=pd.concat([preds,n[name]],axis=1,ignore_index =False,join="inner")
+            for i in bests_of_all_preds:
+                preds=pd.concat([preds,i],axis=1,ignore_index =False,join="inner")
+            preds=preds.reset_index(drop=False)   
+            #print ("preds\n",preds)
             ######################
             all_hysplit_df_list_all_atts=list()
             all_hysplit_df_list_all_atts_without_averaging=list()
             #to pysplit trajectories: iterate altitudes
             if trajectories==True:
                  #here, the new coordination system have to be added from excel or calculated
-                xy_df_for_hysplit=iso_db1[month_num][["CooX","CooY","ID_MeteoPoint"]]
+                xy_df_for_hysplit=iso_db1[month_num][["CooX","CooY","ID"]]
                 xy_df_for_hysplit = iso_db1[month_num].join(xy_df_for_hysplit.apply(convertCoords,axis=1)) 
                 for altitude in range(0,len(altitudes)):
                     al=altitudes[altitude]
@@ -379,7 +318,7 @@ def iso_prediction(iso_db1,month_grouped_list_with_zeros_iso_2h,month_grouped_li
                     points_origin_not_detected_report=open(os.path.join(t_d,"points_origin_not_detected_report.txt"),"a+")
                     traj_shorter_than_runtime_report=open(os.path.join(t_d,"traj_shorter_than_runtime_report.txt"),"a+")  
                     #the following input is for the times that there is no database for measurment dates, So we use the trajectories of 1 whole month
-                    if type(dates_db) is None:
+                    if dates_db is None:
                         all_hysplit_df,nw_ex_all_df=gen_trajs(iso_18,xy_df_for_hysplit,month_num+1,al,points_all_in_water_report,points_origin_not_detected_report,error_in_meteo_file,traj_shorter_than_runtime_report,input_pass_to_bulkrajfun_report,Sampling_date_db=False)
                     else:
                         all_hysplit_df,nw_ex_all_df=gen_trajs(dates_db,xy_df_for_hysplit,month_num+1,al,points_all_in_water_report,points_origin_not_detected_report,error_in_meteo_file,traj_shorter_than_runtime_report,input_pass_to_bulkrajfun_report,Sampling_date_db=True)
@@ -401,24 +340,20 @@ def iso_prediction(iso_db1,month_grouped_list_with_zeros_iso_2h,month_grouped_li
                         all_hysplit_df_list_all_atts_without_averaging=all_hysplit_df_list_all_atts_without_averaging+nw_ex_all_df
                 #print(all_hysplit_df_list_all_atts_without_averaging)        
                 #print (list(all_hysplit_df_list_all_atts_without_averaging[0].columns))
-                dfdf=pd.DataFrame(all_hysplit_df_list_all_atts_without_averaging,columns=["ID_MeteoPoint","newLat", "newLong","Cumulative_Dist","Dist_from_origin","continentality","altitude","year","month","day"])
-                #print (dfdf)
+                dfdf=pd.DataFrame(all_hysplit_df_list_all_atts_without_averaging,columns=["ID","newLat", "newLong","Cumulative_Dist","Dist_from_origin","continentality","altitude","year","month","day"])
             else:
                 preds["month"]=month_num+1
                 predictions_monthly_list.append([preds])
 
-            if  run_iso_whole_year==True and month_num==0:
-                all_preds=preds
-                if trajectories==True:
-                    all_without_averaging=dfdf
-            elif run_iso_whole_year==False and month_num==min(iso_model_month_list_min_one) :
+
+            if month_num==min(iso_model_month_list_min_one) :
                 all_preds=preds
                 if trajectories==True:
                     all_without_averaging=dfdf
             else:
-                all_preds=pd.concat([all_preds,preds],ignore_index=True)
+                all_preds=pd.concat([all_preds,preds],ignore_index=False)
                 if trajectories==True:
-                    all_without_averaging=pd.concat([all_without_averaging,dfdf],ignore_index=True)
+                    all_without_averaging=pd.concat([all_without_averaging,dfdf],ignore_index=False)
     
     if trajectories==True:
         points_all_in_water_report.close()
@@ -428,15 +363,15 @@ def iso_prediction(iso_db1,month_grouped_list_with_zeros_iso_2h,month_grouped_li
         input_pass_to_bulkrajfun_report.close()
         all_without_averaging.to_excel(os.path.join(direc,"traj_data_no_averaging.xls"))
     #############################################################
-    all_preds.to_excel(os.path.join(direc,"predicted_meteo_results_in_iso_stations.xls"))
-
+    all_preds=all_preds.reset_index()
+    all_preds.to_excel(os.path.join(direc,"predicted_st1_results_in_st2_observations.xls"))
+    
     return  predictions_monthly_list, all_preds,all_hysplit_df_list_all_atts,col_for_f_reg,all_without_averaging      
 
 ###########################################################
-def print_to_file(file_name,best_dics):
-
+def st1_print_to_file(direc,best_dics,best_dics_dics_p):
+    file_name=os.path.join(direc,"st1_model_12_month_stats.txt")
     m_out_f=open(file_name,'w')
-    cnt=0
     for featt in best_dics.items():
         for monthnum in range(0,len(featt[1])):
             title=featt[0]+'\nmonth\n'
@@ -457,20 +392,55 @@ def print_to_file(file_name,best_dics):
 
             m_out_f.write('\n\n MUTUAL INFORMATION REGRESSION \n')
             m_out_f.write(str(featt[1][monthnum][2]))
-            m_out_f.write('\n\n BEST ESTIMATOR \n')
-            m_out_f.write(str(featt[1][monthnum][0]))
+
+            m_out_f.write('\n\n BEST ESTIMATOR & parameters\n')
+            try:
+                m_out_f.write(str(featt[1][monthnum][0].best_estimator_))
+                m_out_f.write('\n\n')
+                m_out_f.write(str(featt[1][monthnum][0].best_params_))
+            except:
+                m_out_f.write(str(featt[1][monthnum][0]))
+
             m_out_f.write('\n\nlog(1 + x)? \n')
             m_out_f.write(str(featt[1][monthnum][-1]))
             m_out_f.write('\n')
             m_out_f.write("########################################################\n")
         m_out_f.write('\n"########################################################\n')
-        cnt=cnt+1  
-    m_out_f.close() 
+    #"vif":vif_df,"vif_initial":vif_initial
+    for featt in best_dics_dics_p.items():
+        for monthnum in range(0,len(featt[1])):
+            m_out_f.write("\n\n########\n\n")
+            m_out_f.write(featt[0]+'\nmonth'+str(monthnum+1))
+            m_out_f.write('\n\nVIF INITIAL \n')
+            m_out_f.write(str(featt[1][monthnum]["vif_initial"]))
+            m_out_f.write('\n\nVIF FINAL \n')
+            m_out_f.write(str(featt[1][monthnum]["vif"]))
+            m_out_f.write('\n\nVIF SELECTED FEATURES \n')
+            m_out_f.write(str(featt[1][monthnum]["vif_chosen_features"]))
+    m_out_f.close()
+
+    ############
+    #writing all models
+    file_name=os.path.join(direc,"st1_all_models_12_month_stats.txt")
+    m_out_f=open(file_name,'w')
+    for featt in best_dics_dics_p.items():
+        for monthnum in range(0,len(featt[1])):
+            m_out_f.write(featt[0]+'\nmonth'+str(monthnum+1))
+            dic_al_mods=featt[1][monthnum]["models_output_dic"]
+            for k,v in dic_al_mods.items():
+                m_out_f.write('\n\nmodel\n'+k+"\n\n"+str(v["model"].best_estimator_)+"\nbest params\n"+str(v["model"].best_params_)+"\n\nR^2:\n"+str(v["mod_score"]))
+                m_out_f.write("\n\n#########################\n\n")
+        m_out_f.write("\n\n#########################\n#########################\n\n")
+    m_out_f.close()
+
+
+
     return       
 
 
 
-def isotope_model_selection_by_meteo_line(thresh,a,b,selection_method,report,direc,all_preds,iso18_bests_dic,iso2h_bests_dic,iso18_preds_real_dic,iso2h_preds_real_dic,iso18_bests,iso2h_bests):
+def isotope_model_selection_by_meteo_line(x,y,thresh,a,b,selection_method,report,direc,all_preds,st2_model_results_dic):
+
     """
     selection_method:
         independent: old (default)
@@ -480,19 +450,30 @@ def isotope_model_selection_by_meteo_line(thresh,a,b,selection_method,report,dir
     """
     #adj_r_sqrd=lambda r2,sam_size=sam_size,num_var=num_var: 1-(1-r2)*(sam_size-1)/(sam_size-num_var-1)
     #list_bests.append([best_estimator_all,best_score_all,mutual_info_regression_value,f_regression_value,used_features,rsquared,x_scaler,y_scaler,didlog])
+    for k,v in st2_model_results_dic.items():
+        if k==x:
+            iso18_bests_dic=v["bests_dic"]
+            iso18_preds_real_dic=v["preds_real_dic"]
+            iso18_bests=v["bests"]
+
+        if k==y:
+            iso2h_bests_dic=v["bests_dic"]
+            iso2h_preds_real_dic=v["preds_real_dic"]
+            iso2h_bests=v["bests"]
+
     y_scaler_18=iso18_bests[0][7]
     y_scaler_2h=iso2h_bests[0][7]
 
 
     #transform allpreds isos:
     all_preds_=copy.deepcopy(all_preds)
-    all_preds_.iso_18=y_scaler_18.transform(np.array(all_preds_.iso_18).reshape(-1,1))
-    all_preds_.iso_2h=y_scaler_2h.transform(np.array(all_preds_.iso_2h).reshape(-1,1))
+    all_preds_.iso_18=y_scaler_18.transform(np.array(all_preds_[[x]]).reshape(-1,1))
+    all_preds_.iso_2h=y_scaler_2h.transform(np.array(all_preds_[[y]]).reshape(-1,1))
 
 
     all_preds_=round(all_preds_,5)
-    iso_18_obs=all_preds_.iso_18
-    iso_2h_obs=all_preds_.iso_2h
+    iso_18_obs=all_preds_[[x]]
+    iso_2h_obs=all_preds_[[y]]
     ################
     #to just choose between good scores!
     iso18_models_=iso18_bests_dic[0]["models_output_dic"]
@@ -570,7 +551,8 @@ def isotope_model_selection_by_meteo_line(thresh,a,b,selection_method,report,dir
             df_2h=pd.DataFrame(predicted_2h,columns=["pred_2h"])
             preds_df=pd.concat([x_transformed,df_18,df_2h],axis=1)
             merged_df=pd.merge(preds_df,all_preds_,on=used_feats)
-            merged_df["score_"]=((merged_df.pred_18-merged_df.iso_18)**2 + (merged_df.pred_2h-merged_df.iso_2h)**2)**0.5
+            print (merged_df)
+            merged_df["score_"]=((merged_df.pred_18-merged_df[x])**2 + (merged_df.pred_2h-merged_df[y])**2)**0.5
             score_for_report=merged_df.score_.mean()
 
 
@@ -618,99 +600,110 @@ def isotope_model_selection_by_meteo_line(thresh,a,b,selection_method,report,dir
     if report==True:
         Path(direc).mkdir(parents=True, exist_ok=True)
         file_name=os.path.join(direc,"isotope_modeling_scoring_function_report_18_2h.txt")
-        str_to_write="Formula= Argmin( mean( sqrt(Resid_iso18^2 + Resid_iso2h^2) ) )\n\n selection_method: " +selection_method+"\n\nModels:\n\nIso_18: "+best_k_18+"\n\n adjrsquared_18: " + str(mod_score_18)+"\n\nIso_2h: "+best_k_2h+"\n\n adjrsquared_2h: " + str(mod_score_2h)+"\n\nScore: \n (Less is better)\n\n" + str(best_score_for_report)
+        str_to_write="Formula= Argmin( mean( sqrt(Resid " + x +"^2 + Resid "+ y +"^2) ) )\n\n selection_method: " +selection_method+"\n\nModels:\n\n"+x+":\n\n"+ best_k_18+"\n\n adjrsquared  " + x+":\n\n" + str(mod_score_18)+"\n\n"+y +":\n"+best_k_2h+"\n\n adjrsquared  " + y+":\n\n" + str(mod_score_2h)+"\n\nScore: \n (Less is better)\n\n" + str(best_score_for_report)
         m_out_f=open(file_name,'w')
         m_out_f.write(str_to_write)
         m_out_f.close()
 
     ##############################################################
     #update data: iso18
+    new_results_dic=dict()
+    #####
+
     iso18_bests[0][0]=best_model_18
     num_var=len(iso18_bests_dic[0]["used_features"])
     iso18_bests[0][5]=mod_score_18 #rsquared
     iso18_bests[0][-1]=log_18
     iso18_bests[0][1]=1-(1-mod_score_18)*(sam_size-1)/(sam_size-num_var-1) #bestestimator (adjrsquared)
+    
+    new_results_dic["bests"]=iso18_bests
+    #####
 
     iso18_preds_real_dic[0]["Y_preds"]=pd.DataFrame(y_scaler_18.inverse_transform( predicted_18_final.reshape(-1, 1)),columns=["Value"])
+    
+    new_results_dic["preds_real_dic"]=iso18_preds_real_dic
+    #####
+
     iso18_bests_dic[0]["best_estimator"]=best_model_18
     iso18_bests_dic[0]["best_score"]=1-(1-mod_score_18)*(sam_size-1)/(sam_size-num_var-1) #best_score_all (adjrsquared)
     iso18_bests_dic[0]["rsquared"]=mod_score_18
     iso18_bests_dic[0]["didlog"]=log_18
 
+    new_results_dic["bests_dic"]=iso18_bests_dic
+
+    for k,v in new_results_dic.items():
+        st2_model_results_dic[x][k]=v
+
+
+    new_results_dic=dict()
+
+
     #update data: iso2h
+    new_results_dic=dict()
     iso2h_bests[0][0]=best_model_2h
     num_var=len(iso2h_bests_dic[0]["used_features"])
     iso2h_bests[0][5]=mod_score_2h #best_score_all
     iso2h_bests[0][-1]=log_2h
     iso2h_bests[0][1]=1-(1-mod_score_2h)*(sam_size-1)/(sam_size-num_var-1) 
+    
+    new_results_dic["bests"]=iso2h_bests
+    #####
 
     iso2h_preds_real_dic[0]["Y_preds"]=pd.DataFrame(y_scaler_2h.inverse_transform( predicted_2h_final.reshape(-1, 1) ),columns=["Value"])
     
+    new_results_dic["preds_real_dic"]=iso2h_preds_real_dic
+    #####
+
     iso2h_bests_dic[0]["best_estimator"]=best_model_2h
     iso2h_bests_dic[0]["best_score"]=1-(1-mod_score_2h)*(sam_size-1)/(sam_size-num_var-1) #best_score_all
     iso2h_bests_dic[0]["rsquared"]=mod_score_2h
     iso2h_bests_dic[0]["didlog"]=log_2h
+
+    new_results_dic["bests_dic"]=iso2h_bests_dic
+
+    for k,v in new_results_dic.items():
+        st2_model_results_dic[y][k]=v
+
     
-    return iso18_bests,iso18_preds_real_dic,iso18_bests_dic,iso2h_bests,iso2h_preds_real_dic,iso2h_bests_dic
+    return st2_model_results_dic
 
                 
-def iso_output_report(iso18_fit,iso2h_fit,iso3h_fit,iso18_bests,iso2h_bests,iso3h_bests,iso18_bests_dic,iso2h_bests_dic,iso3h_bests_dic,direc):
+def st2_output_report(st2_model_results_dic,direc):
     #writing isotope results to a txt file
     from tabulate import tabulate
-    pr_is_18=""
-    pr_is_2h=""
-    pr_is_3h=""
-    if iso18_fit==True: pr_is_18="\n################\n\n best_estimator_all_iso18\n"+str(iso18_bests[0][0])+"\n\n################\n\n used_features_iso18 \n"+str(iso18_bests[0][4])+"\n\n################\n\n best_score_all_iso18 \n"+str(iso18_bests[0][1])+"\n\n################\n\n rsquared_iso18 \n"+str(iso18_bests[0][5])+"\n\n################\n\n didlog_iso18 \n"+str(iso18_bests[0][-1])+"\n\n################\n\n VIF_iso18 \n"+tabulate(iso18_bests_dic[0]["vif"])+"\n\n################\n\n vif_chosen_features \n"+str(iso18_bests_dic[0]["vif_chosen_features"])+"\n\n################\n\n f_regression_iso18 \n"+tabulate(iso18_bests_dic[0]["f_regression"])+"\n\n################\n\n correlation_iso18 \n"+tabulate(iso18_bests_dic[0]["correlation"])+"\n\n#########################\n#########################\n#########################\n"
-    if iso2h_fit==True:pr_is_2h="\n################\n\n best_estimator_all_iso2h\n"+str(iso2h_bests[0][0])+"\n\n################\n\n used_features_iso2h \n"+str(iso2h_bests[0][4])+"\n\n################\n\n best_score_all_iso2h \n"+str(iso2h_bests[0][1])+"\n\n################\n\n rsquared_iso2h \n"+str(iso2h_bests[0][5])+"\n\n################\n\n didlog_iso2h \n"+str(iso2h_bests[0][-1])+"\n\n################\n\n VIF_iso2h \n"+tabulate(iso2h_bests_dic[0]["vif"])+"\n\n################\n\n f_regression \n"+tabulate(iso2h_bests_dic[0]["f_regression"],headers='firstrow')+"\n\n################\n\n correlation_iso2h \n"+tabulate(iso2h_bests_dic[0]["correlation"])+"\n\n#########################\n#########################\n#########################\n"
-    if iso3h_fit==True:pr_is_3h="\n################\n\n best_estimator_all_iso3h\n"+str(iso3h_bests[0][0])+"\n\n################\n\n used_features_iso3h \n"+str(iso3h_bests[0][4])+"\n\n################\n\n best_score_all_iso3h \n"+str(iso3h_bests[0][1])+"\n\n################\n\n rsquared_iso3h \n"+str(iso3h_bests[0][5])+"\n\n################\n\n didlog_iso3h \n"+str(iso3h_bests[0][-1])+"\n\n################\n\n VIF_iso3h \n"+tabulate(iso3h_bests_dic[0]["vif"])+"\n\n################\n\n f_regression \n"+tabulate(iso3h_bests_dic[0]["f_regression"],headers='firstrow')+"\n\n################\n\n correlation_iso3h \n"+tabulate(iso3h_bests_dic[0]["correlation"])+"\n\n#########################\n#########################\n#########################\n"
+
     Path(direc).mkdir(parents=True, exist_ok=True)
-    file_name=os.path.join(direc,"isotope_modeling_output_report_18_2h_3h.txt")
+    file_name=os.path.join(direc,"stage_2_modeling_output_report.txt")
     m_out_f=open(file_name,'w')
-    if iso18_fit==True:m_out_f.write(pr_is_18)
-    if iso2h_fit==True:m_out_f.write(pr_is_2h)
-    if iso3h_fit==True:m_out_f.write(pr_is_3h)
+    m_out_f=open(file_name,'w')
+
+    for k,v in st2_model_results_dic.items():
+        iso18_bests=v["bests"]
+        iso18_bests_dic=v["bests_dic"]
+        pr_is_18="\n################\n\n best_estimator_and_params_all"+str(k)+"\n"+str(iso18_bests_dic[0]["best_estimator"].best_estimator_)+"\n\n"+str(iso18_bests_dic[0]["best_estimator"].best_params_)+"\n\n################\n\n used_features_"+str(k)+"\n"+str(iso18_bests[0][4])+"\n\n################\n\n best_score_all_"+str(k)+"\n"+str(iso18_bests[0][1])+"\n\n################\n\n rsquared_"+str(k)+"\n"+str(iso18_bests[0][5])+"\n\n################\n\n didlog_"+str(k)+"\n"+str(iso18_bests[0][-1])+"\n\n################\n\n VIF_INITIAL_"+str(k)+"\n"+tabulate(iso18_bests_dic[0]["vif_initial"])+"\n\n################\n\n VIF_"+str(k)+"\n"+tabulate(iso18_bests_dic[0]["vif"])+"\n\n################\n\n vif_chosen_features \n"+str(iso18_bests_dic[0]["vif_chosen_features"])+ "\n\n################\n\n f_regression_"+str(k)+"\n"+tabulate(iso18_bests_dic[0]["f_regression"])+"\n\n################\n\n correlation_"+str(k)+"\n"+tabulate(iso18_bests_dic[0]["correlation"])+"\n\n#########################\n#########################\n#########################\n"
+
+        m_out_f.write(pr_is_18)
     m_out_f.close()
 
 
     #################
     #all models report
-    prr_is_18=""
-    prr_is_2h=""
-    prr_is_3h=""
-    if iso18_fit==True: 
-        tp_is=str()
+    file_name=os.path.join(direc,"stage_2_all_models.txt")
+    m_out_f=open(file_name,'w')
+    for kn,vn in st2_model_results_dic.items():
+        iso18_bests_dic=vn["bests_dic"]
+        tp=str()
         for k,v in iso18_bests_dic[0]["models_output_dic"].items():
             try:
-                tw="\n\n"+k+":\n\nmodel:\n"+str(v['model'])+"\n\nmod_score:\n"+str(v["mod_score"])+"\n\nmod_cv_score:\n"+str(v["model"].best_score_)+"\n\n########################"
-                tp_is=tp_is+tw
-            except: pass
-        prr_is_18="\n\n################\n\n models_output_dic_iso_18 \n################\n"+tp_is+"\n\n#########################\n#########################\n#########################\n"
-    
-    if iso2h_fit==True:
-        tp_is=str()
-        for k,v in iso2h_bests_dic[0]["models_output_dic"].items():
-            try:
-                tw="\n\n"+k+":\n\nmodel:\n"+str(v['model'])+"\n\nmod_score:\n"+str(v["mod_score"])+"\n\nmod_cv_score:\n"+str(v["model"].best_score_)+"\n\n########################"
-                tp_is=tp_is+tw   
-            except: pass
+                tw="\n\n"+k+":\n\nmodel:\n"+str(v['model'].best_estimator_)+"\n\n"+ str(v['model'].best_params_)+"\n\nmod_score:\n"+str(v["mod_score"])+"\n\nmod_cv_score:\n"+str(v["model"].best_score_)+"\n\n########################"
+                tp=tp+tw
+            except: 
+                print ("except in iso_output_report function!!")
+                pass
 
-        prr_is_2h="\n\n################\n\n models_output_dic_iso_2h  \n################\n"+tp_is+"\n\n#########################\n#########################\n#########################\n"
-    
-    if iso3h_fit==True:
-        tp_is=str()
-        for k,v in iso3h_bests_dic[0]["models_output_dic"].items():
-            try:
-                tw="\n\n"+k+":\n\nmodel:\n"+str(v['model'])+"\n\nmod_score:\n"+str(v["mod_score"])+"\n\nmod_cv_score:\n"+str(v["model"].best_score_)+"\n\n########################"
-                tp_is=tp_is+tw  
-            except: pass
+        prr_is_18="\n\n################\n\n models_output_dic_"+kn +"\n################\n"+tp+"\n\n#########################\n#########################\n#########################\n"
+        m_out_f.write(prr_is_18)
 
-        prr_is_3h="\n\n################\n\n models_output_dic_iso_3h  \n################\n"+tp_is+"\n\n#########################\n#########################\n#########################\n"
-    
-    file_name=os.path.join(direc,"isotope_all_models_18_2h_3h.txt")
-    m_out_f=open(file_name,'w')
-    if iso18_fit==True:m_out_f.write(prr_is_18)
-    if iso2h_fit==True:m_out_f.write(prr_is_2h)
-    if iso3h_fit==True:m_out_f.write(prr_is_3h)
     m_out_f.close()
 
 

@@ -1,204 +1,542 @@
 from pathlib import Path
-
-from pandas.io.parquet import FastParquetImpl
-from isocompy.model_fitting import rfmethod, iso_prediction,print_to_file,isotope_model_selection_by_meteo_line,iso_output_report
+from isocompy.model_fitting import rfmethod, iso_prediction,st1_print_to_file,isotope_model_selection_by_meteo_line,st2_output_report
+from isocompy import cv_uncertainty as cvun
 import os
-import numpy as np
-#class for isotope and meteorology modeling and prediction
+#class for stage 1 and 2 modeling and prediction
 class model(object):
+
+    """
+        The class to fit the regression models in stage one, predict the stage one results and fit stage two regresison models
+
+        #------------------
+        Methods:
+
+            __init__(self)
+
+            st1_fit(self,var_cls_list,direc,st1_model_month_list="all",args_dic={"feature_selection":"auto","vif_threshold":5, "vif_selection_pairs":[], "correlation_threshold":0.87,"vif_corr":True,"p_val":0.05})
+
+            st1_predict(self,cls_list,st2_model_month_list=None,trajectories=False,daily_rain_data_for_trajs=None)
+
+            st2_fit(self,model_var_dict,output_report=True,dependent_model_selection=False,dependent_model_selection_list=None,meteo_coef=8,meteo_intercept=10,selection_method="point_to_point",thresh=None,model_selection_report=True,args_dic={"feature_selection":"auto","vif_threshold":5, "vif_selection_pairs":[],"correlation_threshold":0.87,"vif_corr":True,"p_val":0.05})
+            
+            choose_estimator_by_meteo_line(self,dependent_model_selection_list,selection_method="point_to_point",model_selection_report=True,thresh=None,meteo_coef=8,meteo_intercept=10)
+
+            stage2_output_report(self,direc=None)
+
+
+        #------------------
+        Attributes:
+        (__init__ method of model class)
+
+
+            #st1
+
+            direc str
+                Directory of the class
+
+            st1_model_results_dic dict
+                A dictionary consist of st1 model results
+
+            st1_varname_list list
+                List of the names of independent variables in st1
+
+            st1_model_month_list list
+                List of desired months to model in st1
+            
+
+            #st1 prediction
+
+            used_feature_list list
+                List of all used features (strings) in st1
+
+            cls_list list
+                A list of preprocess class objects that we wish to model in st2
+
+            all_pred Pandas Dataframe
+                A dataframe of all st1 predictions
+
+            predictions_monthly_list list
+                Dataframes of predictions of stage one, seperated monthly as list elements 
+            
+            st2_model_month_list list
+                List of desired months to model in st1. Indicated months have to exist in st1_model_month_list
+
+            #st2
+
+            dic_second_stage_names dict
+                Helps in generating model_var_dict in st2_fit
+
+            st2_model_results_dic dict
+                A dictionary consist of st2 model results
+
+
+           
+            
+            
+
+            #  model selection in st2 based on a line
+
+            dependent_model_selection boolean
+                To select the best model based on meteorological line. only useful if there is a linear refrence line (EX:Isotopes)
+
+            meteo_coef float 
+                If dependent_model_selection=True,global_line, coefficient of the line
+
+            meteo_intercept float
+                If dependent_model_selection=True,global_line, intercept of the line
+
+            selection_method str
+                If dependent_model_selection=True, selection_method: independent,local_line,global_line, point_to_point
+
+            thresh_meteoline_high_scores None type or float
+                A threshold to just consider models with scores higher than that value. if none, equal to mean of scores+std of scores/3
+            
+            model_selection_report boolean
+                True or Flase, to determine if there is a need to model selection method report
+
+        #------------------
+
+    """
     
-    def __init__(self,
-    tunedpars_rfr_rain={"min_weight_fraction_leaf":[0,0.02,0.04],"n_estimators":[50,100,150,200,250,300],"criterion": ["mse","mae"],"min_samples_split":[2,5] },
-    tunedpars_svr_rain={"kernel":[ "poly", "rbf", "sigmoid"],"C":np.logspace(-1, 1, 3),"gamma":np.logspace(-3, 1, 3) },
-    tunedpars_nusvr_rain={"kernel":["linear", "poly", "rbf", "sigmoid"] },
-    tunedpars_mlp_rain={"activation" : [ "logistic", "tanh"],"solver" : ["lbfgs", "sgd", "adam"],"alpha":[0.0001,0.0003],"hidden_layer_sizes":[(50,)*2,(50,)*3,(50,)*4,(100,)*2,(100,)*3,(100,)*4],"max_iter":[1000],"n_iter_no_change":[10]},
-    which_regs_rain={"muelnet":True,"rfr":True,"mlp":True,"elnet":True,"omp":True,"br":True,"ard":True,"svr":True,"nusvr":False},
-    vif_threshold_rain=None,
-
-    tunedpars_rfr_temp={"min_weight_fraction_leaf":[0,0.02,0.04],"n_estimators":[50,100,150,200,250,300],"criterion": ["mse","mae"],"min_samples_split":[2,5] },
-    tunedpars_svr_temp={"kernel":[ "poly", "rbf", "sigmoid"],"C":np.logspace(-1, 1, 3),"gamma":np.logspace(-3, 1, 3) },
-    tunedpars_nusvr_temp={"kernel":["linear", "poly", "rbf", "sigmoid"] },
-    tunedpars_mlp_temp={"activation" : [ "logistic", "tanh"],"solver" : ["lbfgs", "sgd", "adam"],"alpha":[0.0001,0.0003],"hidden_layer_sizes":[(50,)*2,(50,)*3,(50,)*4,(100,)*2,(100,)*3,(100,)*4],"max_iter":[1000],"n_iter_no_change":[10]},
-    which_regs_temp={"muelnet":True,"rfr":True,"mlp":True,"elnet":True,"omp":True,"br":True,"ard":True,"svr":True,"nusvr":False},
-    vif_threshold_temp=None,
-
-    tunedpars_rfr_hum={"min_weight_fraction_leaf":[0,0.02,0.04],"n_estimators":[50,100,150,200,250,300],"criterion": ["mse","mae"],"min_samples_split":[2,5] },
-    tunedpars_svr_hum={"kernel":[ "poly", "rbf", "sigmoid"],"C":np.logspace(-1, 1, 3),"gamma":np.logspace(-3, 1, 3) },
-    tunedpars_nusvr_hum={"kernel":["linear", "poly", "rbf", "sigmoid"] },
-    tunedpars_mlp_hum={"activation" : [ "logistic", "tanh"],"solver" : ["lbfgs", "sgd", "adam"],"alpha":[0.0001,0.0003],"hidden_layer_sizes":[(50,)*2,(50,)*3,(50,)*4,(100,)*2,(100,)*3,(100,)*4],"max_iter":[1000],"n_iter_no_change":[10]},
-    which_regs_hum={"muelnet":True,"rfr":True,"mlp":True,"elnet":True,"omp":True,"br":True,"ard":True,"svr":True,"nusvr":False},
-    vif_threshold_hum=None,
-
-    tunedpars_rfr_iso18={"min_weight_fraction_leaf":[0,0.01,0.02,0.03,0.04],"n_estimators":[25,50,75,100,150,200,250,300],"criterion": ["mse","mae"],"min_samples_split":[2,5,7] },
-    tunedpars_svr_iso18={"kernel":[ "poly", "rbf", "sigmoid"],"C":np.logspace(-1, 1, 3),"gamma":np.logspace(-3, 1, 3) },
-    tunedpars_nusvr_iso18={"kernel":["linear", "poly", "rbf", "sigmoid"] },
-    tunedpars_mlp_iso18={"activation" : [ "logistic", "tanh"],"solver" : ["lbfgs", "sgd", "adam"],"alpha":[0.0001,0.0003],"hidden_layer_sizes":[(50,)*2,(50,)*3,(50,)*4,(100,)*2,(100,)*3,(100,)*4],"max_iter":[1000],"n_iter_no_change":[10]},
-    which_regs_iso18={"muelnet":True,"rfr":True,"mlp":True,"elnet":True,"omp":True,"br":True,"ard":True,"svr":True,"nusvr":False},
-    vif_threshold_iso18=20,
-
-    tunedpars_rfr_iso2h={"min_weight_fraction_leaf":[0,0.01,0.02,0.03,0.04],"n_estimators":[25,50,75,100,150,200,250,300],"criterion": ["mse","mae"],"min_samples_split":[2,5,7] },
-    tunedpars_svr_iso2h={"kernel":[ "poly", "rbf", "sigmoid"],"C":np.logspace(-1, 1, 3),"gamma":np.logspace(-3, 1, 3) },
-    tunedpars_nusvr_iso2h={"kernel":["linear", "poly", "rbf", "sigmoid"] },
-    tunedpars_mlp_iso2h={"activation" : [ "logistic", "tanh"],"solver" : ["lbfgs", "sgd", "adam"],"alpha":[0.0001,0.0003],"hidden_layer_sizes":[(50,)*2,(50,)*3,(50,)*4,(100,)*2,(100,)*3,(100,)*4],"max_iter":[1000],"n_iter_no_change":[10]},
-    which_regs_iso2h={"muelnet":True,"rfr":True,"mlp":True,"elnet":True,"omp":True,"br":True,"ard":True,"svr":True,"nusvr":False},
-    vif_threshold_iso2h=20,
-
-    tunedpars_rfr_iso3h={"min_weight_fraction_leaf":[0,0.01,0.02,0.03,0.04],"n_estimators":[25,50,75,100,150,200,250,300],"criterion": ["mse","mae"],"min_samples_split":[2,5,7] },
-    tunedpars_svr_iso3h={"kernel":[ "poly", "rbf", "sigmoid"],"C":np.logspace(-1, 1, 3),"gamma":np.logspace(-3, 1, 3) },
-    tunedpars_nusvr_iso3h={"kernel":["linear", "poly", "rbf", "sigmoid"] },
-    tunedpars_mlp_iso3h={"activation" : [ "logistic", "tanh"],"solver" : ["lbfgs", "sgd", "adam"],"alpha":[0.0001,0.0003],"hidden_layer_sizes":[(50,)*2,(50,)*3,(50,)*4,(100,)*2,(100,)*3,(100,)*4],"max_iter":[1000],"n_iter_no_change":[10]},
-    which_regs_iso3h={"muelnet":True,"rfr":True,"mlp":True,"elnet":True,"omp":True,"br":True,"ard":True,"svr":True,"nusvr":False},
-    vif_threshold_iso3h=20,
-
-    apply_on_log=True,
-    cv="auto"):
-
-        self.tunedpars_rfr_rain=tunedpars_rfr_rain
-        self.tunedpars_svr_rain=tunedpars_svr_rain
-        self.tunedpars_nusvr_rain=tunedpars_nusvr_rain
-        self.tunedpars_mlp_rain=tunedpars_mlp_rain
-        self.which_regs_rain=which_regs_rain
-        self.vif_threshold_rain=vif_threshold_rain
+    def __init__(self):
         
-        self.tunedpars_rfr_temp=tunedpars_rfr_temp
-        self.tunedpars_svr_temp=tunedpars_svr_temp
-        self.tunedpars_nusvr_temp=tunedpars_nusvr_temp
-        self.tunedpars_mlp_temp=tunedpars_mlp_temp
-        self.which_regs_temp=which_regs_temp
-        self.vif_threshold_temp=vif_threshold_temp
-
-        self.tunedpars_rfr_hum=tunedpars_rfr_hum
-        self.tunedpars_svr_hum=tunedpars_svr_hum
-        self.tunedpars_nusvr_hum=tunedpars_nusvr_hum
-        self.tunedpars_mlp_hum=tunedpars_mlp_hum
-        self.which_regs_hum=which_regs_hum
-        self.vif_threshold_hum=vif_threshold_hum
-
-        self.tunedpars_rfr_iso18=tunedpars_rfr_iso18
-        self.tunedpars_svr_iso18=tunedpars_svr_iso18
-        self.tunedpars_nusvr_iso18=tunedpars_nusvr_iso18
-        self.tunedpars_mlp_iso18=tunedpars_mlp_iso18
-        self.which_regs_iso18=which_regs_iso18
-        self.vif_threshold_iso18=vif_threshold_iso18
-
-        self.tunedpars_rfr_iso2h=tunedpars_rfr_iso2h
-        self.tunedpars_svr_iso2h=tunedpars_svr_iso2h
-        self.tunedpars_nusvr_iso2h=tunedpars_nusvr_iso2h
-        self.tunedpars_mlp_iso2h=tunedpars_mlp_iso2h
-        self.which_regs_iso2h=which_regs_iso2h
-        self.vif_threshold_iso2h=vif_threshold_iso2h
-
+        #st1
+        self.direc=r"" #Directory of the class
+        self.st1_model_results_dic=dict()
+        self.st1_varname_list=list() #list of the names of independent variables in st1
+        self.st1_model_month_list=[] #list of desired months to model in st1
+        self.used_feature_list =[] #list of all used features (strings) in st1
         
-        self.tunedpars_rfr_iso3h=tunedpars_rfr_iso3h
-        self.tunedpars_svr_iso3h=tunedpars_svr_iso3h
-        self.tunedpars_nusvr_iso3h=tunedpars_nusvr_iso3h
-        self.tunedpars_mlp_iso3h=tunedpars_mlp_iso3h
-        self.which_regs_iso3h=which_regs_iso3h
-        self.vif_threshold_iso3h=vif_threshold_iso3h
+        #st1 prediction
+        self.cls_list=[] #A list of preprocess class objects that we wish to model in st2.
+        self.all_preds=pd.DataFrame() #a dataframe of all st1 predictions
+        self.predictions_monthly_list=[] #dataframes of predictions of stage one, seperated monthly as list elements 
 
-        self.apply_on_log=apply_on_log
-        self.cv=cv
+        #st2
+        self.dic_second_stage_names={} #helps in generating model_var_dict in st2_fit
+        self.st2_model_month_list=[] #list of desired months to model in st1. Indicated months have to exist in st1_model_month_list
+        self.st2_model_results_dic=dict()   
+        
+
+        #model selection method parameters
+        self.dependent_model_selection=False #to select the best model based on meteorological line. only useful if there is a linear refrence line (EX:isotopes)
+        self.meteo_coef=8 #if dependent_model_selection=True,global_line, coefficient of the line
+        self.meteo_intercept=10 #if dependent_model_selection=True,global_line, intercept of the line
+        self.selection_method="point_to_point" #if dependent_model_selection=True, selection_method: independent,local_line,global_line, point_to_point
+        self.thresh_meteoline_high_scores=None #a threshold to just consider models with scores higher than that value. if none, equal to mean of scores+std of scores/3
+        self.model_selection_report=True
+        
+        #trajs
+        self.col_for_f_reg=[] #trajs
+        self.trajectories=False #trajs
+        self.all_hysplit_df_list_all_atts=[] #trajs
+        self.col_for_f_reg=[] #trajs        
+        self.all_without_averaging=pd.DataFrame() #trajs
+
     ##########################################################################################
 
-    def meteo_fit(self,prepcls,p_val=0.05,temp_fit=True,rain_fit=True,hum_fit=True):
-        newmatdframe_rain=prepcls.month_grouped_rain
-        newmatdframe_temp=prepcls.month_grouped_temp
-        newmatdframe_hum=prepcls.month_grouped_hum
-        self.direc=prepcls.direc
-        self.temp_fit=temp_fit
-        self.rain_fit=rain_fit
-        self.hum_fit=hum_fit
-        Path(prepcls.direc).mkdir(parents=True, exist_ok=True)
-        meteo_or_iso="meteo"
-        inputs=None
-        best_dics=dict()
-        ############################################################
-        #RAIN
-        if self.rain_fit==True:
-            self.rain_bests,self.rain_preds_real_dic,self.rain_bests_dic=rfmethod(self.tunedpars_rfr_rain,self.tunedpars_svr_rain,self.tunedpars_nusvr_rain,self.tunedpars_mlp_rain,newmatdframe_rain,meteo_or_iso,inputs,self.apply_on_log,self.direc,self.cv,self.which_regs_rain,self.vif_threshold_rain,p_val)
-            best_dics["PRECIPITATION"]=self.rain_bests
-        ###########################################
-        #TEMP
-        if self.temp_fit==True:
-            self.temp_bests,self.temp_preds_real_dic,self.temp_bests_dic=rfmethod(self.tunedpars_rfr_temp,self.tunedpars_svr_temp,self.tunedpars_nusvr_temp,self.tunedpars_mlp_temp,newmatdframe_temp,meteo_or_iso,inputs,self.apply_on_log,self.direc,self.cv,self.which_regs_temp,self.vif_threshold_temp,p_val)
-            best_dics["TEMPERATURE"]=self.temp_bests
+    def st1_fit(self,var_cls_list,direc,st1_model_month_list="all",args_dic={"feature_selection":"auto","vif_threshold":5, "vif_selection_pairs":[],"correlation_threshold":0.87,"vif_corr":True,"p_val":0.05}):
+    
+        """
+            The method to fit regression models to identified preprocess class objects in stage one 
 
-        ##########################################
-        #Humidity
-        if self.hum_fit==True:
-            self.hum_bests,self.hum_preds_real_dic,self.hum_bests_dic=rfmethod(self.tunedpars_rfr_hum,self.tunedpars_svr_hum,self.tunedpars_nusvr_hum,self.tunedpars_mlp_hum,newmatdframe_hum,meteo_or_iso,inputs,self.apply_on_log,self.direc,self.cv,self.which_regs_hum,self.vif_threshold_hum,p_val)
-            best_dics["HUMIDITY"]=self.hum_bests
+            #------------------
+            Parameters:
+
+                var_cls_list list
+                    A list of preprocess class objects to to fit regression models. Regression models will be fitted to each elemnt
+                    of the list (a preprocess class object).
+
+                direc str
+                    Directory of the class
+
+                st1_model_month_list str or list of integers default="all"
+                    List of desired months to model in st1
+                
+                args_dic dict default={"feature_selection":"auto","vif_threshold":5, "vif_selection_pairs":[],"correlation_threshold":0.87,"vif_corr":True,"p_val":0.05}
+                    A dictionary of parameters that identifies the behaviour of feature selection prior to regressions:    
+                        
+                        args_dic["feature_selection"] ="manual": Statistical information will be shown to the user, and the desired features will be
+                        chosen by the user
+
+                        args_dic["feature_selection"] ="auto": Feature selection will be done automatically
+
+                        args_dic["vif_threshold"] =None: VIF (Variation Inflation Factor) will not be considered as a factor in feature selection
+
+                        args_dic["vif_threshold"] = float type: A threshold to identify high VIF values
+
+                        args_dic["vif_corr"] = True: If True, use correlation coefficient values to identify multicolinearity in features with high vif value
+                        
+                        args_dic["correlation_threshold"] = 0.87 A threshold to identify high correlation coefficient values
+                        
+                        args_dic["vif_selection_pairs"] = empty list or list of list(s): If empty: feature elimination based on vif will be automatic
+                        if  args_dic["vif_selection_pairs"] =[ ["a","b"] ], in case both "a" and "b" have high vif values and high correlations, the b values will be eliminated
+
+            #------------------
+            Attributes:
+
+                direc str
+                    Directory of the class
+
+                st1_model_results_dic dict
+                    A dictionary consist of st1 model results
+
+                st1_varname_list list
+                    List of the names of independent variables in st1
+
+                st1_model_month_list list
+                    List of desired months to model in st1
+
+            #------------------
+        """
+
+        if st1_model_month_list=="all":
+            self.st1_model_month_list=[n for n in range(1,13) ]
+        else:     self.st1_model_month_list=st1_model_month_list
+        self.direc=direc
+        Path(self.direc).mkdir(parents=True, exist_ok=True)
+        stage_1_2=1
+        best_dics_p=dict()
+        best_dics_dics_p=dict()
+        ############################################################
+        
+        for prepcls in  var_cls_list:
+            self.st1_varname_list.append(prepcls.db_input_args_dics["var_name"])
+            fields=prepcls.db_input_args_dics["fields"]
+
+            bests,preds_real_dic,bests_dic=rfmethod(prepcls.month_grouped_inp_var,prepcls.model_pars_name_dic,stage_1_2,st1_model_month_list,args_dic,fields)
+            results_dic={"bests":bests,"preds_real_dic":preds_real_dic,"bests_dic":bests_dic,"db_input_args_dics":prepcls.db_input_args_dics}
+            self.st1_model_results_dic[prepcls.db_input_args_dics["var_name"]]=results_dic
+            best_dics_p[prepcls.db_input_args_dics["var_name"]]=bests
+            best_dics_dics_p[prepcls.db_input_args_dics["var_name"]]=bests_dic
+        ###########################################
 
         #############################################################     
-        print_to_file( os.path.join(self.direc,"meteo_model_temp_rain_hum_12_month_stats.txt"),best_dics )
-
+        st1_print_to_file(self.direc ,best_dics_p,best_dics_dics_p )
+        #model prediction stats prediction_uncertainty_stats
+        Path(os.path.join(self.direc,"st1_prediction_uncertainty_stats")).mkdir(parents=True, exist_ok=True)
+        for k,v in best_dics_dics_p.items():
+            cvun.model_meanstd(k,v,os.path.join(self.direc,"st1_prediction_uncertainty_stats"))
     ##########################################################################################
 
-    def iso_predic(self,cls,run_iso_whole_year,iso_model_month_list,trajectories=False,daily_rain_data_for_trajs=None):
+    def st1_predict(self,cls_list,st2_model_month_list=None,trajectories=False,daily_rain_data_for_trajs=None):
+        """
+            The method to estimate the independent features that modeled in st1 using the new observations that are in 
+            a new list (cls_list) which each element is a preprocess class objects 
+
+            #------------------
+            Parameters:
+
+                cls_list list
+                    A list of preprocess class objects that we wish to model in st2
+                
+                
+                st2_model_month_list list or None type default=None
+                    List of desired months to model in st1. Indicated months have to exist in st1_model_month_list. If None,
+                    if will be equal to st1_model_month_list
+
+            #------------------
+            Attributes:
+
+                used_feature_list list
+                    List of all used features (strings) in st1
+
+                cls_list list
+                    A list of preprocess class objects that we wish to model in st2
+
+                all_pred Pandas Dataframe
+                    A dataframe of all st1 predictions in observed samples
+
+                predictions_monthly_list list
+                    Dataframes of predictions of stage one, seperated monthly as list elements 
+                
+                st2_model_month_list list
+                    List of desired months to model in st1. Indicated months have to exist in st1_model_month_list
+
+            #------------------
+        """
+        #self=iso_meteo_model
+        #cls=prep_dataset
+        ########################################
+        #check the fields in iso are available in fields in cls_list
+        used_feature_list=list()
+        for k,v in  self.st1_model_results_dic.items():
+            for n in v["bests_dic"]:
+                used_feature_list.extend(n["used_features"])
+        self.used_feature_list = list(set(used_feature_list)) #to remove duplicates  
+        self.cls_list=cls_list
+        for cls in cls_list:
+            self.dic_second_stage_names[cls.db_input_args_dics["var_name"]]=None
+            
+            for f in cls.db_input_args_dics["fields"]:
+                if f not in self.used_feature_list:
+                    raise Exception ("used features in the first stage can not be find in fields in second stage! so the prediction can not be done! correct the database!")
+        #######################################    
+
         if trajectories==False: self.col_for_f_reg=[]
-        self.direc=cls.direc
-        Path(cls.direc).mkdir(parents=True, exist_ok=True)
+        Path(self.direc).mkdir(parents=True, exist_ok=True)
         self.trajectories=trajectories
-        if run_iso_whole_year==True: iso_model_month_list=[m for m in range(1,13)]
-        self.iso_model_month_list=iso_model_month_list
-        self.run_iso_whole_year=run_iso_whole_year
-        self.predictions_monthly_list, self.all_preds,self.all_hysplit_df_list_all_atts,self.col_for_f_reg,self.all_without_averaging=iso_prediction(cls.month_grouped_iso_18,cls.month_grouped_iso_2h,cls.month_grouped_iso_3h,self.temp_bests,self.rain_bests,self.hum_bests,cls.iso_18,daily_rain_data_for_trajs,self.trajectories,self.iso_model_month_list,self.run_iso_whole_year,self.direc)
+        #solving months
+        if st2_model_month_list==None: self.st2_model_month_list=self.st1_model_month_list
+        if st2_model_month_list=="all": self.st2_model_month_list=[m for m in range(1,13)]
+        if type(st2_model_month_list) is type(list()):
+            t_l=list()
+            for i in st2_model_month_list:
+                if i in self.st1_model_month_list:
+                    t_l.append(i)
+                else: raise Exception ("month {} in st2_model_month_list can not be found in the modeled month in stage one".format(i))    
+            self.st2_model_month_list=t_l  
+        ###################################
+        if type(cls_list) != type(list()) or len(cls_list)==0:
+            raise Exception ("Revise cls_list!")
+        ###################################
+        
+        self.predictions_monthly_list, self.all_preds,self.all_hysplit_df_list_all_atts,self.col_for_f_reg,self.all_without_averaging=iso_prediction(self.cls_list,
+            self.st1_model_results_dic,
+            dates_db=daily_rain_data_for_trajs,
+            trajectories=self.trajectories,
+            iso_model_month_list=self.st2_model_month_list,
+            direc=self.direc)
 
     ##########################################################################################
 
-    def iso_fit(self,iso18_fit=True,iso3h_fit=True,iso2h_fit=True,output_report=True,p_val=0.05,dependent_model_selection=False,meteo_coef=8,meteo_intercept=10,selection_method="point_to_point",thresh=None,model_selection_report=True):
-        newmatdframe_iso18=self.all_preds
-        newmatdframe_iso2h=self.all_preds
-        newmatdframe_iso3h=self.all_preds
-        self.iso18_fit=iso18_fit
-        self.iso3h_fit=iso3h_fit
-        self.iso2h_fit=iso2h_fit
-        meteo_or_iso="iso"
+    def st2_fit(self,model_var_dict=None,output_report=True,dependent_model_selection=False,dependent_model_selection_list=None,meteo_coef=8,meteo_intercept=10,selection_method="point_to_point",thresh_meteoline_high_scores=None,model_selection_report=True,args_dic={"feature_selection":"auto","vif_threshold":5, "vif_selection_pairs":[],
+            "correlation_threshold":0.87,"vif_corr":True,"p_val":0.05}):
+        
+        """
+            The method to fit regression models to identified preprocess class objects in stage one
+
+            #------------------
+            Parameters:
+
+                model_var_dict None type or dict  default=None
+                    A dictionary that determines dependent (key - string) and independent (value) features of the second stage regression models.
+                    Independent features (value) have to be a list of feature names (string).
+    
+                    If None, all features (independent st1 features and dependent st1 features) will be
+                    considered as independent features of second stage models.
+                    
+                    EXAMPLE: model_var_dict = {"is1":["CooZ","hmd"],"is2":["prc","hmd"],}
+                
+                output_report boolean default=True
+                    To generate output reports
+                
+                #Parameters used in choose_estimator_by_meteo_line 
+                
+                dependent_model_selection boolean default=False
+                    To select the best model based on a (meteorological) line. only useful if there is a linear refrence line (EX:Isotopes)
+                
+                dependent_model_selection_list default=None
+                    Used if dependent_model_selection=True. List of two features that have to be used in dependent_model_selection
+                
+                meteo_coef default=8
+                    Used if dependent_model_selection=True and selection_method="global_line". Coefficient of the line
+                
+                meteo_intercept default=10
+                    Used if dependent_model_selection=True and selection_method="global_line". Intercept of the line
+                
+                selection_method default="point_to_point"
+                    Used if dependent_model_selection=True. Selection_method could be:
+                    independent
+                    local_line: coef and intercept derived from a linear regression of observed data
+                    global_line
+                    point_to_point: find the models pair with shortest average distance between observed and predicted data  
+                
+                thresh_meteoline_high_scores None type or float default=None
+                    A threshold to just consider models with scores higher than that value. if none, equal to mean of scores+std of scores/3
+                
+                model_selection_report boolean default =True
+                    True or False, to determine if there is a need to model selection method report
+                
+                args_dic dict default={"feature_selection":"auto","vif_threshold":5, "vif_selection_pairs":[],"correlation_threshold":0.87,"vif_corr":True,"p_val":0.05}
+                    A dictionary of parameters that identifies the behaviour of feature selection prior to regressions:    
+                        
+                        args_dic["feature_selection"] ="manual": Statistical information will be shown to the user, and the desired features will be
+                        chosen by the user
+
+                        args_dic["feature_selection"] ="auto": Feature selection will be done automatically
+
+                        args_dic["vif_threshold"] =None: VIF (Variation Inflation Factor) will not be considered as a factor in feature selection
+
+                        args_dic["vif_threshold"] = float type: A threshold to identify high VIF values
+
+                        args_dic["vif_corr"] = True: If True, use correlation coefficient values to identify multicolinearity in features with high vif value
+                        
+                        args_dic["correlation_threshold"] = 0.87 A threshold to identify high correlation coefficient values
+                        
+                        args_dic["vif_selection_pairs"] = empty list or list of list(s): If empty: feature elimination based on vif will be automatic
+                        if  args_dic["vif_selection_pairs"] =[ ["a","b"] ], in case both "a" and "b" have high vif values and high correlations, the b values will be eliminated
+
+            #------------------
+            Attributes:
+
+                st2_model_results_dic dict
+                    A dictionary consist of st2 model results
+
+
+                #Attributes used in choose_estimator_by_meteo_line 
+                dependent_model_selection boolean
+                    To select the best model based on meteorological line. only useful if there is a linear refrence line (EX:Isotopes)
+
+                meteo_coef float 
+                    If dependent_model_selection=True,global_line, coefficient of the line
+
+                meteo_intercept float
+                    If dependent_model_selection=True,global_line, intercept of the line
+
+                selection_method str
+                    If dependent_model_selection=True, selection_method: independent,local_line,global_line, point_to_point
+
+                thresh_meteoline_high_scores None type or float
+                    A threshold to just consider models with scores higher than that value. if none, equal to mean of scores+std of scores/3
+                
+                model_selection_report boolean
+                    True or False, to determine if there is a need to model selection method report
+
+            #------------------
+        """
+        #self=iso_meteo_model
+        #cls=prep_dataset
+        stage_1_2=2
         self.dependent_model_selection=dependent_model_selection
         self.meteo_coef=meteo_coef
         self.meteo_intercept=meteo_intercept
         self.selection_method=selection_method
-        self.thresh=thresh
+        self.thresh_meteoline_high_scores=thresh_meteoline_high_scores
         self.model_selection_report=model_selection_report
-        inputs=["CooX","CooY","CooZ","temp","rain","hum"]+self.col_for_f_reg
         Path(self.direc).mkdir(parents=True, exist_ok=True)
-        ####################################
-        #iso18
-        if self.iso18_fit==True:
-            newmatdframe_iso18=newmatdframe_iso18.rename(columns={"iso_18": "Value"})
-            self.iso18_bests,self.iso18_preds_real_dic,self.iso18_bests_dic=rfmethod(self.tunedpars_rfr_iso18,self.tunedpars_svr_iso18,self.tunedpars_nusvr_iso18,self.tunedpars_mlp_iso18,newmatdframe_iso18,meteo_or_iso,inputs,self.apply_on_log,self.direc,self.cv,self.which_regs_iso18,self.vif_threshold_iso18,p_val)
-        ####################################
-        #iso2h
-        if self.iso2h_fit==True:
-            newmatdframe_iso2h=newmatdframe_iso2h.rename(columns={"iso_2h": "Value"})
-            print ("input to rfmethod 2h",newmatdframe_iso2h)
-            self.iso2h_bests,self.iso2h_preds_real_dic,self.iso2h_bests_dic=rfmethod(self.tunedpars_rfr_iso2h,self.tunedpars_svr_iso2h,self.tunedpars_nusvr_iso2h,self.tunedpars_mlp_iso2h,newmatdframe_iso2h,meteo_or_iso,inputs,self.apply_on_log,self.direc,self.cv,self.which_regs_iso2h,self.vif_threshold_iso2h,p_val)
-        ####################################
-        #iso3h
-        if self.iso3h_fit==True:
-            newmatdframe_iso3h=newmatdframe_iso3h.rename(columns={"iso_3h": "Value"})
-            self.iso3h_bests,self.iso3h_preds_real_dic,self.iso3h_bests_dic=rfmethod(self.tunedpars_rfr_iso3h,self.tunedpars_svr_iso3h,self.tunedpars_nusvr_iso3h,self.tunedpars_mlp_iso3h,newmatdframe_iso3h,meteo_or_iso,inputs,self.apply_on_log,self.direc,self.cv,self.which_regs_iso3h,self.vif_threshold_iso3h,p_val)
-        ####################################
-        if self.dependent_model_selection==True:
-            self.iso18_bests,self.iso18_preds_real_dic,self.iso18_bests_dic,self.iso2h_bests,self.iso2h_preds_real_dic,self.iso2h_bests_dic=isotope_model_selection_by_meteo_line(self.thresh,self.meteo_coef,self.meteo_intercept,self.selection_method,self.model_selection_report,self.direc,self.all_preds,self.iso18_bests_dic,self.iso2h_bests_dic,self.iso18_preds_real_dic,self.iso2h_preds_real_dic,self.iso18_bests,self.iso2h_bests)
+        ####################################################
+        if model_var_dict==None: model_var_dict=self.dic_second_stage_names
+         
+        for k,input_v_list in model_var_dict.items():
+            if input_v_list==None: input_v_list=self.used_feature_list+self.st1_varname_list #(x,y,z)  + (temp,hum)
+            else:
+                for i in input_v_list:
+                    if i not in list(self.all_preds.columns):
+                        raise Exception ("Input variable(s)  not existed in stage one model predictions. input_variables_st2_list elements have to be found in {} ".format(self.all_preds.columns))
+
+            
+            input_v_list=input_v_list+self.col_for_f_reg
+            ####################################
+            # stage 2
+            
+            for st2_predic_cls in self.cls_list:
+                if st2_predic_cls.db_input_args_dics["var_name"]==k:
+                    newmatdframe=self.all_preds.rename(columns={k: "Value"})
+
+                    bests,preds_real_dic,bests_dic=rfmethod(
+                        newmatdframe,
+                        st2_predic_cls.model_pars_name_dic,
+                        stage_1_2,
+                        args_dic=args_dic,
+                        fields=input_v_list,
+                        st1_model_month_list=None)
+                    results_dic={"bests":bests,"preds_real_dic":preds_real_dic,"bests_dic":bests_dic,"db_input_args_dics":st2_predic_cls.db_input_args_dics}
+                    self.st2_model_results_dic[k]=results_dic
+
+                ####################################
+        if self.dependent_model_selection==True and dependent_model_selection_list!=None and len(dependent_model_selection_list)==2:
+            self.st2_model_results_dic=isotope_model_selection_by_meteo_line(
+                dependent_model_selection_list[0],
+                dependent_model_selection_list[1],
+                self.thresh_meteoline_high_scores,
+                self.meteo_coef,self.meteo_intercept,self.selection_method,self.model_selection_report,self.direc,
+                self.all_preds,
+                self.st2_model_results_dic)
         ####################################
         if output_report==True:
-            iso_output_report(self.iso18_fit,self.iso2h_fit,self.iso3h_fit,self.iso18_bests,self.iso2h_bests,self.iso3h_bests,self.iso18_bests_dic,self.iso2h_bests_dic,self.iso3h_bests_dic,self.direc)
+
+            st2_output_report(self.st2_model_results_dic,self.direc)
+            
+            #model prediction stats prediction_uncertainty_stats
+            Path(os.path.join(self.direc,"st2_prediction_uncertainty_stats")).mkdir(parents=True, exist_ok=True)
+            for k,v in self.st2_model_results_dic.items():
+                cvun.model_meanstd(k,v["bests_dic"],os.path.join(self.direc,"st2_prediction_uncertainty_stats"))
 
 
+    def choose_estimator_by_meteo_line(self,dependent_model_selection_list,selection_method="point_to_point",model_selection_report=True,thresh_meteoline_high_scores=None,meteo_coef=8,meteo_intercept=10):
+        """
+            The method to select the best model based on a (meteorological) line. only useful if there is a linear refrence line (EX:Isotopes).
+            This method could be called automatically in st2_fit if dependent_model_selection=True. or it can be called after st2_fit execution
+            to see the changes in best regression models based on different criterias.
+            
+            IMPORTANT NOTE:  Executing this method will update the st2_model_results_dic to match the latest chosen selection_method. st2_model_results_dic stores the second stage results.
 
-    def choose_estimator_by_meteo_line(self,selection_method="point_to_point",model_selection_report=True,thresh=None,meteo_coef=8,meteo_intercept=10):
+            #------------------
+            Parameters:
+                
+                dependent_model_selection_list default=None
+                    Used if dependent_model_selection=True. List of two features that have to be used in dependent_model_selection
+                
+                meteo_coef default=8
+                    Used if dependent_model_selection=True and selection_method="global_line". Coefficient of the line
+                
+                meteo_intercept default=10
+                    Used if dependent_model_selection=True and selection_method="global_line". Intercept of the line
+                
+                selection_method default="point_to_point"
+                    Used if dependent_model_selection=True. Selection_method could be:
+                    independent
+                    local_line: coef and intercept derived from a linear regression of observed data
+                    global_line
+                    point_to_point: find the models pair with shortest average distance between observed and predicted data  
+                
+                thresh_meteoline_high_scores None type or float default=None
+                    A threshold to just consider models with scores higher than that value. if none, equal to mean of scores+std of scores/3
+                
+                model_selection_report boolean default =True
+                    True or False, to determine if there is a need to model selection method report
+            #------------------
+            Attributes:
+
+                st2_model_results_dic dict
+                    Updated dictionary of st2 model results
+
+                dependent_model_selection boolean
+                    To select the best model based on meteorological line. only useful if there is a linear refrence line (EX:Isotopes)
+
+                meteo_coef float 
+                    If dependent_model_selection=True,global_line, coefficient of the line
+
+                meteo_intercept float
+                    If dependent_model_selection=True,global_line, intercept of the line
+
+                selection_method str
+                    If dependent_model_selection=True, selection_method: independent,local_line,global_line, point_to_point
+
+                thresh_meteoline_high_scores None type or float
+                    A threshold to just consider models with scores higher than that value. if none, equal to mean of scores+std of scores/3
+                
+                model_selection_report boolean
+                    True or False, to determine if there is a need to model selection method report
+
+            #------------------
+        """
         self.meteo_coef=meteo_coef
         self.meteo_intercept=meteo_intercept
-        self.thresh=thresh
+        self.thresh_meteoline_high_scores=thresh_meteoline_high_scores
         self.selection_method=selection_method
         self.model_selection_report=model_selection_report
-        self.iso18_bests,self.iso18_preds_real_dic,self.iso18_bests_dic,self.iso2h_bests,self.iso2h_preds_real_dic,self.iso2h_bests_dic=isotope_model_selection_by_meteo_line(self.thresh,self.meteo_coef,self.meteo_intercept,self.selection_method,self.model_selection_report,self.direc,self.all_preds,self.iso18_bests_dic,self.iso2h_bests_dic,self.iso18_preds_real_dic,self.iso2h_preds_real_dic,self.iso18_bests,self.iso2h_bests)
-
+        
+        self.st2_model_results_dic=isotope_model_selection_by_meteo_line(
+                        dependent_model_selection_list[0],
+                        dependent_model_selection_list[1],
+                        self.thresh,
+                        self.meteo_coef,self.meteo_intercept,self.selection_method,self.model_selection_report,self.direc,
+                        self.all_preds,
+                        self.st2_model_results_dic)
     
 
-    def isotope_output_report(self,direc=None):
+    def stage2_output_report(self,direc=None):
+        """
+            This method is useful to update st2_fit output files results in case they are changed.
+            (Normally the change can happen if choose_estimator_by_meteo_line method is executed)
+            #------------------
+            Parameters:
+                
+                direc str default=None
+                    Directory of the output 
+            #------------------
+        """
         if direc==None: direc=self.direc
-
-
-        iso_output_report(self.iso18_fit,self.iso2h_fit,self.iso3h_fit,self.iso18_bests,self.iso2h_bests,self.iso3h_bests,self.iso18_bests_dic,self.iso2h_bests_dic,self.iso3h_bests_dic,direc)
+        st2_output_report(self.st2_model_results_dic,self.direc)

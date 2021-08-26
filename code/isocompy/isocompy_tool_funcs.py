@@ -1,4 +1,3 @@
-from matplotlib.pyplot import legend
 from sklearn.feature_selection import f_regression, mutual_info_regression
 import numpy as np
 import pandas as pd
@@ -11,23 +10,36 @@ from sklearn.linear_model import LinearRegression
 
 ###########################################################
 #predict points for contouring
-def predict_points(dir,write_to_file,used_features_iso18,x_y_z_org,iso_model_month_list,temp_bests,rain_bests,hum_bests,x_scaler_iso18,y_scaler_iso18,didlog_iso18,best_estimator_all_iso18,column_name,trajectory_features_list,run_iso_whole_year):
-    
+def predict_points(dir,write_to_file,x_y_z_org,st2_pred_month_list,st1_model_results_dic,st2_model_results_dic_var,column_name,trajectory_features_list):
+    #prepare st1 inputs:
+    st1_col_name=[]
+    st1_bests_list=[]
+    for k,v in st1_model_results_dic.items():
+        st1_col_name.append(k)
+        st1_bests_list.append(v["bests"])
+    #################
+    #prepare st2 inputs:
+    used_features_st2=st2_model_results_dic_var["bests_dic"][0]["used_features"]
+    x_scaler_iso18=st2_model_results_dic_var["bests"][0][6]
+    y_scaler_iso18=st2_model_results_dic_var["bests"][0][7]
+    didlog_iso18=st2_model_results_dic_var["bests_dic"][0]["didlog"]
+    best_estimator_all_iso18=st2_model_results_dic_var["bests_dic"][0]["best_estimator"]
+    #################
     monthly_iso_output=list()
-    iso_model_month_list_min_one=[n-1 for n in iso_model_month_list]
-    if run_iso_whole_year==True:
-        iso_model_month_list_min_one=[n for n in range(0,12)]
+    iso_model_month_list_min_one=[n-1 for n in st2_pred_month_list]
     for month in range(0,12):
         if month in iso_model_month_list_min_one:
             counterr=0
             x_y_z_copy=x_y_z_org.copy()
             #################################################
             #meteo prediction
-            #needs debugging!!
-            for meteopredict,colname in zip([temp_bests,rain_bests,hum_bests],["temp","rain","hum"]):
+            for meteopredict,colname in zip(st1_bests_list,st1_col_name):
                 #just used features
-                x_y_z=x_y_z_copy[meteopredict[month][4]].copy()
-                counterr=counterr+1
+                try:
+                    x_y_z=x_y_z_copy[meteopredict[month][4]].copy()
+                    counterr=counterr+1
+                except:
+                    raise Exception("in stage 1 model, month {}, used features are {} which can not found in the dataset. Features that are available in the dataset: {}. Please revise the dataset".format(month+1, str(meteopredict[month][4]), str(x_y_z_copy.columns) ) )    
                 #general standard
                 x_y_z=meteopredict[month][-3].transform(x_y_z)
                 #transform if there is log in input
@@ -48,8 +60,10 @@ def predict_points(dir,write_to_file,used_features_iso18,x_y_z_org,iso_model_mon
                 #general
                 meteopredict_res=pd.DataFrame(meteopredict_res)
                 meteopredict_res=pd.DataFrame(meteopredict[month][-2].inverse_transform(meteopredict_res),columns=[colname])
+                #print (meteopredict_res)
+                #print (x_y_z_copy)
                 meteopredict_res=pd.concat([meteopredict_res,x_y_z_copy],axis=1)
-                meteopredict_res=meteopredict_res.set_index(["CooX","CooY"],drop=False)
+                meteopredict_res=meteopredict_res.set_index(["ID_preds_st2"],drop=False)
                 #making the dataframe
                 if counterr==1:
                     meteopredict_res_per_month=meteopredict_res
@@ -59,26 +73,34 @@ def predict_points(dir,write_to_file,used_features_iso18,x_y_z_org,iso_model_mon
             #indexed,contain xyz        
             meteopredict_res_per_month=meteopredict_res_per_month[~np.isnan(pd.DataFrame(meteopredict_res_per_month[colname])).any(axis=1)]
             #print ("len each month all  ",meteopredict_res_per_month.shape )    
-
+            #print (meteopredict_res_per_month)
+            #print (meteopredict_res_per_month.shape)
+            #print (type(meteopredict_res_per_month))
             #################################################
             #trajectories prediction
-
+            calc_trajectories=False
             for i in trajectory_features_list:
-                if i in used_features_iso18:
+                if i in used_features_st2:
                     calc_trajectories=True
             if len(trajectory_features_list)==0:
                 calc_trajectories=False
             if calc_trajectories==True:
                 pass #(?????) 
+
             #################################################
-            #Iso prediction
+            #predicting isotopes
             #print (meteopredict_res_per_month)
-            iso_model_input=meteopredict_res_per_month.reset_index(level=["CooX","CooY"],drop=True)
+            iso_model_input=meteopredict_res_per_month.reset_index(level=["ID_preds_st2"],drop=True)
             #print (iso_model_input)
 
             #transforming
-            if x_scaler_iso18 !=None and used_features_iso18!=None:
-                iso_model_input_us=x_scaler_iso18.transform(iso_model_input[used_features_iso18])
+            if x_scaler_iso18 !=None and used_features_st2!=None:
+                try:
+                    iso_model_input_us=x_scaler_iso18.transform(iso_model_input[used_features_st2])
+                except:
+                    raise Exception("in stage 2 model, used features are {} which can not found in the dataset or stage 2 predictions. Features that are available for predicting the second stage are: {}. Please revise the dataset".format(str(used_features_st2), str(iso_model_input.columns) ) )    
+                #general standard
+
                 if didlog_iso18==True:
                     iso_model_input_us=np.log1p(iso_model_input_us)
                     iso_model_input=iso_model_input[~np.isnan(iso_model_input_us).any(axis=1)]
@@ -351,7 +373,7 @@ def pcafun(pca_raw_df,kmeans_group_nums=5,filetitlename="no_name"):
 
 #f_reg and mutual
 def f_reg_mutual(file_name,all_preds,list_of_dics):
-    m_out_f=open(file_name,'w')
+    m_out_f=open(file_name,'a')
     for sets in list_of_dics:
         st_exist=False
         st_exist_m=True
@@ -401,7 +423,7 @@ def f_reg_mutual(file_name,all_preds,list_of_dics):
 ###########################################################
 def best_estimator_and_partial_dep(    
         used_features,
-        meteo_or_iso,
+        st1_or_st2,
         monthnum,
         model_type,
         direc,
@@ -414,10 +436,10 @@ def best_estimator_and_partial_dep(
         partial_dep_plot):
             # Plots       
             lens=len(used_features)
-            if meteo_or_iso=="meteo":
+            if st1_or_st2=="st1":
                 pltttl="month_"+ str(monthnum) +"_All_data_best_estimator_"+model_type
             else:
-                pltttl="Annual_iso_All_data_best_estimator_"+model_type
+                pltttl="Annual_st2_All_data_best_estimator_"+model_type
             
             #########################################################################################################
             #########################################################################################################
@@ -471,23 +493,46 @@ def best_estimator_and_partial_dep(
                 #plt.show()
                 plt.close(figg)
 
-def best_estimator_and_part_plots(cls,meteo_plot,iso_plot,estimator_plot,partial_dep_plot):
+def best_estimator_and_part_plots(cls,st1,st2,estimator_plot,partial_dep_plot):
 
     #check if meteo models exists
-    if meteo_plot==True:
+    if st1==True:
         #try:
         #cls.rain_bests
         #cls.temp_bests
         #cls.hum_bests
-        meteo_or_iso="meteo"
-        rangee=range(0,12)
-        for monthnum in rangee:
+        st1_or_st2="st1"
+        res_dics=cls.st1_model_results_dic
+        st1_model_month_list_min_one=[n-1 for n in cls.st1_model_month_list]
+        for k,v in res_dics.items():
+            for monthnum in st1_model_month_list_min_one:
+                mon_dic=v["bests_dic"][monthnum]
+                mon_dic_rea=v["preds_real_dic"][monthnum]
+                if None not in [mon_dic["used_features"],mon_dic["didlog"],mon_dic["best_estimator"]]:
+                    best_estimator_and_partial_dep(    
+                            mon_dic["used_features"],
+                            st1_or_st2,
+                            monthnum+1,
+                            direc=cls.direc,
+                            Y_preds=mon_dic_rea["Y_preds"],
+                            Y_measured=mon_dic_rea["Y_temp_fin"],
+                            didlog=mon_dic["didlog"],
+                            X_temp=mon_dic_rea["X_temp"],
+                            best_estimator_all=mon_dic["best_estimator"],
+                            estimator_plot=estimator_plot,
+                            partial_dep_plot=partial_dep_plot,
+                            model_type=k)
+
+
+        '''
+            rangee=range(0,12)
+            for monthnum in rangee:
             zip_of_lists=zip(
                 [cls.rain_bests_dic[monthnum]["used_features"],cls.temp_bests_dic[monthnum]["used_features"],cls.hum_bests_dic[monthnum]["used_features"]],
                 ["rain","temp","humid"],
                 [cls.rain_preds_real_dic[monthnum]["Y_preds"],cls.temp_preds_real_dic[monthnum]["Y_preds"],cls.hum_preds_real_dic[monthnum]["Y_preds"]],
                 [cls.rain_preds_real_dic[monthnum]["Y_temp_fin"],cls.temp_preds_real_dic[monthnum]["Y_temp_fin"],cls.hum_preds_real_dic[monthnum]["Y_temp_fin"]],
-                [cls.rain_bests[monthnum][-1],cls.temp_bests[monthnum][-1],cls.hum_bests[monthnum][-1]], #didlog
+                [cls.rain_preds_real_dic[monthnum]["didlog"],cls.temp_bests[monthnum][-1],cls.hum_bests[monthnum][-1]], #didlog
                 [cls.rain_preds_real_dic[monthnum]["X_temp"],cls.temp_preds_real_dic[monthnum]["X_temp"],cls.hum_preds_real_dic[monthnum]["X_temp"]],
                 [cls.rain_bests_dic[monthnum]["best_estimator"],cls.temp_bests_dic[monthnum]["best_estimator"],cls.hum_bests_dic[monthnum]["best_estimator"]])
 
@@ -505,41 +550,34 @@ def best_estimator_and_part_plots(cls,meteo_plot,iso_plot,estimator_plot,partial
                         X_temp,
                         best_estimator_all,
                         estimator_plot,
-                        partial_dep_plot)
+                        partial_dep_plot)'''
         #except:
         #    print ("There is no meteo model in the class")
         #    pass
-    if iso_plot==True:
+    if st2==True:
 
         #try:
-        cls.iso18_bests
-        cls.iso2h_bests
-        cls.iso3h_bests
-        meteo_or_iso="iso"
-        zip_of_lists=zip(
-            [cls.iso18_bests_dic[0]["used_features"],cls.iso2h_bests_dic[0]["used_features"],cls.iso3h_bests_dic[0]["used_features"]],
-            ["iso_18","iso_2h","iso_3h"],
-            [cls.iso18_preds_real_dic[0]["Y_preds"],cls.iso2h_preds_real_dic[0]["Y_preds"],cls.iso3h_preds_real_dic[0]["Y_preds"]],
-            [cls.iso18_preds_real_dic[0]["Y_temp_fin"],cls.iso2h_preds_real_dic[0]["Y_temp_fin"],cls.iso3h_preds_real_dic[0]["Y_temp_fin"]],
-            [cls.iso18_bests[0][-1],cls.iso2h_bests[0][-1],cls.iso3h_bests[0][-1]], #didlog
-            [cls.iso18_preds_real_dic[0]["X_temp"],cls.iso2h_preds_real_dic[0]["X_temp"],cls.iso3h_preds_real_dic[0]["X_temp"]],
-            [cls.iso18_bests_dic[0]["best_estimator"],cls.iso2h_bests_dic[0]["best_estimator"],cls.iso3h_bests_dic[0]["best_estimator"]])
-            
-        for (used_features,model_type,Y_preds,Y_measured,didlog,X_temp,best_estimator_all) in zip_of_lists:
-            if None not in [used_features,didlog,best_estimator_all]:
-                best_estimator_and_partial_dep(    
-                    used_features,
-                    meteo_or_iso,
-                    1,
-                    model_type,
-                    cls.direc,
-                    Y_preds,
-                    Y_measured,
-                    didlog,
-                    X_temp,
-                    best_estimator_all,
-                    estimator_plot,
-                    partial_dep_plot)
-        #except:
-        #    print ("There is no iso model in the class")
-        #    pass
+        #cls.iso18_bests
+        #cls.iso2h_bests
+        #cls.iso3h_bests
+        st1_or_st2="st2"
+        res_dics=cls.st2_model_results_dic
+        st2_model_month_list_min_one=[n-1 for n in cls.st2_model_month_list]
+        for k,v in res_dics.items():
+            for monthnum in st2_model_month_list_min_one:
+                mon_dic=v["bests_dic"][0]
+                mon_dic_rea=v["preds_real_dic"][0]
+                if None not in [mon_dic["used_features"],mon_dic["didlog"],mon_dic["best_estimator"]]:
+                    best_estimator_and_partial_dep(    
+                            mon_dic["used_features"],
+                            st1_or_st2,
+                            monthnum+1,
+                            direc=cls.direc,
+                            Y_preds=mon_dic_rea["Y_preds"],
+                            Y_measured=mon_dic_rea["Y_temp_fin"],
+                            didlog=mon_dic["didlog"],
+                            X_temp=mon_dic_rea["X_temp"],
+                            best_estimator_all=mon_dic["best_estimator"],
+                            estimator_plot=estimator_plot,
+                            partial_dep_plot=partial_dep_plot,
+                            model_type=k)
