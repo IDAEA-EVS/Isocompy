@@ -1,0 +1,17 @@
+#skip commiting the compiled files
+*.gbl
+*.pyc
+*.ipynb
+*.JPEG
+*.xls
+*.xlsx
+*.JPG
+*.pdf
+*.rar
+*.zip
+*.csv
+*.pkl
+.vscode/
+__pycache__/
+.ipynb_checkpoints/
+*.code-workspace
