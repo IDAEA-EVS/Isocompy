@@ -11,9 +11,7 @@
 *.zip
 *.csv
 *.pkl
-*.vscode
-*__pycache__
-*.ipynb_checkpoints
+.vscode/
+__pycache__/
+.ipynb_checkpoints/
 *.code-workspace
-output
-inputs
