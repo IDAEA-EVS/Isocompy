@@ -100,19 +100,19 @@ There is a notebook that explains an example of implementing isocompy on spatial
 
 **cv** int or Boolean default="auto"
 
-    If cv="auto", the cross-validation number of folds will be calculated automatically. It is beneficial when there is few data available (max=10, min=2). If cv is an integer values,
-    it determines number of folds of the cross-validation.
+If cv="auto", the cross-validation number of folds will be calculated automatically. It is beneficial when there is few data available (max=10, min=2). If cv is an integer values,
+it determines number of folds of the cross-validation.
 
 #------------------
 #### **Methods:**
 
-\_\_init__ (self)
+* \_\_init__ (self)
 
-fit(self, inp_var, var_name, fields,direc,
+* fit(self, inp_var, var_name, fields,direc,
     remove_outliers=True, write_outliers_input=True, year_type="all", inc_zeros_inp_var=False, write_integrated_data=True,
     q1=0.05, q3=0.95, IQR_inp_var=True, IQR_rat_inp_var=3, mean_mode_inp_var="arithmetic", elnino=None, lanina=None)
 
-model_pars(self,kwargs)
+* model_pars(self,kwargs)
 
 #------------------
 #### **Attributes:**
