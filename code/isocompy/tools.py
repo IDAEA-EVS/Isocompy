@@ -72,12 +72,12 @@ class session(object):
     @staticmethod
     def load(direc):
         """
-            The method to load an object
+            The method to load a pkl object. `direc` is the directory of the object to be loaded.
 
             #------------------
             Returns:
 
-                obj object
+                obj pkl object
                     The loaded object
 
             #------------------
@@ -452,18 +452,16 @@ class plots(object):
                 b: float default=10
                     Intercept of the line
                 
-                month_data: boolean default=False
+                obs_data: boolean default=False
+
+                    False if iso_18 and iso_2h are not observed data.
                     True if the predictions in evaluation class have an specified date, in "month" field.
+
                     EXAMPLE:
                         pred_inputs=model_class.all_preds[["CooX","CooY","CooZ","month","ID"]].reset_index()
                         ev_class_obs=tools_copy.evaluation()
                         ev_class_obs.predict(model_class,pred_inputs,direc=direc)
-                        tools_copy.plots.isotopes_meteoline_plot(ev_class_obs,model_class,var_list=['is1','is2'],month_data=True)
-
-                
-                obs_data: boolean default=False
-                    False if iso_18 and iso_2h are not observed data
-
+                        tools_copy.plots.isotopes_meteoline_plot(ev_class_obs,model_class,var_list=['is1','is2'],obs_data=True)
                 
                 residplot: boolean default=False
                     Ignored if month_data=False. It create residual plots in each month for each ID.
@@ -507,8 +505,6 @@ class plots(object):
 
             if obs_data==True:
                 ax.scatter(iso_18[iso_18["month"]==k]["Value"],iso_2h[iso_2h["month"]==k]["Value"],marker="x",c="g",label="Original",s=18)
-            if month_data==True:
-                ###################
                 s = pd.concat([df.columns.to_series() for df in (i, all_preds)])
                 
                 # keep all duplicates only, then extract unique names
@@ -551,7 +547,7 @@ class plots(object):
             fig.savefig(os.path.join(ev_class.direc,"isotopes_meteoline_plots","Month_" + str(k)+"_plot.png"),dpi=300)
             plt.close(fig)
             #residuals plot
-            if residplot==True and month_data==True:
+            if residplot==True and obs_data==True:
                 resds_df=merged_all
                 resid_var0=str("residual_")+var_list[0]
                 resid_var1=str("residual_")+var_list[1]
@@ -634,7 +630,7 @@ class plots(object):
                 ).format(R2_Pred_Met,R2_Pred_NewMet,R2_Pred_obs)
 
 
-            if residplot==True and month_data==True:
+            if residplot==True and obs_data==True:
                 s = pd.concat([df.columns.to_series() for df in (vv,all_preds)])
                 # keep all duplicates only, then extract unique names
                 res = s[s.duplicated(keep=False)].unique()

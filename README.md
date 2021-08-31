@@ -305,8 +305,7 @@ prep_class.model_pars( "tunedpars_rfr" = brutesearch_ran_for_dic, "tunedpars_eln
 ---
 ---
 ---
-
-# class model( ):
+# class model ( ):
 
 The class to fit the regression models in stage one, predict the stage one results and fit stage two regresison models
 
@@ -330,7 +329,7 @@ The class to fit the regression models in stage one, predict the stage one resul
 ---
 ## **Attributes:**
 
-(__init__ method of model class)
+(\_\_init__ method of model class)
 
 
 **direc** str
@@ -420,7 +419,6 @@ A threshold to just consider models with scores higher than that value. if none,
 ---
 ---
 ---
-
 # model.st1_fit ( )
 
 model.st1_fit (`self,var_cls_list,direc,st1_model_month_list="all",args_dic= { "feature_selection" : "auto" , "vif_threshold" : 5, "vif_selection_pairs":[],"correlation_threshold":0.87,"vif_corr":True,"p_val":0.05}`)
@@ -639,105 +637,559 @@ if  args_dic[`"vif_selection_pairs"`] =[ [`"a","b"`] ], in case both `"a"` and `
 ---
 ## **Attributes:**
 
-                st2_model_results_dic dict
-                    A dictionary consist of st2 model results
+**st2_model_results_dic** dict
 
+A dictionary consist of st2 model results
 
-                #Attributes used in choose_estimator_by_meteo_line 
-                dependent_model_selection boolean
-                    To select the best model based on meteorological line. only useful if there is a linear refrence line (EX:Isotopes)
+---
+*Attributes used in choose_estimator_by_meteo_line* 
 
-                meteo_coef float 
-                    If dependent_model_selection=True,global_line, coefficient of the line
+**dependent_model_selection** boolean
 
-                meteo_intercept float
-                    If dependent_model_selection=True,global_line, intercept of the line
+To select the best model based on meteorological line. only useful if there is a linear refrence line (EX:Isotopes)
 
-                selection_method str
-                    If dependent_model_selection=True, selection_method: independent,local_line,global_line, point_to_point
+---
+**meteo_coef** float 
 
-                thresh_meteoline_high_scores None type or float
-                    A threshold to just consider models with scores higher than that value. if none, equal to mean of scores+std of scores/3
-                
-                model_selection_report boolean
-                    True or False, to determine if there is a need to model selection method report
+If dependent_model_selection=`True`, global_line, coefficient of the line
 
-            #------------------
-        """
+---
+**meteo_intercept** float
+
+If dependent_model_selection=`True`, global_line, intercept of the line
+
+---
+**selection_method** str
+
+If dependent_model_selection=`True`, selection_method: `"independent", "local_line", "global_line", "point_to_point"`
+
+---
+**thresh_meteoline_high_scores None type or float
+
+A threshold to just consider models with scores higher than that value. if `None`, equal to mean of scores+std of scores/3
+
+---
+**model_selection_report** boolean
+
+To determine if there is a need to model selection method report
 
 ---
 ---
 ---
-    def choose_estimator_by_meteo_line(self,dependent_model_selection_list,selection_method="point_to_point",model_selection_report=True,thresh_meteoline_high_scores=None,meteo_coef=8,meteo_intercept=10):
-        """
-            The method to select the best model based on a (meteorological) line. only useful if there is a linear refrence line (EX:Isotopes).
-            This method could be called automatically in st2_fit if dependent_model_selection=True. or it can be called after st2_fit execution
-            to see the changes in best regression models based on different criterias.
-            
-            IMPORTANT NOTE:  Executing this method will update the st2_model_results_dic to match the latest chosen selection_method. st2_model_results_dic stores the second stage results.
+# model.choose_estimator_by_meteo_line ( )
 
-            #------------------
-            Parameters:
-                
-                dependent_model_selection_list default=None
-                    Used if dependent_model_selection=True. List of two features that have to be used in dependent_model_selection
-                
-                meteo_coef default=8
-                    Used if dependent_model_selection=True and selection_method="global_line". Coefficient of the line
-                
-                meteo_intercept default=10
-                    Used if dependent_model_selection=True and selection_method="global_line". Intercept of the line
-                
-                selection_method default="point_to_point"
-                    Used if dependent_model_selection=True. Selection_method could be:
-                    independent
-                    local_line: coef and intercept derived from a linear regression of observed data
-                    global_line
-                    point_to_point: find the models pair with shortest average distance between observed and predicted data  
-                
-                thresh_meteoline_high_scores None type or float default=None
-                    A threshold to just consider models with scores higher than that value. if none, equal to mean of scores+std of scores/3
-                
-                model_selection_report boolean default =True
-                    True or False, to determine if there is a need to model selection method report
-            #------------------
-            Attributes:
 
-                st2_model_results_dic dict
-                    Updated dictionary of st2 model results
+model.choose_estimator_by_meteo_line( `self, dependent_model_selection_list, selection_method="point_to_point", model_selection_report=True, thresh_meteoline_high_scores=None, meteo_coef=8, meteo_intercept=10` ):
 
-                dependent_model_selection boolean
-                    To select the best model based on meteorological line. only useful if there is a linear refrence line (EX:Isotopes)
+The method to select the best model based on a (meteorological) line. only useful if there is a linear refrence line (EX:Isotopes).
+This method could be called automatically in st2_fit if dependent_model_selection=True. or it can be called after st2_fit execution
+to see the changes in best regression models based on different criterias.
 
-                meteo_coef float 
-                    If dependent_model_selection=True,global_line, coefficient of the line
+*IMPORTANT NOTE:*  Executing this method will update the st2_model_results_dic to match the latest chosen selection_method. st2_model_results_dic stores the second stage results.
 
-                meteo_intercept float
-                    If dependent_model_selection=True,global_line, intercept of the line
+---
+---
 
-                selection_method str
-                    If dependent_model_selection=True, selection_method: independent,local_line,global_line, point_to_point
+## Parameters:
 
-                thresh_meteoline_high_scores None type or float
-                    A threshold to just consider models with scores higher than that value. if none, equal to mean of scores+std of scores/3
-                
-                model_selection_report boolean
-                    True or False, to determine if there is a need to model selection method report
+**dependent_model_selection_list** default=`None`
 
-            #------------------
-        """
+Used if dependent_model_selection=True. List of two features that have to be used in dependent_model_selection
+
+---
+**meteo_coef** default=8
+
+Used if dependent_model_selection=`True` and selection_method=`"global_line"`. Coefficient of the line
+
+---
+**meteo_intercept** default=10
+
+Used if dependent_model_selection=`True` and selection_method=`"global_line"`. Intercept of the line
+
+---
+**selection_method** default=`"point_to_point"`
+
+Used if dependent_model_selection=`True`. Selection_method could be:
+
+* `"independent"`
+* `"local_line"`: coef and intercept derived from a linear regression of observed data
+* `"global_line"`
+* `"point_to_point"`: find the models pair with shortest average distance between observed and predicted data  
+
+---
+**thresh_meteoline_high_scores** None type or float default=None
+
+A threshold to just consider models with scores higher than that value. if none, equal to mean of scores+std of scores/3
+
+---
+**model_selection_report** boolean default =`True`
+
+`True` or `False`, to determine if there is a need to model selection method report
+
+---
+---
+## Attributes:
+
+**st2_model_results_dic** dict
+
+Updated dictionary of st2 model results
+
+---
+**dependent_model_selection** boolean
+
+To select the best model based on meteorological line. only useful if there is a linear refrence line (EX:Isotopes)
+
+---
+**meteo_coef** float 
+
+If dependent_model_selection=True,global_line, coefficient of the line
+
+---
+**meteo_intercept** float
+
+If dependent_model_selection=True,global_line, intercept of the line
+
+---
+**selection_method** str
+
+If dependent_model_selection=`True`, selection_method: `"independent","local_line","global_line", "point_to_point"`
+
+---
+**thresh_meteoline_high_scores** None type or float
+
+A threshold to just consider models with scores higher than that value. if none, equal to mean of scores+std of scores/3
+
+---
+**model_selection_report** boolean
+
+True or False, to determine if there is a need to model selection method report
 
 ---
 ---
 ---
-    def stage2_output_report(self,direc=None):
-        """
-            This method is useful to update st2_fit output files results in case they are changed.
-            (Normally the change can happen if choose_estimator_by_meteo_line method is executed)
-            #------------------
-            Parameters:
-                
-                direc str default=None
-                    Directory of the output 
-            #------------------
-        """
+# model.stage2_output_report ( )
+
+model.stage2_output_report(self,direc=None):
+
+This method is useful to update st2_fit output files results in case they are changed.
+(Normally the change can happen if choose_estimator_by_meteo_line method is executed)
+
+---
+---
+## Parameters:
+
+**direc** str default=`None`
+
+Directory of the output 
+
+---
+---
+---
+# class session ( ):
+
+The class to save and load the objects and sessions
+
+---
+---
+## **Methods:**
+
+* save()
+
+* load()
+
+* save_session()
+
+* load_session()
+
+---
+---
+---
+# session.save ( )
+
+session.save(self,name="isocompy_saved_object")
+
+The method to save an object
+
+---
+---
+## **Parameters:**
+
+**name** str default=`"isocompy_saved_object"`
+
+The output name string
+
+---
+---
+## **Returns:**
+
+**filename** string
+
+Directory of the saved object
+
+---
+---
+---
+# session.load ( )
+
+session.load(direc)
+
+The method to load a pkl object. `direc` is the directory of the object to be loaded.
+
+---
+---
+## **Returns:**
+
+**obj** object
+
+The loaded object
+
+---
+---
+---
+# session.save_session( )
+
+save_session(direc,name="isocompy_saved_session", *argv):
+
+The method to save a session
+
+---
+---
+## **Parameters:**
+
+name: str default="isocompy_saved_object"
+
+The output name string
+
+---
+**\*argv**
+
+The objects that wanted to be stored in the session
+
+---
+---
+## **Returns:**
+
+**filename** string 
+
+Directory of the saved session
+
+---
+---
+---
+# session.load_session ( )
+
+session.load_session(dir)
+
+The method to load a session
+
+---
+---
+## **Parameters:**
+
+**\*argv**
+
+The objects that wanted to be stored in the session
+
+---
+---
+## **Returns:**
+
+Loads the session
+
+---
+---
+---
+# class evaluation ( )
+
+The class to predict the second stage regression models
+
+---
+---
+
+## **Methods:**
+
+* \_\_init__ (self)  
+
+* predict ( )
+
+---
+---
+## **Attributes:**
+
+**direc** str
+
+directory of the class
+
+---
+**monthly_st2_output_list_all_vars** list
+
+list of stage two models outputs, seperated by month
+
+---
+**monthly_st2_output_dic_all_vars_df** dict
+
+dictionary of stage two models outputs, seperated by month. key is the month, and value is the output df of that specific month
+
+---
+**pred_inputs** Pandas Dataframe
+
+A Dataframe, that have to be contain of features that is used in stage one, that is going to be used to estimate the stage one and two models
+
+---
+**st2_predicted_month_list** list
+
+List of the months that have stage two regression models
+
+---
+---
+---
+# evaluation.predict( )
+
+evaluation.predict(`self, cls, pred_inputs, stage2_vars_to_predict=None, direc=None, write_to_file=True` )
+
+The method to predict the second stage regression models
+
+---
+---
+## **Parameters:**
+
+**cls ** model class
+
+The model class that contains st1 and st2 models
+
+---
+**pred_inputs ** Pandas dataframe
+
+A Dataframe, that have to be contain of features that is used in stage one, that is going to be used to estimate the stage one and two models.
+
+It can contain `"month"` field which could be used in evaluating the stage two predictions in observed data.
+
+* *EXAMPLE:*
+    ```python
+
+    pred_inputs=model_class.all_preds[["CooX","CooY","CooZ","month","ID"]].reset_index()
+
+    ```
+
+---
+**stage2_vars_to_predict ** None type or list of strs default=`None`
+
+List of stage two dependent features to predict the outputs. If `None`, The results will be predicted for all two dependent features
+
+---
+**direc ** None type or str default=None
+
+Directory of the class. If `None`, it is the same directory as the model class.
+
+---
+**write_to_file ** boolean default=`True`
+
+To write the outputs in .xls files, seperated by the month
+
+---
+---
+## **Attributes:**
+
+**direc** str
+
+directory of the class
+
+---
+**monthly_st2_output_list_all_vars** list
+
+list of stage two models outputs, seperated by month
+
+---
+**monthly_st2_output_dic_all_vars_df** dict
+
+dictionary of stage two models outputs, seperated by month. key is the month, and value is the output df of that specific month
+
+---
+**pred_inputs** Pandas Dataframe
+
+A Dataframe, that have to be contain of features that is used in stage one, that is going to be used to estimate the stage one and two models
+
+---
+**st2_predicted_month_list** list
+
+List of the months that have stage two regression models
+
+---
+---
+---
+# class stats( )   
+
+The class to calculate and generate statistical reports for the second stage models
+
+---
+---
+
+## **Methods:**
+
+* annual_stats( )
+
+* mensual_stats( )
+
+---
+---
+---
+
+# stats.seasonal_stats( )
+
+stats.seasonal_stats(model_cls_obj)
+
+The method to generate statistical reports for the second stage models based on  all specified month in second stage data
+
+---
+---
+## Parameters:
+
+**model_cls_obj**
+
+Input model class object
+
+---
+---
+---
+# stats.mensual_stats()
+
+stats.mensual_stats(model_cls_obj)
+
+The method to generate statistical reports for the second stage models based on  each specified month in second stage data
+
+---
+---
+## Parameters:
+
+**model_cls_obj**
+
+Input model class object
+
+---
+---
+---
+# class plots ( )
+
+The method to generate the model class plots
+
+---
+---
+## Methods:
+
+* best_estimator_plots ( )
+
+* partial_dep_plots ( )
+
+* isotopes_meteoline_plot ( )
+
+---
+---
+---
+# plots.best_estimator_plots()
+
+plots.best_estimator_plots( `cls, st1=True, st2=True` )
+
+The method to plot the model class best estimators 
+
+---
+---
+## **Parameters:**
+
+**st1** boolean default=`True`
+
+Generate plots for stage one regression models of the model class
+
+
+**st2** boolean default=`True`
+
+Generate plots for stage one regression models of the model class
+
+---
+---
+---
+# plots.partial_dep_plots( )
+
+plots. partial_dep_plots(`cls,st1=True,st2=True`)
+
+The method to plot the partial dependency of the features of the model class
+
+---
+---
+## **Parameters:**
+
+**st1** boolean default=`True`
+
+Generate plots for stage one regression models of the model class
+
+
+**st2** boolean default=`True`
+
+Generate plots for stage two regression models of the model class
+
+---
+---
+---
+# plots.isotopes_meteoline_plot ( )
+
+plots.isotopes_meteoline_plot( `ev_class, iso_class, var_list, iso_18=None, iso_2h=None, a=8, b=10, obs_data=False, residplot=False` )
+
+The method to plot the (meteorological) line between  two features (isotopes) that are determined in var_list
+
+---
+---
+## **Parameters:**
+
+**ev_class** evaluation class
+
+evaluation class that contains the second stage models predictions
+
+---
+**iso_class** model class
+
+model class that contains the second stage models
+
+---
+**iso_18** none type or Pandas Dataframe default=`None`
+
+First feature (isotope) observed raw data. Ignored if obs_data=`False`
+
+---
+**iso_2h** none type or Pandas Dataframe default=`None`
+
+Second feature (isotope) observed raw data. Ignored if obs_data=`False`
+
+---
+**var_list** list of strings
+
+List of strings that identifies the names of two features in the evaluation and model class (in stage two)
+
+---
+**a** float default=`8`
+
+Coefficient of the line
+
+---
+**b** float default=`10`
+
+Intercept of the line
+
+---
+**obs_data** boolean default=`False`
+
+`False` if iso_18 and iso_2h are not observed data.
+`True` if the predictions in evaluation class have an specified date, in `"month"` field.
+
+* *EXAMPLE:*
+
+    ```python
+    pred_inputs=model_class.all_preds[["CooX","CooY","CooZ","month","ID"]].reset_index()
+    ev_class_obs=tools_copy.evaluation()
+    ev_class_obs.predict(model_class,pred_inputs,direc=direc)
+    tools_copy.plots.isotopes_meteoline_plot(ev_class_obs,model_class,var_list=['is1','is2'],obs_data=True)
+    ```
+---
+**residplot** boolean default=`False`
+
+Ignored if obs_data=`False`. It create residual plots in each month for each ID.
+
+#------------------
