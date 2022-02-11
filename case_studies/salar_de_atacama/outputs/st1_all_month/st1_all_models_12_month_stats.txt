@@ -1,0 +1,2116 @@
+prc
+month1
+
+model
+lr
+
+LinearRegression()
+best params
+{}
+
+R^2:
+0.7741668675345272
+
+#########################
+
+
+
+model
+rfr
+
+RandomForestRegressor(criterion='mae', min_weight_fraction_leaf=0,
+                      n_estimators=150, random_state=0)
+best params
+{'criterion': 'mae', 'min_samples_split': 2, 'min_weight_fraction_leaf': 0, 'n_estimators': 150}
+
+R^2:
+0.9676285291808513
+
+#########################
+
+
+
+model
+mlp
+
+MLPRegressor(activation='logistic', hidden_layer_sizes=(100, 100),
+             learning_rate='adaptive', max_iter=1000, random_state=0,
+             solver='lbfgs')
+best params
+{'activation': 'logistic', 'alpha': 0.0001, 'hidden_layer_sizes': (100, 100), 'max_iter': 1000, 'n_iter_no_change': 10, 'solver': 'lbfgs'}
+
+R^2:
+0.7760298262361618
+
+#########################
+
+
+
+model
+elnet
+
+ElasticNet(l1_ratio=0.1)
+best params
+{'l1_ratio': 0.1}
+
+R^2:
+0.0
+
+#########################
+
+
+
+model
+omp
+
+OrthogonalMatchingPursuit()
+best params
+{}
+
+R^2:
+0.7739548847127214
+
+#########################
+
+
+
+model
+br
+
+BayesianRidge()
+best params
+{}
+
+R^2:
+0.7738256555658679
+
+#########################
+
+
+
+model
+ard
+
+ARDRegression()
+best params
+{}
+
+R^2:
+0.7738815280339284
+
+#########################
+
+
+
+model
+svr
+
+SVR(C=10.0, cache_size=10000, gamma=0.1, kernel='sigmoid')
+best params
+{'C': 10.0, 'cache_size': 10000, 'gamma': 0.1, 'kernel': 'sigmoid'}
+
+R^2:
+0.7340474274564094
+
+#########################
+
+
+
+model
+log_lr
+
+LinearRegression()
+best params
+{}
+
+R^2:
+0.7826130596112539
+
+#########################
+
+
+
+model
+log_rfr
+
+RandomForestRegressor(min_weight_fraction_leaf=0, n_estimators=250,
+                      random_state=0)
+best params
+{'criterion': 'mse', 'min_samples_split': 2, 'min_weight_fraction_leaf': 0, 'n_estimators': 250}
+
+R^2:
+0.9735761993712814
+
+#########################
+
+
+
+model
+log_mlp
+
+MLPRegressor(activation='logistic', hidden_layer_sizes=(100, 100),
+             learning_rate='adaptive', max_iter=1000, random_state=0,
+             solver='lbfgs')
+best params
+{'activation': 'logistic', 'alpha': 0.0001, 'hidden_layer_sizes': (100, 100), 'max_iter': 1000, 'n_iter_no_change': 10, 'solver': 'lbfgs'}
+
+R^2:
+0.7826868437113587
+
+#########################
+
+
+
+model
+log_elnet
+
+ElasticNet(l1_ratio=0.1)
+best params
+{'l1_ratio': 0.1}
+
+R^2:
+0.0
+
+#########################
+
+
+
+model
+log_omp
+
+OrthogonalMatchingPursuit()
+best params
+{}
+
+R^2:
+0.7823147212726078
+
+#########################
+
+
+
+model
+log_br
+
+BayesianRidge()
+best params
+{}
+
+R^2:
+0.7823178501685244
+
+#########################
+
+
+
+model
+log_ard
+
+ARDRegression()
+best params
+{}
+
+R^2:
+0.7822474130621924
+
+#########################
+
+
+
+model
+log_svr
+
+SVR(C=10.0, cache_size=10000, gamma=0.1)
+best params
+{'C': 10.0, 'cache_size': 10000, 'gamma': 0.1, 'kernel': 'rbf'}
+
+R^2:
+0.7453221530322159
+
+#########################
+
+prc
+month2
+
+model
+lr
+
+LinearRegression()
+best params
+{}
+
+R^2:
+0.7366525176285736
+
+#########################
+
+
+
+model
+rfr
+
+RandomForestRegressor(criterion='mae', min_samples_split=5,
+                      min_weight_fraction_leaf=0, n_estimators=300,
+                      random_state=0)
+best params
+{'criterion': 'mae', 'min_samples_split': 5, 'min_weight_fraction_leaf': 0, 'n_estimators': 300}
+
+R^2:
+0.9009622184038641
+
+#########################
+
+
+
+model
+mlp
+
+MLPRegressor(activation='tanh', alpha=0.0003,
+             hidden_layer_sizes=(100, 100, 100, 100), learning_rate='adaptive',
+             max_iter=1000, random_state=0)
+best params
+{'activation': 'tanh', 'alpha': 0.0003, 'hidden_layer_sizes': (100, 100, 100, 100), 'max_iter': 1000, 'n_iter_no_change': 10, 'solver': 'adam'}
+
+R^2:
+0.7412315203968982
+
+#########################
+
+
+
+model
+elnet
+
+ElasticNet(l1_ratio=0.1)
+best params
+{'l1_ratio': 0.1}
+
+R^2:
+0.0
+
+#########################
+
+
+
+model
+omp
+
+OrthogonalMatchingPursuit()
+best params
+{}
+
+R^2:
+0.643584134184891
+
+#########################
+
+
+
+model
+br
+
+BayesianRidge()
+best params
+{}
+
+R^2:
+0.7355992794447912
+
+#########################
+
+
+
+model
+ard
+
+ARDRegression()
+best params
+{}
+
+R^2:
+0.733287975107697
+
+#########################
+
+
+
+model
+svr
+
+SVR(C=10.0, cache_size=10000, gamma=0.1, kernel='sigmoid')
+best params
+{'C': 10.0, 'cache_size': 10000, 'gamma': 0.1, 'kernel': 'sigmoid'}
+
+R^2:
+0.7283842342679152
+
+#########################
+
+
+
+model
+log_lr
+
+LinearRegression()
+best params
+{}
+
+R^2:
+0.7398786061518311
+
+#########################
+
+
+
+model
+log_rfr
+
+RandomForestRegressor(criterion='mae', min_weight_fraction_leaf=0,
+                      n_estimators=300, random_state=0)
+best params
+{'criterion': 'mae', 'min_samples_split': 2, 'min_weight_fraction_leaf': 0, 'n_estimators': 300}
+
+R^2:
+0.9566196400690786
+
+#########################
+
+
+
+model
+log_mlp
+
+MLPRegressor(activation='tanh', alpha=0.0003, hidden_layer_sizes=(50, 50),
+             learning_rate='adaptive', max_iter=1000, random_state=0)
+best params
+{'activation': 'tanh', 'alpha': 0.0003, 'hidden_layer_sizes': (50, 50), 'max_iter': 1000, 'n_iter_no_change': 10, 'solver': 'adam'}
+
+R^2:
+0.736072867815847
+
+#########################
+
+
+
+model
+log_elnet
+
+ElasticNet(l1_ratio=0.1)
+best params
+{'l1_ratio': 0.1}
+
+R^2:
+0.0
+
+#########################
+
+
+
+model
+log_omp
+
+OrthogonalMatchingPursuit()
+best params
+{}
+
+R^2:
+0.6310528718017325
+
+#########################
+
+
+
+model
+log_br
+
+BayesianRidge()
+best params
+{}
+
+R^2:
+0.7388915690244182
+
+#########################
+
+
+
+model
+log_ard
+
+ARDRegression()
+best params
+{}
+
+R^2:
+0.7369121130899656
+
+#########################
+
+
+
+model
+log_svr
+
+SVR(C=10.0, cache_size=10000, gamma=0.1)
+best params
+{'C': 10.0, 'cache_size': 10000, 'gamma': 0.1, 'kernel': 'rbf'}
+
+R^2:
+0.7404726269155377
+
+#########################
+
+prc
+month3
+
+model
+lr
+
+LinearRegression()
+best params
+{}
+
+R^2:
+0.6759523760138928
+
+#########################
+
+
+
+model
+rfr
+
+RandomForestRegressor(criterion='mae', min_weight_fraction_leaf=0,
+                      n_estimators=200, random_state=0)
+best params
+{'criterion': 'mae', 'min_samples_split': 2, 'min_weight_fraction_leaf': 0, 'n_estimators': 200}
+
+R^2:
+0.9362570530473712
+
+#########################
+
+
+
+model
+mlp
+
+MLPRegressor(activation='tanh', alpha=0.0003,
+             hidden_layer_sizes=(100, 100, 100, 100), learning_rate='adaptive',
+             max_iter=1000, random_state=0, solver='sgd')
+best params
+{'activation': 'tanh', 'alpha': 0.0003, 'hidden_layer_sizes': (100, 100, 100, 100), 'max_iter': 1000, 'n_iter_no_change': 10, 'solver': 'sgd'}
+
+R^2:
+0.5578271455163457
+
+#########################
+
+
+
+model
+elnet
+
+ElasticNet(l1_ratio=0.1)
+best params
+{'l1_ratio': 0.1}
+
+R^2:
+0.0
+
+#########################
+
+
+
+model
+omp
+
+OrthogonalMatchingPursuit()
+best params
+{}
+
+R^2:
+0.5506631741738852
+
+#########################
+
+
+
+model
+br
+
+BayesianRidge()
+best params
+{}
+
+R^2:
+0.6752370180602657
+
+#########################
+
+
+
+model
+ard
+
+ARDRegression()
+best params
+{}
+
+R^2:
+0.6749952990639905
+
+#########################
+
+
+
+model
+svr
+
+SVR(C=0.1, cache_size=10000, gamma=10.0, kernel='poly')
+best params
+{'C': 0.1, 'cache_size': 10000, 'gamma': 10.0, 'kernel': 'poly'}
+
+R^2:
+0.7692289824780354
+
+#########################
+
+
+
+model
+log_lr
+
+LinearRegression()
+best params
+{}
+
+R^2:
+0.6533445784534133
+
+#########################
+
+
+
+model
+log_rfr
+
+RandomForestRegressor(criterion='mae', min_weight_fraction_leaf=0,
+                      n_estimators=200, random_state=0)
+best params
+{'criterion': 'mae', 'min_samples_split': 2, 'min_weight_fraction_leaf': 0, 'n_estimators': 200}
+
+R^2:
+0.9335491284683735
+
+#########################
+
+
+
+model
+log_mlp
+
+MLPRegressor(activation='logistic', alpha=0.0003, hidden_layer_sizes=(100, 100),
+             learning_rate='adaptive', max_iter=1000, random_state=0,
+             solver='lbfgs')
+best params
+{'activation': 'logistic', 'alpha': 0.0003, 'hidden_layer_sizes': (100, 100), 'max_iter': 1000, 'n_iter_no_change': 10, 'solver': 'lbfgs'}
+
+R^2:
+0.6513886860296267
+
+#########################
+
+
+
+model
+log_elnet
+
+ElasticNet(l1_ratio=0.1)
+best params
+{'l1_ratio': 0.1}
+
+R^2:
+0.0
+
+#########################
+
+
+
+model
+log_omp
+
+OrthogonalMatchingPursuit()
+best params
+{}
+
+R^2:
+0.5484891756354943
+
+#########################
+
+
+
+model
+log_br
+
+BayesianRidge()
+best params
+{}
+
+R^2:
+0.6524761226536666
+
+#########################
+
+
+
+model
+log_ard
+
+ARDRegression()
+best params
+{}
+
+R^2:
+0.6519924214409819
+
+#########################
+
+
+
+model
+log_svr
+
+SVR(cache_size=10000, gamma=10.0, kernel='poly')
+best params
+{'C': 1.0, 'cache_size': 10000, 'gamma': 10.0, 'kernel': 'poly'}
+
+R^2:
+0.6873258617794779
+
+#########################
+
+prc
+month4prc
+month5prc
+month6prc
+month7prc
+month8prc
+month9prc
+month10prc
+month11prc
+month12
+
+#########################
+#########################
+
+tmp
+month1
+
+model
+lr
+
+LinearRegression()
+best params
+{}
+
+R^2:
+0.955234330188224
+
+#########################
+
+
+
+model
+rfr
+
+RandomForestRegressor(criterion='mae', min_weight_fraction_leaf=0,
+                      random_state=0)
+best params
+{'criterion': 'mae', 'min_samples_split': 2, 'min_weight_fraction_leaf': 0, 'n_estimators': 100}
+
+R^2:
+0.9762313847068684
+
+#########################
+
+
+
+model
+mlp
+
+MLPRegressor(activation='tanh', hidden_layer_sizes=(100, 100, 100, 100),
+             learning_rate='adaptive', max_iter=1000, random_state=0)
+best params
+{'activation': 'tanh', 'alpha': 0.0001, 'hidden_layer_sizes': (100, 100, 100, 100), 'max_iter': 1000, 'n_iter_no_change': 10, 'solver': 'adam'}
+
+R^2:
+0.9527670185990446
+
+#########################
+
+
+
+model
+elnet
+
+ElasticNet(l1_ratio=0.1)
+best params
+{'l1_ratio': 0.1}
+
+R^2:
+0.0
+
+#########################
+
+
+
+model
+omp
+
+OrthogonalMatchingPursuit()
+best params
+{}
+
+R^2:
+0.9442152585604783
+
+#########################
+
+
+
+model
+br
+
+BayesianRidge()
+best params
+{}
+
+R^2:
+0.9552128426157411
+
+#########################
+
+
+
+model
+ard
+
+ARDRegression()
+best params
+{}
+
+R^2:
+0.9549123842073823
+
+#########################
+
+
+
+model
+svr
+
+SVR(C=10.0, cache_size=10000, gamma=0.1)
+best params
+{'C': 10.0, 'cache_size': 10000, 'gamma': 0.1, 'kernel': 'rbf'}
+
+R^2:
+0.9537687547163946
+
+#########################
+
+
+
+model
+log_lr
+
+LinearRegression()
+best params
+{}
+
+R^2:
+0.9357053759196235
+
+#########################
+
+
+
+model
+log_rfr
+
+RandomForestRegressor(criterion='mae', min_weight_fraction_leaf=0,
+                      random_state=0)
+best params
+{'criterion': 'mae', 'min_samples_split': 2, 'min_weight_fraction_leaf': 0, 'n_estimators': 100}
+
+R^2:
+0.9718421917699249
+
+#########################
+
+
+
+model
+log_mlp
+
+MLPRegressor(activation='tanh', hidden_layer_sizes=(100, 100, 100),
+             learning_rate='adaptive', max_iter=1000, random_state=0)
+best params
+{'activation': 'tanh', 'alpha': 0.0001, 'hidden_layer_sizes': (100, 100, 100), 'max_iter': 1000, 'n_iter_no_change': 10, 'solver': 'adam'}
+
+R^2:
+0.9249855587640847
+
+#########################
+
+
+
+model
+log_elnet
+
+ElasticNet(l1_ratio=0.1)
+best params
+{'l1_ratio': 0.1}
+
+R^2:
+0.0
+
+#########################
+
+
+
+model
+log_omp
+
+OrthogonalMatchingPursuit()
+best params
+{}
+
+R^2:
+0.930583120957734
+
+#########################
+
+
+
+model
+log_br
+
+BayesianRidge()
+best params
+{}
+
+R^2:
+0.9356658075660672
+
+#########################
+
+
+
+model
+log_ard
+
+ARDRegression()
+best params
+{}
+
+R^2:
+0.9343419227106738
+
+#########################
+
+
+
+model
+log_svr
+
+SVR(C=10.0, cache_size=10000, gamma=0.1)
+best params
+{'C': 10.0, 'cache_size': 10000, 'gamma': 0.1, 'kernel': 'rbf'}
+
+R^2:
+0.9065085761926939
+
+#########################
+
+tmp
+month2
+
+model
+lr
+
+LinearRegression()
+best params
+{}
+
+R^2:
+0.9669865577240541
+
+#########################
+
+
+
+model
+rfr
+
+RandomForestRegressor(criterion='mae', min_weight_fraction_leaf=0,
+                      random_state=0)
+best params
+{'criterion': 'mae', 'min_samples_split': 2, 'min_weight_fraction_leaf': 0, 'n_estimators': 100}
+
+R^2:
+0.9843682641484595
+
+#########################
+
+
+
+model
+mlp
+
+MLPRegressor(activation='tanh', hidden_layer_sizes=(100, 100, 100, 100),
+             learning_rate='adaptive', max_iter=1000, random_state=0)
+best params
+{'activation': 'tanh', 'alpha': 0.0001, 'hidden_layer_sizes': (100, 100, 100, 100), 'max_iter': 1000, 'n_iter_no_change': 10, 'solver': 'adam'}
+
+R^2:
+0.7845347338613451
+
+#########################
+
+
+
+model
+elnet
+
+ElasticNet(l1_ratio=0.1)
+best params
+{'l1_ratio': 0.1}
+
+R^2:
+0.0
+
+#########################
+
+
+
+model
+omp
+
+OrthogonalMatchingPursuit()
+best params
+{}
+
+R^2:
+0.9662158188121752
+
+#########################
+
+
+
+model
+br
+
+BayesianRidge()
+best params
+{}
+
+R^2:
+0.966975827154572
+
+#########################
+
+
+
+model
+ard
+
+ARDRegression()
+best params
+{}
+
+R^2:
+0.9662141983207753
+
+#########################
+
+
+
+model
+svr
+
+SVR(C=10.0, cache_size=10000, gamma=0.1)
+best params
+{'C': 10.0, 'cache_size': 10000, 'gamma': 0.1, 'kernel': 'rbf'}
+
+R^2:
+0.9500651288986087
+
+#########################
+
+
+
+model
+log_lr
+
+LinearRegression()
+best params
+{}
+
+R^2:
+0.9560903577289498
+
+#########################
+
+
+
+model
+log_rfr
+
+RandomForestRegressor(criterion='mae', min_weight_fraction_leaf=0,
+                      random_state=0)
+best params
+{'criterion': 'mae', 'min_samples_split': 2, 'min_weight_fraction_leaf': 0, 'n_estimators': 100}
+
+R^2:
+0.9828443734955346
+
+#########################
+
+
+
+model
+log_mlp
+
+MLPRegressor(activation='tanh', alpha=0.0003,
+             hidden_layer_sizes=(100, 100, 100), learning_rate='adaptive',
+             max_iter=1000, random_state=0)
+best params
+{'activation': 'tanh', 'alpha': 0.0003, 'hidden_layer_sizes': (100, 100, 100), 'max_iter': 1000, 'n_iter_no_change': 10, 'solver': 'adam'}
+
+R^2:
+0.9486606069497897
+
+#########################
+
+
+
+model
+log_elnet
+
+ElasticNet(l1_ratio=0.1)
+best params
+{'l1_ratio': 0.1}
+
+R^2:
+0.0
+
+#########################
+
+
+
+model
+log_omp
+
+OrthogonalMatchingPursuit()
+best params
+{}
+
+R^2:
+0.9560820197594172
+
+#########################
+
+
+
+model
+log_br
+
+BayesianRidge()
+best params
+{}
+
+R^2:
+0.9560739882781155
+
+#########################
+
+
+
+model
+log_ard
+
+ARDRegression()
+best params
+{}
+
+R^2:
+0.9560792521117338
+
+#########################
+
+
+
+model
+log_svr
+
+SVR(C=10.0, cache_size=10000, gamma=0.1)
+best params
+{'C': 10.0, 'cache_size': 10000, 'gamma': 0.1, 'kernel': 'rbf'}
+
+R^2:
+0.9300840225723863
+
+#########################
+
+tmp
+month3
+
+model
+lr
+
+LinearRegression()
+best params
+{}
+
+R^2:
+0.9540096283581271
+
+#########################
+
+
+
+model
+rfr
+
+RandomForestRegressor(criterion='mae', min_weight_fraction_leaf=0,
+                      n_estimators=150, random_state=0)
+best params
+{'criterion': 'mae', 'min_samples_split': 2, 'min_weight_fraction_leaf': 0, 'n_estimators': 150}
+
+R^2:
+0.9853801992016532
+
+#########################
+
+
+
+model
+mlp
+
+MLPRegressor(activation='tanh', alpha=0.0003,
+             hidden_layer_sizes=(100, 100, 100), learning_rate='adaptive',
+             max_iter=1000, random_state=0, solver='lbfgs')
+best params
+{'activation': 'tanh', 'alpha': 0.0003, 'hidden_layer_sizes': (100, 100, 100), 'max_iter': 1000, 'n_iter_no_change': 10, 'solver': 'lbfgs'}
+
+R^2:
+0.9649688053385317
+
+#########################
+
+
+
+model
+elnet
+
+ElasticNet(l1_ratio=0.1)
+best params
+{'l1_ratio': 0.1}
+
+R^2:
+0.0
+
+#########################
+
+
+
+model
+omp
+
+OrthogonalMatchingPursuit()
+best params
+{}
+
+R^2:
+0.9465208213605181
+
+#########################
+
+
+
+model
+br
+
+BayesianRidge()
+best params
+{}
+
+R^2:
+0.9539582969370948
+
+#########################
+
+
+
+model
+ard
+
+ARDRegression()
+best params
+{}
+
+R^2:
+0.9524761637279195
+
+#########################
+
+
+
+model
+svr
+
+SVR(C=10.0, cache_size=10000, gamma=0.1)
+best params
+{'C': 10.0, 'cache_size': 10000, 'gamma': 0.1, 'kernel': 'rbf'}
+
+R^2:
+0.9354526977945335
+
+#########################
+
+
+
+model
+log_lr
+
+LinearRegression()
+best params
+{}
+
+R^2:
+0.9333299472710872
+
+#########################
+
+
+
+model
+log_rfr
+
+RandomForestRegressor(criterion='mae', min_weight_fraction_leaf=0,
+                      n_estimators=150, random_state=0)
+best params
+{'criterion': 'mae', 'min_samples_split': 2, 'min_weight_fraction_leaf': 0, 'n_estimators': 150}
+
+R^2:
+0.984040031351398
+
+#########################
+
+
+
+model
+log_mlp
+
+MLPRegressor(activation='tanh', hidden_layer_sizes=(50, 50, 50, 50),
+             learning_rate='adaptive', max_iter=1000, random_state=0,
+             solver='lbfgs')
+best params
+{'activation': 'tanh', 'alpha': 0.0001, 'hidden_layer_sizes': (50, 50, 50, 50), 'max_iter': 1000, 'n_iter_no_change': 10, 'solver': 'lbfgs'}
+
+R^2:
+0.971453795959226
+
+#########################
+
+
+
+model
+log_elnet
+
+ElasticNet(l1_ratio=0.1)
+best params
+{'l1_ratio': 0.1}
+
+R^2:
+0.0
+
+#########################
+
+
+
+model
+log_omp
+
+OrthogonalMatchingPursuit()
+best params
+{}
+
+R^2:
+0.92568397353205
+
+#########################
+
+
+
+model
+log_br
+
+BayesianRidge()
+best params
+{}
+
+R^2:
+0.9332370123850439
+
+#########################
+
+
+
+model
+log_ard
+
+ARDRegression()
+best params
+{}
+
+R^2:
+0.9324258119998038
+
+#########################
+
+
+
+model
+log_svr
+
+SVR(C=10.0, cache_size=10000, gamma=0.1)
+best params
+{'C': 10.0, 'cache_size': 10000, 'gamma': 0.1, 'kernel': 'rbf'}
+
+R^2:
+0.9080235898718749
+
+#########################
+
+tmp
+month4tmp
+month5tmp
+month6tmp
+month7tmp
+month8tmp
+month9tmp
+month10tmp
+month11tmp
+month12
+
+#########################
+#########################
+
+hmd
+month1
+
+model
+lr
+
+LinearRegression()
+best params
+{}
+
+R^2:
+0.6810029488915217
+
+#########################
+
+
+
+model
+rfr
+
+RandomForestRegressor(min_samples_split=5, min_weight_fraction_leaf=0,
+                      n_estimators=50, random_state=0)
+best params
+{'criterion': 'mse', 'min_samples_split': 5, 'min_weight_fraction_leaf': 0, 'n_estimators': 50}
+
+R^2:
+0.860883359460124
+
+#########################
+
+
+
+model
+mlp
+
+MLPRegressor(activation='tanh', alpha=0.0003, hidden_layer_sizes=(50, 50),
+             learning_rate='adaptive', max_iter=1000, random_state=0)
+best params
+{'activation': 'tanh', 'alpha': 0.0003, 'hidden_layer_sizes': (50, 50), 'max_iter': 1000, 'n_iter_no_change': 10, 'solver': 'adam'}
+
+R^2:
+0.6480810237392038
+
+#########################
+
+
+
+model
+elnet
+
+ElasticNet(l1_ratio=0.1)
+best params
+{'l1_ratio': 0.1}
+
+R^2:
+0.0
+
+#########################
+
+
+
+model
+omp
+
+OrthogonalMatchingPursuit()
+best params
+{}
+
+R^2:
+0.6107361959016128
+
+#########################
+
+
+
+model
+br
+
+BayesianRidge()
+best params
+{}
+
+R^2:
+0.679398989690291
+
+#########################
+
+
+
+model
+ard
+
+ARDRegression()
+best params
+{}
+
+R^2:
+0.6799631926842583
+
+#########################
+
+
+
+model
+svr
+
+SVR(C=10.0, cache_size=10000, gamma=0.1, kernel='sigmoid')
+best params
+{'C': 10.0, 'cache_size': 10000, 'gamma': 0.1, 'kernel': 'sigmoid'}
+
+R^2:
+0.6728969783672165
+
+#########################
+
+
+
+model
+log_lr
+
+LinearRegression()
+best params
+{}
+
+R^2:
+0.6838865594660553
+
+#########################
+
+
+
+model
+log_rfr
+
+RandomForestRegressor(criterion='mae', min_samples_split=5,
+                      min_weight_fraction_leaf=0, n_estimators=50,
+                      random_state=0)
+best params
+{'criterion': 'mae', 'min_samples_split': 5, 'min_weight_fraction_leaf': 0, 'n_estimators': 50}
+
+R^2:
+0.8710871554930937
+
+#########################
+
+
+
+model
+log_mlp
+
+MLPRegressor(activation='tanh', alpha=0.0003, hidden_layer_sizes=(100, 100),
+             learning_rate='adaptive', max_iter=1000, random_state=0)
+best params
+{'activation': 'tanh', 'alpha': 0.0003, 'hidden_layer_sizes': (100, 100), 'max_iter': 1000, 'n_iter_no_change': 10, 'solver': 'adam'}
+
+R^2:
+0.5946478866872986
+
+#########################
+
+
+
+model
+log_elnet
+
+ElasticNet(l1_ratio=0.1)
+best params
+{'l1_ratio': 0.1}
+
+R^2:
+0.0
+
+#########################
+
+
+
+model
+log_omp
+
+OrthogonalMatchingPursuit()
+best params
+{}
+
+R^2:
+0.6154236579734749
+
+#########################
+
+
+
+model
+log_br
+
+BayesianRidge()
+best params
+{}
+
+R^2:
+0.681810964513023
+
+#########################
+
+
+
+model
+log_ard
+
+ARDRegression()
+best params
+{}
+
+R^2:
+0.6826986145568048
+
+#########################
+
+
+
+model
+log_svr
+
+SVR(C=10.0, cache_size=10000, gamma=0.1, kernel='sigmoid')
+best params
+{'C': 10.0, 'cache_size': 10000, 'gamma': 0.1, 'kernel': 'sigmoid'}
+
+R^2:
+0.6521017194444464
+
+#########################
+
+hmd
+month2
+
+model
+lr
+
+LinearRegression()
+best params
+{}
+
+R^2:
+0.31434249820584936
+
+#########################
+
+
+
+model
+rfr
+
+RandomForestRegressor(min_weight_fraction_leaf=0, n_estimators=150,
+                      random_state=0)
+best params
+{'criterion': 'mse', 'min_samples_split': 2, 'min_weight_fraction_leaf': 0, 'n_estimators': 150}
+
+R^2:
+0.8413031501304178
+
+#########################
+
+
+
+model
+mlp
+
+MLPRegressor(activation='logistic', hidden_layer_sizes=(100, 100, 100, 100),
+             learning_rate='adaptive', max_iter=1000, random_state=0)
+best params
+{'activation': 'logistic', 'alpha': 0.0001, 'hidden_layer_sizes': (100, 100, 100, 100), 'max_iter': 1000, 'n_iter_no_change': 10, 'solver': 'adam'}
+
+R^2:
+-0.009044374491702367
+
+#########################
+
+
+
+model
+elnet
+
+ElasticNet(l1_ratio=0.1)
+best params
+{'l1_ratio': 0.1}
+
+R^2:
+0.0
+
+#########################
+
+
+
+model
+omp
+
+OrthogonalMatchingPursuit()
+best params
+{}
+
+R^2:
+0.28670782352922486
+
+#########################
+
+
+
+model
+br
+
+BayesianRidge()
+best params
+{}
+
+R^2:
+0.3072768398012896
+
+#########################
+
+
+
+model
+ard
+
+ARDRegression()
+best params
+{}
+
+R^2:
+0.307682854502362
+
+#########################
+
+
+
+model
+svr
+
+SVR(C=10.0, cache_size=10000, gamma=0.1, kernel='poly')
+best params
+{'C': 10.0, 'cache_size': 10000, 'gamma': 0.1, 'kernel': 'poly'}
+
+R^2:
+0.07788102980392297
+
+#########################
+
+
+
+model
+log_lr
+
+LinearRegression()
+best params
+{}
+
+R^2:
+0.2486780561233909
+
+#########################
+
+
+
+model
+log_rfr
+
+RandomForestRegressor(criterion='mae', min_samples_split=5,
+                      min_weight_fraction_leaf=0, n_estimators=200,
+                      random_state=0)
+best params
+{'criterion': 'mae', 'min_samples_split': 5, 'min_weight_fraction_leaf': 0, 'n_estimators': 200}
+
+R^2:
+0.732113212776841
+
+#########################
+
+
+
+model
+log_mlp
+
+MLPRegressor(activation='tanh', alpha=0.0003, hidden_layer_sizes=(100, 100),
+             learning_rate='adaptive', max_iter=1000, random_state=0,
+             solver='sgd')
+best params
+{'activation': 'tanh', 'alpha': 0.0003, 'hidden_layer_sizes': (100, 100), 'max_iter': 1000, 'n_iter_no_change': 10, 'solver': 'sgd'}
+
+R^2:
+0.019341655643236533
+
+#########################
+
+
+
+model
+log_elnet
+
+ElasticNet(l1_ratio=0.1)
+best params
+{'l1_ratio': 0.1}
+
+R^2:
+0.0
+
+#########################
+
+
+
+model
+log_omp
+
+OrthogonalMatchingPursuit()
+best params
+{}
+
+R^2:
+0.23555297827135135
+
+#########################
+
+
+
+model
+log_br
+
+BayesianRidge()
+best params
+{}
+
+R^2:
+0.2326206458909278
+
+#########################
+
+
+
+model
+log_ard
+
+ARDRegression()
+best params
+{}
+
+R^2:
+0.23223449296825904
+
+#########################
+
+
+
+model
+log_svr
+
+SVR(C=0.1, cache_size=10000, gamma=10.0)
+best params
+{'C': 0.1, 'cache_size': 10000, 'gamma': 10.0, 'kernel': 'rbf'}
+
+R^2:
+0.24512810196132462
+
+#########################
+
+hmd
+month3
+
+model
+lr
+
+LinearRegression()
+best params
+{}
+
+R^2:
+0.6313727803856917
+
+#########################
+
+
+
+model
+rfr
+
+RandomForestRegressor(min_samples_split=5, min_weight_fraction_leaf=0,
+                      random_state=0)
+best params
+{'criterion': 'mse', 'min_samples_split': 5, 'min_weight_fraction_leaf': 0, 'n_estimators': 100}
+
+R^2:
+0.8213656601792996
+
+#########################
+
+
+
+model
+mlp
+
+MLPRegressor(activation='tanh', hidden_layer_sizes=(100, 100, 100),
+             learning_rate='adaptive', max_iter=1000, random_state=0)
+best params
+{'activation': 'tanh', 'alpha': 0.0001, 'hidden_layer_sizes': (100, 100, 100), 'max_iter': 1000, 'n_iter_no_change': 10, 'solver': 'adam'}
+
+R^2:
+0.5815965179631157
+
+#########################
+
+
+
+model
+elnet
+
+ElasticNet(l1_ratio=0.1)
+best params
+{'l1_ratio': 0.1}
+
+R^2:
+0.0
+
+#########################
+
+
+
+model
+omp
+
+OrthogonalMatchingPursuit()
+best params
+{}
+
+R^2:
+0.45018164979735387
+
+#########################
+
+
+
+model
+br
+
+BayesianRidge()
+best params
+{}
+
+R^2:
+0.6273999061676703
+
+#########################
+
+
+
+model
+ard
+
+ARDRegression()
+best params
+{}
+
+R^2:
+0.6280368811517072
+
+#########################
+
+
+
+model
+svr
+
+SVR(cache_size=10000, gamma=10.0)
+best params
+{'C': 1.0, 'cache_size': 10000, 'gamma': 10.0, 'kernel': 'rbf'}
+
+R^2:
+0.7467252104776388
+
+#########################
+
+
+
+model
+log_lr
+
+LinearRegression()
+best params
+{}
+
+R^2:
+0.645469907810746
+
+#########################
+
+
+
+model
+log_rfr
+
+RandomForestRegressor(min_samples_split=5, min_weight_fraction_leaf=0,
+                      n_estimators=50, random_state=0)
+best params
+{'criterion': 'mse', 'min_samples_split': 5, 'min_weight_fraction_leaf': 0, 'n_estimators': 50}
+
+R^2:
+0.8177437934954556
+
+#########################
+
+
+
+model
+log_mlp
+
+MLPRegressor(activation='tanh', alpha=0.0003, hidden_layer_sizes=(100, 100),
+             learning_rate='adaptive', max_iter=1000, random_state=0,
+             solver='lbfgs')
+best params
+{'activation': 'tanh', 'alpha': 0.0003, 'hidden_layer_sizes': (100, 100), 'max_iter': 1000, 'n_iter_no_change': 10, 'solver': 'lbfgs'}
+
+R^2:
+0.6461637795326023
+
+#########################
+
+
+
+model
+log_elnet
+
+ElasticNet(l1_ratio=0.1)
+best params
+{'l1_ratio': 0.1}
+
+R^2:
+0.0
+
+#########################
+
+
+
+model
+log_omp
+
+OrthogonalMatchingPursuit()
+best params
+{}
+
+R^2:
+0.47601149558270583
+
+#########################
+
+
+
+model
+log_br
+
+BayesianRidge()
+best params
+{}
+
+R^2:
+0.6404536736113041
+
+#########################
+
+
+
+model
+log_ard
+
+ARDRegression()
+best params
+{}
+
+R^2:
+0.6417610183589931
+
+#########################
+
+
+
+model
+log_svr
+
+SVR(cache_size=10000, gamma=10.0)
+best params
+{'C': 1.0, 'cache_size': 10000, 'gamma': 10.0, 'kernel': 'rbf'}
+
+R^2:
+0.7205117342447215
+
+#########################
+
+hmd
+month4hmd
+month5hmd
+month6hmd
+month7hmd
+month8hmd
+month9hmd
+month10hmd
+month11hmd
+month12
+
+#########################
+#########################
+

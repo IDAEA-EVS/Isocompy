@@ -94,7 +94,7 @@ class preprocess(object):
 
     def __init__(self):
         tunedpars_rfr={"min_weight_fraction_leaf":[0,0.02,0.04],"n_estimators":[50,100,150,200,250,300],"criterion": ["mse","mae"],"min_samples_split":[2,5] }
-        tunedpars_svr={"kernel":[ "poly", "rbf", "sigmoid"],"C":np.logspace(-1, 1, 3),"gamma":np.logspace(-3, 1, 3) }
+        tunedpars_svr={"cache_size":[10000],"kernel":[ "poly", "rbf", "sigmoid"],"C":np.logspace(-1, 1, 3),"gamma":np.logspace(-3, 1, 3) }
         tunedpars_nusvr={"kernel":["linear", "poly", "rbf", "sigmoid"] }
         tunedpars_mlp={"activation" : [ "logistic", "tanh"],"solver" : ["lbfgs", "sgd", "adam"],"alpha":[0.0001,0.0003],"hidden_layer_sizes":[(50,)*2,(50,)*3,(50,)*4,(100,)*2,(100,)*3,(100,)*4],"max_iter":[1000],"n_iter_no_change":[10]}
         which_regs={"muelnet":True,"rfr":True,"mlp":True,"elnet":True,"omp":True,"br":True,"ard":True,"svr":True,"nusvr":False}
@@ -123,6 +123,7 @@ class preprocess(object):
         "IQR_inp_var":False,
         "IQR_rat_inp_var":3,
         "mean_mode_inp_var":"arithmetic",
+        "per_year_integration_method":"mean",
         "elnino":[],
         "lanina":[]}
 
@@ -153,13 +154,14 @@ class preprocess(object):
         remove_outliers=True,
         write_outliers_input=True,
         year_type="all",
-        inc_zeros_inp_var=False,
+        inc_zeros_inp_var=True,
         write_integrated_data=True,
         q1=0.05,
         q3=0.95,
         IQR_inp_var=True,
         IQR_rat_inp_var=3,
         mean_mode_inp_var="arithmetic", #geometric
+        per_year_integration_method="mean", #"sum"
         elnino=None,
         lanina=None):
 
@@ -216,6 +218,9 @@ class preprocess(object):
                 
                 mean_mode_inp_var: str default="arithmetic"
                     Data averaging method. available options are arithmetic  or geometric
+
+                per_year_integration_method: str default="mean"
+                    Data integration method in year month of each year. available options are "mean" and "sum"
                 
                 elnino: None type or list of integers default=None
                     List of elnino years
@@ -244,7 +249,7 @@ class preprocess(object):
         "var_name":var_name,
         "fields":fields,
         "direc":direc,
-        "remove_outliers":True,
+        "remove_outliers":remove_outliers,
         "write_outliers_input":write_outliers_input,
         "year_type":year_type,
         "inc_zeros_inp_var":inc_zeros_inp_var,
@@ -254,6 +259,7 @@ class preprocess(object):
         "IQR_inp_var":IQR_inp_var,
         "IQR_rat_inp_var":IQR_rat_inp_var,
         "mean_mode_inp_var":mean_mode_inp_var, #geometric
+        "per_year_integration_method":per_year_integration_method, #sum or mean
         "elnino":elnino,
         "lanina":lanina}
         self.direc=direc
@@ -278,7 +284,8 @@ class preprocess(object):
             year_type,
             elnino,
             lanina,
-            mean_mode_inp_var=mean_mode_inp_var)      
+            mean_mode_inp_var=mean_mode_inp_var,
+            per_year_integration_method=per_year_integration_method)      
 
 
     def model_pars(self,**kwargs):

@@ -1,0 +1,1637 @@
+prc
+month
+1
+
+
+ Used features 
+['CooZ', 'CooY']
+
+ BEST SCORE adjusted R squared 
+0.9716887850406586
+
+ BEST SCORE R squared 
+0.9735761993712814
+
+ F REGRESSION 
+F
+CooX     1.476421
+CooY     1.950152
+CooZ    99.292974
+Name: 0, dtype: float64
+ P values
+CooX    2.341359e-01
+CooY    1.731682e-01
+CooZ    7.152595e-11
+Name: 1, dtype: float64
+
+ MUTUAL INFORMATION REGRESSION 
+[0.45304282 0.03466753 1.        ]
+
+ BEST ESTIMATOR & parameters
+RandomForestRegressor(min_weight_fraction_leaf=0, n_estimators=250,
+                      random_state=0)
+
+{'criterion': 'mse', 'min_samples_split': 2, 'min_weight_fraction_leaf': 0, 'n_estimators': 250}
+
+log(1 + x)? 
+True
+########################################################
+prc
+month
+2
+
+
+ Used features 
+['CooX', 'CooY', 'CooZ']
+
+ BEST SCORE adjusted R squared 
+0.951799600076754
+
+ BEST SCORE R squared 
+0.9566196400690786
+
+ F REGRESSION 
+F
+CooX     8.539716
+CooY     6.658210
+CooZ    52.365626
+Name: 0, dtype: float64
+ P values
+CooX    6.669612e-03
+CooY    1.519975e-02
+CooZ    5.736045e-08
+Name: 1, dtype: float64
+
+ MUTUAL INFORMATION REGRESSION 
+[0.28605581 0.00653934 1.        ]
+
+ BEST ESTIMATOR & parameters
+RandomForestRegressor(criterion='mae', min_weight_fraction_leaf=0,
+                      n_estimators=300, random_state=0)
+
+{'criterion': 'mae', 'min_samples_split': 2, 'min_weight_fraction_leaf': 0, 'n_estimators': 300}
+
+log(1 + x)? 
+True
+########################################################
+prc
+month
+3
+
+
+ Used features 
+['CooY', 'CooZ']
+
+ BEST SCORE adjusted R squared 
+0.9317039854078977
+
+ BEST SCORE R squared 
+0.9362570530473712
+
+ F REGRESSION 
+F
+CooX     1.350065
+CooY    13.317030
+CooZ    35.539558
+Name: 0, dtype: float64
+ P values
+CooX    0.254741
+CooY    0.001027
+CooZ    0.000002
+Name: 1, dtype: float64
+
+ MUTUAL INFORMATION REGRESSION 
+[0.53936953 0.40238981 1.        ]
+
+ BEST ESTIMATOR & parameters
+RandomForestRegressor(criterion='mae', min_weight_fraction_leaf=0,
+                      n_estimators=200, random_state=0)
+
+{'criterion': 'mae', 'min_samples_split': 2, 'min_weight_fraction_leaf': 0, 'n_estimators': 200}
+
+log(1 + x)? 
+False
+########################################################
+prc
+month
+4
+
+
+ Used features 
+None
+
+ BEST SCORE adjusted R squared 
+None
+
+ BEST SCORE R squared 
+None
+
+ F REGRESSION 
+F
+
+
+ MUTUAL INFORMATION REGRESSION 
+None
+
+ BEST ESTIMATOR & parameters
+None
+
+log(1 + x)? 
+None
+########################################################
+prc
+month
+5
+
+
+ Used features 
+None
+
+ BEST SCORE adjusted R squared 
+None
+
+ BEST SCORE R squared 
+None
+
+ F REGRESSION 
+F
+
+
+ MUTUAL INFORMATION REGRESSION 
+None
+
+ BEST ESTIMATOR & parameters
+None
+
+log(1 + x)? 
+None
+########################################################
+prc
+month
+6
+
+
+ Used features 
+None
+
+ BEST SCORE adjusted R squared 
+None
+
+ BEST SCORE R squared 
+None
+
+ F REGRESSION 
+F
+
+
+ MUTUAL INFORMATION REGRESSION 
+None
+
+ BEST ESTIMATOR & parameters
+None
+
+log(1 + x)? 
+None
+########################################################
+prc
+month
+7
+
+
+ Used features 
+None
+
+ BEST SCORE adjusted R squared 
+None
+
+ BEST SCORE R squared 
+None
+
+ F REGRESSION 
+F
+
+
+ MUTUAL INFORMATION REGRESSION 
+None
+
+ BEST ESTIMATOR & parameters
+None
+
+log(1 + x)? 
+None
+########################################################
+prc
+month
+8
+
+
+ Used features 
+None
+
+ BEST SCORE adjusted R squared 
+None
+
+ BEST SCORE R squared 
+None
+
+ F REGRESSION 
+F
+
+
+ MUTUAL INFORMATION REGRESSION 
+None
+
+ BEST ESTIMATOR & parameters
+None
+
+log(1 + x)? 
+None
+########################################################
+prc
+month
+9
+
+
+ Used features 
+None
+
+ BEST SCORE adjusted R squared 
+None
+
+ BEST SCORE R squared 
+None
+
+ F REGRESSION 
+F
+
+
+ MUTUAL INFORMATION REGRESSION 
+None
+
+ BEST ESTIMATOR & parameters
+None
+
+log(1 + x)? 
+None
+########################################################
+prc
+month
+10
+
+
+ Used features 
+None
+
+ BEST SCORE adjusted R squared 
+None
+
+ BEST SCORE R squared 
+None
+
+ F REGRESSION 
+F
+
+
+ MUTUAL INFORMATION REGRESSION 
+None
+
+ BEST ESTIMATOR & parameters
+None
+
+log(1 + x)? 
+None
+########################################################
+prc
+month
+11
+
+
+ Used features 
+None
+
+ BEST SCORE adjusted R squared 
+None
+
+ BEST SCORE R squared 
+None
+
+ F REGRESSION 
+F
+
+
+ MUTUAL INFORMATION REGRESSION 
+None
+
+ BEST ESTIMATOR & parameters
+None
+
+log(1 + x)? 
+None
+########################################################
+prc
+month
+12
+
+
+ Used features 
+None
+
+ BEST SCORE adjusted R squared 
+None
+
+ BEST SCORE R squared 
+None
+
+ F REGRESSION 
+F
+
+
+ MUTUAL INFORMATION REGRESSION 
+None
+
+ BEST ESTIMATOR & parameters
+None
+
+log(1 + x)? 
+None
+########################################################
+
+"########################################################
+tmp
+month
+1
+
+
+ Used features 
+['CooX', 'CooZ']
+
+ BEST SCORE adjusted R squared 
+0.9743298954834179
+
+ BEST SCORE R squared 
+0.9762313847068684
+
+ F REGRESSION 
+F
+CooX      8.559874
+CooY      3.581410
+CooZ    440.077270
+Name: 0, dtype: float64
+ P values
+CooX    7.042962e-03
+CooY    6.961438e-02
+CooZ    8.063648e-18
+Name: 1, dtype: float64
+
+ MUTUAL INFORMATION REGRESSION 
+[0.3610853 0.        1.       ]
+
+ BEST ESTIMATOR & parameters
+RandomForestRegressor(criterion='mae', min_weight_fraction_leaf=0,
+                      random_state=0)
+
+{'criterion': 'mae', 'min_samples_split': 2, 'min_weight_fraction_leaf': 0, 'n_estimators': 100}
+
+log(1 + x)? 
+False
+########################################################
+tmp
+month
+2
+
+
+ Used features 
+['CooX', 'CooZ']
+
+ BEST SCORE adjusted R squared 
+0.9831177252803363
+
+ BEST SCORE R squared 
+0.9843682641484595
+
+ F REGRESSION 
+F
+CooX     12.271814
+CooY      2.648154
+CooZ    743.590947
+Name: 0, dtype: float64
+ P values
+CooX    1.682841e-03
+CooY    1.157302e-01
+CooZ    1.176183e-20
+Name: 1, dtype: float64
+
+ MUTUAL INFORMATION REGRESSION 
+[0.35435417 0.         1.        ]
+
+ BEST ESTIMATOR & parameters
+RandomForestRegressor(criterion='mae', min_weight_fraction_leaf=0,
+                      random_state=0)
+
+{'criterion': 'mae', 'min_samples_split': 2, 'min_weight_fraction_leaf': 0, 'n_estimators': 100}
+
+log(1 + x)? 
+False
+########################################################
+tmp
+month
+3
+
+
+ Used features 
+['CooX', 'CooY', 'CooZ']
+
+ BEST SCORE adjusted R squared 
+0.9834732686627384
+
+ BEST SCORE R squared 
+0.9853801992016532
+
+ F REGRESSION 
+F
+CooX      6.415494
+CooY      5.391577
+CooZ    442.471652
+Name: 0, dtype: float64
+ P values
+CooX    1.796297e-02
+CooY    2.867235e-02
+CooZ    2.051010e-17
+Name: 1, dtype: float64
+
+ MUTUAL INFORMATION REGRESSION 
+[0.34931552 0.         1.        ]
+
+ BEST ESTIMATOR & parameters
+RandomForestRegressor(criterion='mae', min_weight_fraction_leaf=0,
+                      n_estimators=150, random_state=0)
+
+{'criterion': 'mae', 'min_samples_split': 2, 'min_weight_fraction_leaf': 0, 'n_estimators': 150}
+
+log(1 + x)? 
+False
+########################################################
+tmp
+month
+4
+
+
+ Used features 
+None
+
+ BEST SCORE adjusted R squared 
+None
+
+ BEST SCORE R squared 
+None
+
+ F REGRESSION 
+F
+
+
+ MUTUAL INFORMATION REGRESSION 
+None
+
+ BEST ESTIMATOR & parameters
+None
+
+log(1 + x)? 
+None
+########################################################
+tmp
+month
+5
+
+
+ Used features 
+None
+
+ BEST SCORE adjusted R squared 
+None
+
+ BEST SCORE R squared 
+None
+
+ F REGRESSION 
+F
+
+
+ MUTUAL INFORMATION REGRESSION 
+None
+
+ BEST ESTIMATOR & parameters
+None
+
+log(1 + x)? 
+None
+########################################################
+tmp
+month
+6
+
+
+ Used features 
+None
+
+ BEST SCORE adjusted R squared 
+None
+
+ BEST SCORE R squared 
+None
+
+ F REGRESSION 
+F
+
+
+ MUTUAL INFORMATION REGRESSION 
+None
+
+ BEST ESTIMATOR & parameters
+None
+
+log(1 + x)? 
+None
+########################################################
+tmp
+month
+7
+
+
+ Used features 
+None
+
+ BEST SCORE adjusted R squared 
+None
+
+ BEST SCORE R squared 
+None
+
+ F REGRESSION 
+F
+
+
+ MUTUAL INFORMATION REGRESSION 
+None
+
+ BEST ESTIMATOR & parameters
+None
+
+log(1 + x)? 
+None
+########################################################
+tmp
+month
+8
+
+
+ Used features 
+None
+
+ BEST SCORE adjusted R squared 
+None
+
+ BEST SCORE R squared 
+None
+
+ F REGRESSION 
+F
+
+
+ MUTUAL INFORMATION REGRESSION 
+None
+
+ BEST ESTIMATOR & parameters
+None
+
+log(1 + x)? 
+None
+########################################################
+tmp
+month
+9
+
+
+ Used features 
+None
+
+ BEST SCORE adjusted R squared 
+None
+
+ BEST SCORE R squared 
+None
+
+ F REGRESSION 
+F
+
+
+ MUTUAL INFORMATION REGRESSION 
+None
+
+ BEST ESTIMATOR & parameters
+None
+
+log(1 + x)? 
+None
+########################################################
+tmp
+month
+10
+
+
+ Used features 
+None
+
+ BEST SCORE adjusted R squared 
+None
+
+ BEST SCORE R squared 
+None
+
+ F REGRESSION 
+F
+
+
+ MUTUAL INFORMATION REGRESSION 
+None
+
+ BEST ESTIMATOR & parameters
+None
+
+log(1 + x)? 
+None
+########################################################
+tmp
+month
+11
+
+
+ Used features 
+None
+
+ BEST SCORE adjusted R squared 
+None
+
+ BEST SCORE R squared 
+None
+
+ F REGRESSION 
+F
+
+
+ MUTUAL INFORMATION REGRESSION 
+None
+
+ BEST ESTIMATOR & parameters
+None
+
+log(1 + x)? 
+None
+########################################################
+tmp
+month
+12
+
+
+ Used features 
+None
+
+ BEST SCORE adjusted R squared 
+None
+
+ BEST SCORE R squared 
+None
+
+ F REGRESSION 
+F
+
+
+ MUTUAL INFORMATION REGRESSION 
+None
+
+ BEST ESTIMATOR & parameters
+None
+
+log(1 + x)? 
+None
+########################################################
+
+"########################################################
+hmd
+month
+1
+
+
+ Used features 
+['CooX', 'CooZ']
+
+ BEST SCORE adjusted R squared 
+0.858195871042403
+
+ BEST SCORE R squared 
+0.8710871554930937
+
+ F REGRESSION 
+F
+CooX    32.792428
+CooY     3.628374
+CooZ    32.947990
+Name: 0, dtype: float64
+ P values
+CooX    0.000011
+CooY    0.070590
+CooZ    0.000011
+Name: 1, dtype: float64
+
+ MUTUAL INFORMATION REGRESSION 
+[1.         0.13993878 0.64436587]
+
+ BEST ESTIMATOR & parameters
+RandomForestRegressor(criterion='mae', min_samples_split=5,
+                      min_weight_fraction_leaf=0, n_estimators=50,
+                      random_state=0)
+
+{'criterion': 'mae', 'min_samples_split': 5, 'min_weight_fraction_leaf': 0, 'n_estimators': 50}
+
+log(1 + x)? 
+True
+########################################################
+hmd
+month
+2
+
+
+ Used features 
+['CooX', 'CooZ']
+
+ BEST SCORE adjusted R squared 
+0.8261891644285528
+
+ BEST SCORE R squared 
+0.8413031501304178
+
+ F REGRESSION 
+F
+CooX    8.477138
+CooY    3.028469
+CooZ    8.842901
+Name: 0, dtype: float64
+ P values
+CooX    0.008088
+CooY    0.095787
+CooZ    0.007009
+Name: 1, dtype: float64
+
+ MUTUAL INFORMATION REGRESSION 
+[1.         0.         0.64263972]
+
+ BEST ESTIMATOR & parameters
+RandomForestRegressor(min_weight_fraction_leaf=0, n_estimators=150,
+                      random_state=0)
+
+{'criterion': 'mse', 'min_samples_split': 2, 'min_weight_fraction_leaf': 0, 'n_estimators': 150}
+
+log(1 + x)? 
+False
+########################################################
+hmd
+month
+3
+
+
+ Used features 
+['CooX', 'CooY', 'CooZ']
+
+ BEST SCORE adjusted R squared 
+0.7945705092061945
+
+ BEST SCORE R squared 
+0.8213656601792996
+
+ F REGRESSION 
+F
+CooX    15.818109
+CooY     7.614428
+CooZ    18.013215
+Name: 0, dtype: float64
+ P values
+CooX    0.000638
+CooY    0.011440
+CooZ    0.000332
+Name: 1, dtype: float64
+
+ MUTUAL INFORMATION REGRESSION 
+[1.         0.16374668 0.53390954]
+
+ BEST ESTIMATOR & parameters
+RandomForestRegressor(min_samples_split=5, min_weight_fraction_leaf=0,
+                      random_state=0)
+
+{'criterion': 'mse', 'min_samples_split': 5, 'min_weight_fraction_leaf': 0, 'n_estimators': 100}
+
+log(1 + x)? 
+False
+########################################################
+hmd
+month
+4
+
+
+ Used features 
+None
+
+ BEST SCORE adjusted R squared 
+None
+
+ BEST SCORE R squared 
+None
+
+ F REGRESSION 
+F
+
+
+ MUTUAL INFORMATION REGRESSION 
+None
+
+ BEST ESTIMATOR & parameters
+None
+
+log(1 + x)? 
+None
+########################################################
+hmd
+month
+5
+
+
+ Used features 
+None
+
+ BEST SCORE adjusted R squared 
+None
+
+ BEST SCORE R squared 
+None
+
+ F REGRESSION 
+F
+
+
+ MUTUAL INFORMATION REGRESSION 
+None
+
+ BEST ESTIMATOR & parameters
+None
+
+log(1 + x)? 
+None
+########################################################
+hmd
+month
+6
+
+
+ Used features 
+None
+
+ BEST SCORE adjusted R squared 
+None
+
+ BEST SCORE R squared 
+None
+
+ F REGRESSION 
+F
+
+
+ MUTUAL INFORMATION REGRESSION 
+None
+
+ BEST ESTIMATOR & parameters
+None
+
+log(1 + x)? 
+None
+########################################################
+hmd
+month
+7
+
+
+ Used features 
+None
+
+ BEST SCORE adjusted R squared 
+None
+
+ BEST SCORE R squared 
+None
+
+ F REGRESSION 
+F
+
+
+ MUTUAL INFORMATION REGRESSION 
+None
+
+ BEST ESTIMATOR & parameters
+None
+
+log(1 + x)? 
+None
+########################################################
+hmd
+month
+8
+
+
+ Used features 
+None
+
+ BEST SCORE adjusted R squared 
+None
+
+ BEST SCORE R squared 
+None
+
+ F REGRESSION 
+F
+
+
+ MUTUAL INFORMATION REGRESSION 
+None
+
+ BEST ESTIMATOR & parameters
+None
+
+log(1 + x)? 
+None
+########################################################
+hmd
+month
+9
+
+
+ Used features 
+None
+
+ BEST SCORE adjusted R squared 
+None
+
+ BEST SCORE R squared 
+None
+
+ F REGRESSION 
+F
+
+
+ MUTUAL INFORMATION REGRESSION 
+None
+
+ BEST ESTIMATOR & parameters
+None
+
+log(1 + x)? 
+None
+########################################################
+hmd
+month
+10
+
+
+ Used features 
+None
+
+ BEST SCORE adjusted R squared 
+None
+
+ BEST SCORE R squared 
+None
+
+ F REGRESSION 
+F
+
+
+ MUTUAL INFORMATION REGRESSION 
+None
+
+ BEST ESTIMATOR & parameters
+None
+
+log(1 + x)? 
+None
+########################################################
+hmd
+month
+11
+
+
+ Used features 
+None
+
+ BEST SCORE adjusted R squared 
+None
+
+ BEST SCORE R squared 
+None
+
+ F REGRESSION 
+F
+
+
+ MUTUAL INFORMATION REGRESSION 
+None
+
+ BEST ESTIMATOR & parameters
+None
+
+log(1 + x)? 
+None
+########################################################
+hmd
+month
+12
+
+
+ Used features 
+None
+
+ BEST SCORE adjusted R squared 
+None
+
+ BEST SCORE R squared 
+None
+
+ F REGRESSION 
+F
+
+
+ MUTUAL INFORMATION REGRESSION 
+None
+
+ BEST ESTIMATOR & parameters
+None
+
+log(1 + x)? 
+None
+########################################################
+
+"########################################################
+
+
+########
+
+prc
+month1
+
+VIF INITIAL 
+           VIF
+CooX  1.114249
+CooY  1.124493
+CooZ  1.164953
+
+VIF FINAL 
+           VIF
+CooX  1.114249
+CooY  1.124493
+CooZ  1.164953
+
+VIF SELECTED FEATURES 
+['CooX', 'CooY', 'CooZ']
+
+########
+
+prc
+month2
+
+VIF INITIAL 
+           VIF
+CooX  1.114249
+CooY  1.124493
+CooZ  1.164953
+
+VIF FINAL 
+           VIF
+CooX  1.114249
+CooY  1.124493
+CooZ  1.164953
+
+VIF SELECTED FEATURES 
+['CooX', 'CooY', 'CooZ']
+
+########
+
+prc
+month3
+
+VIF INITIAL 
+           VIF
+CooX  1.114249
+CooY  1.124493
+CooZ  1.164953
+
+VIF FINAL 
+           VIF
+CooX  1.114249
+CooY  1.124493
+CooZ  1.164953
+
+VIF SELECTED FEATURES 
+['CooX', 'CooY', 'CooZ']
+
+########
+
+prc
+month4
+
+VIF INITIAL 
+None
+
+VIF FINAL 
+None
+
+VIF SELECTED FEATURES 
+None
+
+########
+
+prc
+month5
+
+VIF INITIAL 
+None
+
+VIF FINAL 
+None
+
+VIF SELECTED FEATURES 
+None
+
+########
+
+prc
+month6
+
+VIF INITIAL 
+None
+
+VIF FINAL 
+None
+
+VIF SELECTED FEATURES 
+None
+
+########
+
+prc
+month7
+
+VIF INITIAL 
+None
+
+VIF FINAL 
+None
+
+VIF SELECTED FEATURES 
+None
+
+########
+
+prc
+month8
+
+VIF INITIAL 
+None
+
+VIF FINAL 
+None
+
+VIF SELECTED FEATURES 
+None
+
+########
+
+prc
+month9
+
+VIF INITIAL 
+None
+
+VIF FINAL 
+None
+
+VIF SELECTED FEATURES 
+None
+
+########
+
+prc
+month10
+
+VIF INITIAL 
+None
+
+VIF FINAL 
+None
+
+VIF SELECTED FEATURES 
+None
+
+########
+
+prc
+month11
+
+VIF INITIAL 
+None
+
+VIF FINAL 
+None
+
+VIF SELECTED FEATURES 
+None
+
+########
+
+prc
+month12
+
+VIF INITIAL 
+None
+
+VIF FINAL 
+None
+
+VIF SELECTED FEATURES 
+None
+
+########
+
+tmp
+month1
+
+VIF INITIAL 
+           VIF
+CooX  1.622482
+CooY  1.100243
+CooZ  1.714530
+
+VIF FINAL 
+           VIF
+CooX  1.622482
+CooY  1.100243
+CooZ  1.714530
+
+VIF SELECTED FEATURES 
+['CooX', 'CooY', 'CooZ']
+
+########
+
+tmp
+month2
+
+VIF INITIAL 
+           VIF
+CooX  1.622482
+CooY  1.100243
+CooZ  1.714530
+
+VIF FINAL 
+           VIF
+CooX  1.622482
+CooY  1.100243
+CooZ  1.714530
+
+VIF SELECTED FEATURES 
+['CooX', 'CooY', 'CooZ']
+
+########
+
+tmp
+month3
+
+VIF INITIAL 
+           VIF
+CooX  1.337867
+CooY  1.150836
+CooZ  1.509643
+
+VIF FINAL 
+           VIF
+CooX  1.337867
+CooY  1.150836
+CooZ  1.509643
+
+VIF SELECTED FEATURES 
+['CooX', 'CooY', 'CooZ']
+
+########
+
+tmp
+month4
+
+VIF INITIAL 
+None
+
+VIF FINAL 
+None
+
+VIF SELECTED FEATURES 
+None
+
+########
+
+tmp
+month5
+
+VIF INITIAL 
+None
+
+VIF FINAL 
+None
+
+VIF SELECTED FEATURES 
+None
+
+########
+
+tmp
+month6
+
+VIF INITIAL 
+None
+
+VIF FINAL 
+None
+
+VIF SELECTED FEATURES 
+None
+
+########
+
+tmp
+month7
+
+VIF INITIAL 
+None
+
+VIF FINAL 
+None
+
+VIF SELECTED FEATURES 
+None
+
+########
+
+tmp
+month8
+
+VIF INITIAL 
+None
+
+VIF FINAL 
+None
+
+VIF SELECTED FEATURES 
+None
+
+########
+
+tmp
+month9
+
+VIF INITIAL 
+None
+
+VIF FINAL 
+None
+
+VIF SELECTED FEATURES 
+None
+
+########
+
+tmp
+month10
+
+VIF INITIAL 
+None
+
+VIF FINAL 
+None
+
+VIF SELECTED FEATURES 
+None
+
+########
+
+tmp
+month11
+
+VIF INITIAL 
+None
+
+VIF FINAL 
+None
+
+VIF SELECTED FEATURES 
+None
+
+########
+
+tmp
+month12
+
+VIF INITIAL 
+None
+
+VIF FINAL 
+None
+
+VIF SELECTED FEATURES 
+None
+
+########
+
+hmd
+month1
+
+VIF INITIAL 
+           VIF
+CooX  2.683072
+CooY  1.058178
+CooZ  2.748157
+
+VIF FINAL 
+           VIF
+CooX  2.683072
+CooY  1.058178
+CooZ  2.748157
+
+VIF SELECTED FEATURES 
+['CooX', 'CooY', 'CooZ']
+
+########
+
+hmd
+month2
+
+VIF INITIAL 
+           VIF
+CooX  2.751968
+CooY  1.043487
+CooZ  2.807448
+
+VIF FINAL 
+           VIF
+CooX  2.751968
+CooY  1.043487
+CooZ  2.807448
+
+VIF SELECTED FEATURES 
+['CooX', 'CooY', 'CooZ']
+
+########
+
+hmd
+month3
+
+VIF INITIAL 
+           VIF
+CooX  2.751968
+CooY  1.043487
+CooZ  2.807448
+
+VIF FINAL 
+           VIF
+CooX  2.751968
+CooY  1.043487
+CooZ  2.807448
+
+VIF SELECTED FEATURES 
+['CooX', 'CooY', 'CooZ']
+
+########
+
+hmd
+month4
+
+VIF INITIAL 
+None
+
+VIF FINAL 
+None
+
+VIF SELECTED FEATURES 
+None
+
+########
+
+hmd
+month5
+
+VIF INITIAL 
+None
+
+VIF FINAL 
+None
+
+VIF SELECTED FEATURES 
+None
+
+########
+
+hmd
+month6
+
+VIF INITIAL 
+None
+
+VIF FINAL 
+None
+
+VIF SELECTED FEATURES 
+None
+
+########
+
+hmd
+month7
+
+VIF INITIAL 
+None
+
+VIF FINAL 
+None
+
+VIF SELECTED FEATURES 
+None
+
+########
+
+hmd
+month8
+
+VIF INITIAL 
+None
+
+VIF FINAL 
+None
+
+VIF SELECTED FEATURES 
+None
+
+########
+
+hmd
+month9
+
+VIF INITIAL 
+None
+
+VIF FINAL 
+None
+
+VIF SELECTED FEATURES 
+None
+
+########
+
+hmd
+month10
+
+VIF INITIAL 
+None
+
+VIF FINAL 
+None
+
+VIF SELECTED FEATURES 
+None
+
+########
+
+hmd
+month11
+
+VIF INITIAL 
+None
+
+VIF FINAL 
+None
+
+VIF SELECTED FEATURES 
+None
+
+########
+
+hmd
+month12
+
+VIF INITIAL 
+None
+
+VIF FINAL 
+None
+
+VIF SELECTED FEATURES 
+None

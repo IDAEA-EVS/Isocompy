@@ -1,3 +1,4 @@
+import copy
 import os
 import dill
 from pathlib import Path
@@ -11,6 +12,9 @@ import numpy as np
 import itertools #do not remove it. ZIP used!
 import matplotlib as mpl
 from sklearn.linear_model import LinearRegression
+from pylr2 import regress2 
+from sklearn.metrics import r2_score
+import isocompy.create_maps
 
 class session(object):
     """
@@ -259,7 +263,6 @@ class evaluation(object):
         #to write all predictions in one file
         if type(temp_month_list)==list:
             lnn=len(self.monthly_st2_output_list_all_vars[0])
-            
             for mon in range(0,lnn): #month
                 n=0
                 for i in self.monthly_st2_output_list_all_vars: #st2 vars
@@ -272,9 +275,9 @@ class evaluation(object):
                         cols_to_use = ndf.columns.difference(df.columns)
                         df = pd.merge(df, ndf[cols_to_use], left_index=True, right_index=True, how='inner')
                     n=n+1 
-                addd=os.path.join(self.direc,str(temp_month_list[mon])+"_all_vars_st2_prediction.xls")
+                addd=os.path.join(self.direc,str(temp_month_list[mon])+"_all_vars_st2_prediction.csv")
                 Path(self.direc).mkdir(parents=True,exist_ok=True)
-                df.to_excel(addd)
+                df.to_csv(addd)
                 self.monthly_st2_output_dic_all_vars_df[temp_month_list[mon]]=df
             self.st2_predicted_month_list=temp_month_list
 
@@ -334,7 +337,7 @@ class  stats(object):
         f_reg_mutual( os.path.join(model_cls_obj.direc,"annual_statistics_f_test_MI.txt") ,model_cls_obj.all_preds,list_of_dics_for_stats)   
     
     @staticmethod
-    def mensual_stats(model_cls_obj): #params=all, meteo, iso
+    def monthly_stats(model_cls_obj): #params=all, meteo, iso
         """
             The method to generate statistical reports for the second stage models based on  each specified month in second stage data
 
@@ -377,6 +380,7 @@ class plots(object):
 
             isotopes_meteoline_plot(ev_class,iso_class,iso_18,iso_2h,var_list,a=8,b=10,obs_data=False,residplot=False)
 
+            map_generator(ev_class,feat_list,observed_class_list=None,month_list=None,unit_list=None,opt_title_list=None,x="CooX",y="CooY",shp_file=None,html=True,direc=None,minus_to_zero=False,max_to_hundred=False)
         #------------------
     """
     @staticmethod
@@ -498,19 +502,26 @@ class plots(object):
                 iso_18["month"]=pd.to_datetime(iso_18['Date']).dt.month
                 iso_2h["month"]=pd.to_datetime(iso_2h['Date']).dt.month
 
-
             fig, ax = plt.subplots()
-            print (i.columns)
-            reg = LinearRegression().fit(i[v0].to_frame().values,i[v1].to_frame().values)
-
+            
+            #reg = LinearRegression().fit(i[v0].to_frame().values,i[v1].to_frame().values)
+            
+            
+            reg = regress2(i[v0].to_frame().values, i[v1].to_frame().values, _method_type_2="reduced major axis")
+        
             if obs_data==True:
+
                 ax.scatter(iso_18[iso_18["month"]==k]["Value"],iso_2h[iso_2h["month"]==k]["Value"],marker="x",c="g",label="Original",s=18)
                 s = pd.concat([df.columns.to_series() for df in (i, all_preds)])
                 
                 # keep all duplicates only, then extract unique names
                 res = s[s.duplicated(keep=False)].unique()
                 res=list(res)
-                
+                try:
+                    res.remove("index")
+                except:
+                    pass    
+
                 merged_all=pd.merge(i,all_preds[all_preds["month"]==k],on=res)
                 ####################
                 evenly_spaced_interval = np.linspace(0, 1, merged_all.shape[0] )
@@ -528,18 +539,24 @@ class plots(object):
             left1, right1 = ax.get_ylim()
             met_x = np.linspace(min(left,left1),max(right,right1),100)
             met_y= a*met_x+b
-            met_y_preds=reg.coef_*met_x+reg.intercept_
+            met_y_preds=reg['slope']*met_x+reg['intercept']
             ax.plot(met_x,met_y,color="red",label="GMWL: "+iso2h_st+"="+str(a)+iso18_st+"+"+str(b)) #GMWL
 
-            ax.plot(met_x,met_y_preds.reshape(-1,1),linestyle='dashed',c="brown",label="Estimated LMWL:"+iso2h_st+"="+str(round(reg.coef_[0][0],1))+iso18_st+"+"+str(round(reg.intercept_[0],1)))
+            ax.plot(met_x,met_y_preds.reshape(-1,1),linestyle='dashed',c="brown",label="Estimated LMWL:"+iso2h_st+"="+str(round(reg['slope'],1))+iso18_st+"+"+str(round(reg['intercept'],1)))
             #################
             #Observed LMWL
-            reg2=LinearRegression().fit(all_preds[all_preds["month"]==k][var_list[0]].to_frame(),all_preds[all_preds["month"]==k][var_list[1]].to_frame())
-            met_y_preds_2=reg2.coef_*met_x+reg2.intercept_
-            ax.plot(met_x,met_y_preds_2.reshape(-1,1),linestyle='dashdot',c="yellow",label="Observed LMWL:"+iso2h_st+"="+str(round(reg2.coef_[0][0],1))+iso18_st+"+"+str(round(reg2.intercept_[0],1)))
+            
+            #reg2=LinearRegression().fit(all_preds[all_preds["month"]==k][var_list[0]].to_frame(),all_preds[all_preds["month"]==k][var_list[1]].to_frame())
+            reg2 = regress2(all_preds[all_preds["month"]==k][var_list[0]],all_preds[all_preds["month"]==k][var_list[1]], _method_type_2="reduced major axis")
+        
+            
+            met_y_preds_2=reg2['slope']*met_x+reg2['intercept']
+            
+            ax.plot(met_x,met_y_preds_2.reshape(-1,1),linestyle='dashdot',c="yellow",label="Observed LMWL:"+iso2h_st+"="+str(round(reg2['slope'],1))+iso18_st+"+"+str(round(reg2['intercept'],1)))
 
             ax.set_xlim(left,right)
             ax.set_ylim(left1,right1)
+            #score to r2_score
             #ax.set_title("M: " + str(k)+ " |R2 org: " +str(round(iso_class.iso18_bests_dic[0]["best_score"],2))+" |R2 Pred. to Met.: " +str(round(r2_score(y_true, y_pred),2))+ " |R2 Mean monthly obs.: " +str(round(reg.score(i[v0].to_frame().values,j[v1].to_frame().values),2))+ " |R2 Pred. to New Met. Line: " +str(round(reg2.score(all_preds[all_preds["month"]==k]["iso_18"].to_frame(),all_preds[all_preds["month"]==k][var_list[1]].to_frame()),2)) )
             ax.set_xlabel(iso18_st+vsmow_st)
             ax.set_ylabel(iso2h_st+vsmow_st)
@@ -548,10 +565,10 @@ class plots(object):
             plt.close(fig)
             #residuals plot
             if residplot==True and obs_data==True:
+                merged_all.drop_duplicates(inplace=True,ignore_index=True)
                 resds_df=merged_all
                 resid_var0=str("residual_")+var_list[0]
                 resid_var1=str("residual_")+var_list[1]
-                print (merged_all)
                 resds_df[resid_var0]=resds_df[var_list[0] ] - resds_df[v0] 
                 resds_df=resds_df.sort_values(by=resid_var0)
                 plt.scatter(np.arange(len(resds_df['ID'])),  resds_df[resid_var0] )
@@ -569,7 +586,7 @@ class plots(object):
                 tit=iso18_st+"|mn_resid: {} std_resid: {} mn_obs: {} std_obs: {} mn_pred: {} std_pred:{}".format(mean_resids, std_resids, mean_obs, std_obs, mean_pred, std_pred)
                 #plt.title(tit)
                 fig = plt.gcf()
-                fig.savefig(os.path.join(ev_class.direc,"isotopes_meteoline_plots","Residuals_var1_Month_" + str(k)+"_plot.png"), bbox_inches = "tight")
+                fig.savefig(os.path.join(ev_class.direc,"isotopes_meteoline_plots",resid_var0+"_Month_" + str(k)+"_plot.png"), bbox_inches = "tight")
                 plt.close("all")
 
                 resds_df[resid_var1]=resds_df[var_list[1] ] - resds_df[v1]
@@ -589,7 +606,7 @@ class plots(object):
                 tit=iso2h_st+"|mn_resid: {} std_resid: {} mn_obs: {} std_obs: {} mn_pred: {} std_pred:{}".format(mean_resids, std_resids, mean_obs, std_obs, mean_pred, std_pred)
                 #plt.title(tit)
                 fig = plt.gcf()
-                fig.savefig(os.path.join(ev_class.direc,"isotopes_meteoline_plots","Residuals_iso2h_Month_" + str(k)+"_plot.png"), bbox_inches = "tight")
+                fig.savefig(os.path.join(ev_class.direc,"isotopes_meteoline_plots",resid_var1+"_Month_" + str(k)+"_plot.png"), bbox_inches = "tight")
                 plt.close("all")
 
 
@@ -603,7 +620,11 @@ class plots(object):
             mpl.style.use("seaborn-whitegrid")
 
             plt.scatter(vv[v0],vv[v1],marker=".",c="b",label="Estimated",s=70)
-            reg = LinearRegression().fit(vv[v0].to_frame().values,vv[v1].to_frame().values)
+            #reg = LinearRegression().fit(vv[v0].to_frame().values,vv[v1].to_frame().values)
+            
+            reg = regress2(vv[v0].to_frame().values,vv[v1].to_frame().values, _method_type_2="reduced major axis")
+            #print ("Method: RMA", "slope: ",reg['slope'],"intercept: ", reg['intercept'],"r: ",reg['r'])
+            
             if obs_data==True:
                 plt.scatter(iso_18[iso_18["month"].isin(st2_predicted_month_list)]["Value"],iso_2h[iso_2h["month"].isin(st2_predicted_month_list)]["Value"],marker="x",c="g",label="Original",s=18)
             plt.scatter(all_preds[all_preds["month"].isin(st2_predicted_month_list)][var_list[0]],all_preds[all_preds["month"].isin(st2_predicted_month_list)][var_list[1]],marker="^",c="c",label="Observed - Monthly",s=18)
@@ -611,19 +632,36 @@ class plots(object):
             left1, right1 = plt.ylim()
             met_x = np.linspace(min(left,left1),max(right,right1),100)
             met_y= a*met_x+b
-            met_y_preds=reg.coef_*met_x+reg.intercept_
+            met_y_preds=reg['slope']*met_x+reg['intercept']
             plt.plot(met_x,met_y,color="red",label="GMWL: "+iso2h_st+"="+str(a)+iso18_st+"+"+str(b))
-            plt.plot(met_x,met_y_preds.reshape(-1,1),linestyle='dashed',c="brown",label="Estimated LMWL: "+iso2h_st+"="+str(round(reg.coef_[0][0],1))+iso18_st+"+"+str(round(reg.intercept_[0],1)))
-            reg2 = LinearRegression().fit(all_preds[all_preds["month"].isin(st2_predicted_month_list)][var_list[0]].to_frame(),all_preds[all_preds["month"].isin(st2_predicted_month_list)][var_list[1]].to_frame())
-            met_y_preds_2=reg2.coef_*met_x+reg2.intercept_
-            plt.plot(met_x,met_y_preds_2.reshape(-1,1),linestyle='dashdot',c="yellow",label="Observed LMWL: "+iso2h_st+"="+str(round(reg2.coef_[0][0],1))+iso18_st+"+"+str(round(reg2.intercept_[0],1)))
+            plt.plot(met_x,met_y_preds.reshape(-1,1),linestyle='dashed',c="brown",label="Estimated LMWL: "+iso2h_st+"="+str(round(reg['slope'],1))+iso18_st+"+"+str(round(reg['intercept'],1)))
+            #reg2 = LinearRegression().fit(all_preds[all_preds["month"].isin(st2_predicted_month_list)][var_list[0]].to_frame(),all_preds[all_preds["month"].isin(st2_predicted_month_list)][var_list[1]].to_frame())
+            
+            reg2 = regress2(all_preds[all_preds["month"].isin(st2_predicted_month_list)][var_list[0]],all_preds[all_preds["month"].isin(st2_predicted_month_list)][var_list[1]], _method_type_2="reduced major axis")
+            #print ("Method: RMA", "slope: ",reg2['slope'],"intercept: ", reg2['intercept'],"r: ",reg2['r'])
+        
+            met_y_preds_2=reg2['slope']*met_x+reg2['intercept']
+            plt.plot(met_x,met_y_preds_2.reshape(-1,1),linestyle='dashdot',c="yellow",label="Observed LMWL: "+iso2h_st+"="+str(round(reg2['slope'],1))+iso18_st+"+"+str(round(reg2['intercept'],1)))
             plt.xlim(left,right)
             plt.ylim(left1,right1)
             plt.xlabel(iso18_st+vsmow_st)
             plt.ylabel(iso2h_st+vsmow_st)
             R2_Pred_Met=round(r2_score(8*vv[v0] + 10, vv[v1]),2)
-            R2_Pred_NewMet=round(reg.score(vv[v0].to_frame().values,vv[v1].to_frame().values),2)
-            R2_Pred_obs=round(reg2.score(all_preds[all_preds["month"].isin(st2_predicted_month_list)][var_list[0]].to_frame(),all_preds[all_preds["month"].isin(st2_predicted_month_list)][var_list[1]].to_frame()),2)
+
+            #score to r2score
+            v1_on_the_line=reg['slope']*vv[v0]+reg['intercept']
+            _score_=r2_score(vv[v1],v1_on_the_line)
+
+            R2_Pred_NewMet=round(_score_,2)
+
+            #score to r2score
+            reg2_on_the_line=reg2['slope']*all_preds[all_preds["month"].isin(st2_predicted_month_list)][var_list[0]]+reg2['intercept']
+            _score_=r2_score(all_preds[all_preds["month"].isin(st2_predicted_month_list)][var_list[1]],reg2_on_the_line)
+
+
+            R2_Pred_obs=round(_score_,2)
+            
+            
             tit=("All| R2 Pred_Met: {}"
                 "|R2 Pred_NewMet: {}" 
                 "|R2 Pred_obs: {}|"  
@@ -636,7 +674,7 @@ class plots(object):
                 res = s[s.duplicated(keep=False)].unique()
                 res=list(res)
                 resds_df=pd.merge(vv,all_preds,on=res)
-                print (resds_df.columns,resds_df.shape)
+                resds_df.drop_duplicates(inplace=True,ignore_index=True)
                 resds_df[resid_var0]=resds_df[var_list[0] ] - resds_df[v0] 
                 resds_df[resid_var1]=resds_df[var_list[1] ] - resds_df[v1]
 
@@ -678,5 +716,111 @@ class plots(object):
             plt.legend()
             plt.savefig(os.path.join(ev_class.direc,"isotopes_meteoline_plots","all_range_plot.png"),dpi=300, bbox_inches = "tight")
             plt.close("all")
+
+    @staticmethod
+    def map_generator(ev_class,feat_list,observed_class_list=None,month_list=None,unit_list=None,opt_title_list=None,x="CooX",y="CooY",shp_file=None,html=True,direc=None,minus_to_zero_list=None,max_to_hundred_list=None):
+        """
+            The method to generate the maps (.png and HTML) of the evaluation class
+
+            #------------------
+            Parameters:
+
+                ev_class: evaluation class
+                    Evaluation class that contains the second stage models predictions
+                
+                
+                feat_list: list
+                    List of strings that identifies the desired features to map  
+                
+                observed_class_list: none type or list default=None
+                    List of the preprocess classes of the observed data. No observed data will be shown in the maps if  observed_class_list=None, or an element of the list is none.
+                
+                month_list: none type or list default=None
+                    List of the desired month to generate the maps. If None, the maps will be generated for all the months available in evaluation class
+                
+                unit_list: list of strings default=None
+                    List of strings that identifies the units to be shown for every feature in the generated maps
+                
+                opt_title_list: list of strings default=None
+                    List of strings that identifies the titles to be shown for every feature in the generated maps
+                
+
+                x: string default="CooX"
+                    Identifies the name of the x (longitude) field in the evaluation class (same as defined in preprocess classess)
+                
+                y: string default="CooY"
+                    Identifies the name of the y (latitude) field in the evaluation class (same as defined in preprocess classess)
+                
+                shp_file: none type or string default=None
+                    Directory to the shape file to be used in .png maps. If None, no shape file will be included in the maps.If shapefile exists, it has to be in the same coordination system as the x & y.
+                
+                html: boolean default=True
+                    If True, an HTML version of the maps will be created
+                
+                direc: none type or string default=None
+                    The new directory to store the maps. If None, a new folder will be created in the directory that determined in the evaluation class
+                
+                minus_to_zero_list: none type or list default=None
+                    If minus_to_zero_list is a list of booleans, when it is True, replace the minus values with zero for that feature. Usage in features such as relative humidity.
+
+                max_to_hundred_list: none type or list default=None
+                    If max_to_hundred_list is a list of booleans, when it is True, replace the values more that 100 with 100 for that feature. Usage in features such as relative humidity.
+            #------------------
+        """
+
+        if month_list==None: month_list=list(ev_class.monthly_st2_output_dic_all_vars_df.keys())
+        for month in month_list:
+            if month in  list(ev_class.monthly_st2_output_dic_all_vars_df.keys()):
+                for n,feat in enumerate(feat_list):
+                    if unit_list==None or unit_list[n]==None:unit=""
+                    else: unit=str(unit_list[n])
+
+                    if opt_title_list==None or opt_title_list[n]==None:opt_title=None
+                    else: opt_title=str(opt_title_list[n])
+
+                    if observed_class_list==None or observed_class_list[n]==None:
+                        observed_data=None
+                    else: observed_data=observed_class_list[n].month_grouped_inp_var[month-1]
+
+                    ls1=list(ev_class.monthly_st2_output_dic_all_vars_df[month].columns)
+                    #because sometimes we add the "predicted_" prefix to the features
+                    pred_feat=None
+                    if feat in ls1:
+                        pred_feat=False
+                    if "predicted_"+feat in ls1:
+                        pred_feat=True
+                        feat="predicted_"+feat
+                    if pred_feat!=None:
+
+                        print ('data for month{} and feature {} exists. creating maps'.format(month,feat))
+                        
+                        df=copy.deepcopy(ev_class.monthly_st2_output_dic_all_vars_df[month])
+                        if minus_to_zero_list!=None:
+                            if minus_to_zero_list[n]==True:
+                                df.loc[df[feat]<=0, feat] = 0
+                        if max_to_hundred_list!=None:
+                            if max_to_hundred_list[n]==True:
+                                df.loc[df[feat]>100, feat] = 100
+
+                        if html ==True:
+
+                            if direc==None:
+                                Path(os.path.join(ev_class.direc,str(feat)+"_maps")).mkdir(parents=True,exist_ok=True)
+                                dir_bokeh=os.path.join(ev_class.direc,str(feat)+"_maps",str(feat)+"_Month_" + str(month)+"_interactive.html")
+                            else:
+                                dir_bokeh=direc  
+                            print (df.columns)  
+                            isocompy.create_maps.create_maps_bokeh(df,feat=feat,CooX=x,CooY=y,dir=dir_bokeh,unit=unit,opt_title=opt_title,observed_data=observed_data)
+
+                        #.png
+                        if direc==None:
+                            Path(os.path.join(ev_class.direc,str(feat)+"_maps")).mkdir(parents=True,exist_ok=True)
+                            dir_gpd=os.path.join(ev_class.direc,str(feat)+"_maps",str(feat)+"_Month_" + str(month)+"_fig.png")
+                        else:
+                            dir_gpd=direc
+
+                        isocompy.create_maps.make_maps_gpd(df,shp_dir=shp_file,feat=feat,CooX=x,CooY=y,dir=dir_gpd,unit=unit,opt_title=opt_title,observed_data=observed_data)
+
+
 
 

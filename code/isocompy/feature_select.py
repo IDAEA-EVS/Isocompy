@@ -24,7 +24,7 @@ def feature_selection(X_temp,Y_temp,args_dic):
     #correlation coefficient    
     correl_mat=X_temp.corr()
     correl_mat = pd.DataFrame(correl_mat,columns=X_temp.columns,index=X_temp.columns)
-    print("Correlation matrix\n",correl_mat)
+    print("Correlation matrix:\n",correl_mat)
     ##################################################
     X,vif_df= vif_calc(X_temp)   
     vif_initial=copy.deepcopy(vif_df)
@@ -39,7 +39,7 @@ def feature_selection(X_temp,Y_temp,args_dic):
 
     f_reg=f_regression(X_temp, Y_temp)
     f_regression_value=pd.DataFrame(f_reg,columns=X_temp.columns)
-    print ("f regression - p_values\n", f_regression_value)
+    print ("f regression - p_values:\n", f_regression_value)
     ###############
     #manual
     if args_dic["feature_selection"]=="manual":
@@ -54,7 +54,7 @@ def feature_selection(X_temp,Y_temp,args_dic):
         if vif_threshold !=None:
             #correlation:
             correl=correl_mat[(correl_mat<-cor_th) | (correl_mat>cor_th)]
-            print ("correl",correl)
+            #print ("correl",correl)
             more_than_thres=vif_df[vif_df["VIF"]>vif_threshold].index
 
             #omit introduced pairs:
@@ -86,20 +86,27 @@ def feature_selection(X_temp,Y_temp,args_dic):
         #f test  just using the significant variables!
         p_val=args_dic["p_val"]
 
-        f_less_ind=list(np.where(f_reg[1]<=p_val)[0])
-        if len(f_less_ind)<2:
-            f_regression_value_sor=sorted(f_reg[1])[:2]
-            f_less_ind1=list(
-                (np.where
-                (f_reg[1]==f_regression_value_sor[0])
-                                ) [0]
-            )
-            f_less_ind2=list((np.where
-                (f_reg[1]==f_regression_value_sor[1])
-                                )[0]   
-            ) 
-            f_less_ind=f_less_ind1+f_less_ind2
-        used_features=[X_temp.columns[i] for i in f_less_ind]
+        f_reg=f_regression_value[vif_chosen_features].drop([0])
+        f_regt=f_reg.T
+        f_less_col=list( f_regt[f_regt[1]<=p_val].index )
+
+        #f_less_ind=list(np.where(f_reg[1]<=p_val)[0])
+        if len(f_less_col)<2:
+            f_regt_sort=f_regt.sort_values(by=1)
+            f_less_col=[ f_regt_sort.index[0],f_regt_sort.index[1] ]
+            """
+                f_less_ind1=list(
+                    (np.where
+                    (f_reg[1]==f_regression_value_sor[0])
+                                    ) [0]
+                )
+                f_less_ind2=list((np.where
+                    (f_reg[1]==f_regression_value_sor[1])
+                                    )[0]   
+                ) 
+                f_less_ind=f_less_ind1+f_less_ind2
+            """
+        used_features=f_less_col 
 
 
     return mutual_info_regression_value,f_regression_value,correl_mat,used_features,vif_df,vif_chosen_features,vif_initial

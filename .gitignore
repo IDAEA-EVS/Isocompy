@@ -1,17 +1,16 @@
 #skip commiting the compiled files
 *.gbl
 *.pyc
-*.ipynb
 *.JPEG
-*.xls
-*.xlsx
 *.JPG
 *.pdf
 *.rar
 *.zip
-*.csv
 *.pkl
 *.code-workspace
 .vscode/
 __pycache__/
 .ipynb_checkpoints/
+pysplit_funcs_for_meteo_model.py
+change_meteo_file_names.py
+gen_traj_prediction.py

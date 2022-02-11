@@ -47,21 +47,19 @@ def predict_points(dir,write_to_file,x_y_z_org,st2_pred_month_list,st1_model_res
                     x_y_z=np.log1p(x_y_z)
                     x_y_z_copy=x_y_z_copy[~np.isnan(x_y_z).any(axis=1)]
                     x_y_z=x_y_z[~np.isnan(x_y_z).any(axis=1)]
-
                 #predicting    
                 meteopredict_res=meteopredict[month][0].predict(x_y_z)
                 #inverse transform
                 #log
                 if meteopredict[month][-1]==True:
-                    meteopredict_res=pd.DataFrame(np.expm1(meteopredict_res))
+                    meteopredict_res=pd.DataFrame(np.expm1(meteopredict_res),index=x_y_z_copy.index)
                     x_y_z_copy=x_y_z_copy[~np.isnan(meteopredict_res).any(axis=1)]
                     meteopredict_res=meteopredict_res[~np.isnan(meteopredict_res).any(axis=1)]
                 
                 #general
                 meteopredict_res=pd.DataFrame(meteopredict_res)
-                meteopredict_res=pd.DataFrame(meteopredict[month][-2].inverse_transform(meteopredict_res),columns=[colname])
-                #print (meteopredict_res)
-                #print (x_y_z_copy)
+                meteopredict_res=pd.DataFrame(meteopredict[month][-2].inverse_transform(meteopredict_res),columns=[colname],index=x_y_z_copy.index)
+
                 meteopredict_res=pd.concat([meteopredict_res,x_y_z_copy],axis=1)
                 meteopredict_res=meteopredict_res.set_index(["ID_preds_st2"],drop=False)
                 #making the dataframe
@@ -69,13 +67,9 @@ def predict_points(dir,write_to_file,x_y_z_org,st2_pred_month_list,st1_model_res
                     meteopredict_res_per_month=meteopredict_res
                 else:
                     meteopredict_res_per_month=pd.concat([meteopredict_res_per_month,meteopredict_res[colname]],axis=1)
-                #print ("len each month  ",meteopredict_res_per_month.shape   ) 
             #indexed,contain xyz        
             meteopredict_res_per_month=meteopredict_res_per_month[~np.isnan(pd.DataFrame(meteopredict_res_per_month[colname])).any(axis=1)]
-            #print ("len each month all  ",meteopredict_res_per_month.shape )    
-            #print (meteopredict_res_per_month)
-            #print (meteopredict_res_per_month.shape)
-            #print (type(meteopredict_res_per_month))
+
             #################################################
             #trajectories prediction
             calc_trajectories=False
@@ -89,9 +83,7 @@ def predict_points(dir,write_to_file,x_y_z_org,st2_pred_month_list,st1_model_res
 
             #################################################
             #predicting isotopes
-            #print (meteopredict_res_per_month)
             iso_model_input=meteopredict_res_per_month.reset_index(level=["ID_preds_st2"],drop=True)
-            #print (iso_model_input)
 
             #transforming
             if x_scaler_iso18 !=None and used_features_st2!=None:
@@ -120,7 +112,6 @@ def predict_points(dir,write_to_file,x_y_z_org,st2_pred_month_list,st1_model_res
                 #general
                 each_month_iso_predict=pd.DataFrame(y_scaler_iso18.inverse_transform(pd.DataFrame(each_month_iso_predict)),columns=[column_name])
                 df_to_excel=pd.concat([iso_model_input,each_month_iso_predict],axis=1)
-                #print (df_to_excel)
             else:
                 df_to_excel=None    
             if write_to_file==True:
@@ -139,7 +130,6 @@ def predict_points(dir,write_to_file,x_y_z_org,st2_pred_month_list,st1_model_res
                         except:
                             feats=[]    
                     monthly_iso_output[ib]=pd.DataFrame(columns=feats)
-
 
 
     return monthly_iso_output  
@@ -199,7 +189,6 @@ def regional_mensual_plot(x_y_z_,monthly_iso18_output,monthly_iso2h_output):
             reg3.score(np.array(region3_iso18["predicted_iso18"]).reshape(-1, 1), np.array(region3_iso2h["predicted_iso2h"]).reshape(-1, 1))
             plt.scatter(region3_iso18["predicted_iso18"].mean(), region3_iso2h["predicted_iso2h"].mean(),marker=m[mon],c=coll[mon])
         a = np.linspace(-10,0)
-        print ((regmean/regcnt)[0],(regcept/regcnt)[0])
         
         b2=8*a+10
         b1=(regmean/regcnt)[0]*a+(regcept/regcnt)[0]
@@ -265,7 +254,6 @@ def new_data_prediction_comparison(newd,iso_model_month_list,temp_bests,rain_bes
                     x_y_z=np.log1p(x_y_z)
                 #predicting
                 meteopredict_res=meteopredict[month][0].predict(x_y_z)
-                print ("meteopredict_res",meteopredict_res)
                 #inverse transform
                 #log
                 if meteopredict[month][-1]==True:
@@ -332,7 +320,6 @@ def new_data_prediction_comparison(newd,iso_model_month_list,temp_bests,rain_bes
             else:
                 integr_df=pd.concat([integr_df,df_to_excel])
             counter_month=counter_month+1    
-            print ("##############\n integr_df last \n",integr_df)    
     integr_df=integr_df[["CooX","CooY","CooZ","temp","rain","hum","iso_18","iso_2h","month"]].reset_index()
     addd="C:\\Users\\Ash kan\\Documents\\meteo_iso_model\\meteo_iso_model_input_code_and_results\\output\\iso_excel_out\\new_data_prediction_comparison.xls"
     integr_df.to_excel(addd)
@@ -552,7 +539,6 @@ def best_estimator_and_part_plots(cls,st1,st2,estimator_plot,partial_dep_plot):
                         estimator_plot,
                         partial_dep_plot)'''
         #except:
-        #    print ("There is no meteo model in the class")
         #    pass
     if st2==True:
 

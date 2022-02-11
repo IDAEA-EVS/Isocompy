@@ -2,6 +2,7 @@ from pathlib import Path
 from isocompy.model_fitting import rfmethod, iso_prediction,st1_print_to_file,isotope_model_selection_by_meteo_line,st2_output_report
 from isocompy import cv_uncertainty as cvun
 import os
+import pandas as pd
 #class for stage 1 and 2 modeling and prediction
 class model(object):
 
@@ -204,7 +205,7 @@ class model(object):
             self.st1_varname_list.append(prepcls.db_input_args_dics["var_name"])
             fields=prepcls.db_input_args_dics["fields"]
 
-            bests,preds_real_dic,bests_dic=rfmethod(prepcls.month_grouped_inp_var,prepcls.model_pars_name_dic,stage_1_2,st1_model_month_list,args_dic,fields)
+            bests,preds_real_dic,bests_dic=rfmethod(prepcls.month_grouped_inp_var,prepcls.model_pars_name_dic,stage_1_2,self.st1_model_month_list,args_dic,fields)
             results_dic={"bests":bests,"preds_real_dic":preds_real_dic,"bests_dic":bests_dic,"db_input_args_dics":prepcls.db_input_args_dics}
             self.st1_model_results_dic[prepcls.db_input_args_dics["var_name"]]=results_dic
             best_dics_p[prepcls.db_input_args_dics["var_name"]]=bests
@@ -521,7 +522,7 @@ class model(object):
         self.st2_model_results_dic=isotope_model_selection_by_meteo_line(
                         dependent_model_selection_list[0],
                         dependent_model_selection_list[1],
-                        self.thresh,
+                        self.thresh_meteoline_high_scores,
                         self.meteo_coef,self.meteo_intercept,self.selection_method,self.model_selection_report,self.direc,
                         self.all_preds,
                         self.st2_model_results_dic)

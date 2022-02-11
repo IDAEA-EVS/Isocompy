@@ -1,0 +1,7 @@
+All| R2 Pred_Met: 0.9|R2 Pred_NewMet: 0.91|R2 Pred_obs: 0.96|
+#######
+iso_18mae: 1.40 mse: 2.72 |iso_2hmae: 10.78 mse: 187.86|
+#######
+iso_18mn_resid: 0.61 std_resid: 1.58 mn_obs: -4.68 std_obs: 2.39 mn_pred: -5.29 std_pred:1.47|
+#######
+iso_2hmn_resid: 4.88 std_resid: 13.2 mn_obs: -25.92 std_obs: 18.48 mn_pred: -30.8 std_pred:10.13|

@@ -2,7 +2,7 @@ import pandas as pd
 import os
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
-
+import copy
                                       
 ##########################################################################################
 ##########################################################################################
@@ -84,7 +84,7 @@ def monthly_uniting(datab,fields,year_type,elnino,lanina,filter_avraged,mean_mod
     return    month_grouped_list
 ###########################################################
 #to remove outliers from daily meteorological data
-def remove_outliers(inp_var,fields,q1,q3,IQR,inc_zeros,IQR_rat): #inc_zeros_remove zeros to find outliers, but add them in the end to include them in the main db
+def remove_outliers_func(inp_var,fields,q1,q3,IQR,inc_zeros,IQR_rat): #inc_zeros_remove zeros to find outliers, but add them in the end to include them in the main db
     inp_var_main_list_df=list()
     list_total=list()
     list_true=list()
@@ -94,29 +94,39 @@ def remove_outliers(inp_var,fields,q1,q3,IQR,inc_zeros,IQR_rat): #inc_zeros_remo
     list_ave=list()
     if inc_zeros==True:
         inp_var_=inp_var
-    else:    
-        inp_var_=inp_var[inp_var["Value"]!=0] #to find points without zeros to calculate outliers. but in model, we enter the zero points also!
+    else:
+        inp_var_=inp_var[inp_var["Value"]!=0] #to find points without zeros to calculate outliers. but the zero values will be added to the inputs at the end of this stage!
         inp_var_zeros=inp_var[inp_var["Value"]==0]
         inp_var_zeros.insert(2,"outlier",True,True)
-    stations=inp_var_[fields].drop_duplicates()
-    for index,row in stations.iterrows():
-        for f in fields:
-            inp_var_=inp_var_[inp_var_[f]==row[f]]
-        if IQR==True:
-            uplimit=inp_var_["Value"].quantile(0.75)+IQR_rat*abs(inp_var_["Value"].quantile(0.25)-inp_var_["Value"].quantile(.75))
-            inp_var_main_bool=inp_var_["Value"].between(q1,uplimit)
-        else:
-            uplimit=inp_var_["Value"].quantile(q3)
-            inp_var_main_bool=inp_var_["Value"].between(inp_var_["Value"].quantile(q1), uplimit)
 
-        list_true.append(inp_var_main_bool.value_counts()[1]) #true
-        list_total.append(inp_var_main_bool.size) #total
-        list_stations.append(inp_var_.iloc[0]['ID'])
+    stations=inp_var_[fields].drop_duplicates()
+
+    for index,row in stations.iterrows():
+
+        inp_var_t=copy.deepcopy(inp_var_) #to reset the inp_var_ every time!
+
+        for f in fields:
+            inp_var_t=inp_var_t[inp_var_t[f]==row[f]]
+
+        if IQR==True:
+            uplimit=inp_var_t["Value"].quantile(0.75)+IQR_rat*abs(inp_var_t["Value"].quantile(0.25)-inp_var_t["Value"].quantile(.75))
+            inp_var_tmain_bool=inp_var_t["Value"].between(q1,uplimit)
+        else:
+            uplimit=inp_var_t["Value"].quantile(q3)
+            inp_var_tmain_bool=inp_var_t["Value"].between(inp_var_t["Value"].quantile(q1), uplimit)
+        try:
+            list_true.append(inp_var_tmain_bool.value_counts()[True]) #true
+        except:
+            list_true.append(0)    
+            
+        list_total.append(inp_var_tmain_bool.size) #total
+        list_stations.append(inp_var_t.iloc[0]['ID'])
         list_uplimit.append(uplimit)
-        list_max.append(inp_var_["Value"].max())
-        list_ave.append(inp_var_["Value"].mean())
-        inp_var_.insert(2,"outlier",inp_var_main_bool,True)
-        inp_var_main_list_df.append(inp_var_)
+        list_max.append(inp_var_t["Value"].max())
+        list_ave.append(inp_var_t["Value"].mean())
+        inp_var_t.insert(2,"outlier",inp_var_tmain_bool,True)
+        inp_var_main_list_df.append(inp_var_t)
+
     inp_var_main=pd.concat(inp_var_main_list_df)
     if inc_zeros==False:
         inp_var_main=pd.concat([inp_var_main,inp_var_zeros])
@@ -125,24 +135,24 @@ def remove_outliers(inp_var,fields,q1,q3,IQR,inc_zeros,IQR_rat): #inc_zeros_remo
     return inp_var_main,inp_var_df_station_outliers
 ###########################################################
 #importing_preprocess
-def data_preparation_func(inp_var,var_name,fields,direc,remove_outliers,q1,q3,IQR_inp_var,inc_zeros_inp_var,write_outliers_input,write_integrated_data,IQR_rat_inp_var,year_type,elnino,lanina,mean_mode_inp_var):
+def data_preparation_func(inp_var,var_name,fields,direc,remove_outliers,q1,q3,IQR_inp_var,inc_zeros_inp_var,write_outliers_input,write_integrated_data,IQR_rat_inp_var,year_type,elnino,lanina,mean_mode_inp_var,per_year_integration_method):
     #main is q1 &q3. less than 0.25 more than .75 are outliers.
     if remove_outliers==True:
         #to remove the outliers
-        inp_var,inp_var_df_station_outliers=remove_outliers(inp_var,fields,q1,q3,IQR_inp_var,inc_zeros_inp_var,IQR_rat_inp_var)
+        inp_var,inp_var_df_station_outliers=remove_outliers_func(inp_var,fields,q1,q3,IQR_inp_var,inc_zeros_inp_var,IQR_rat_inp_var)
         inp_var=inp_var[inp_var['outlier']==True]
         inp_var.to_csv(os.path.join(direc,var_name+"_outliers_removed_1.csv"))
 
     ###########################################################
     inp_var['Date'] = pd.to_datetime(inp_var['Date'])#,format=date_format)
     gr_list=['ID']+fields+ [pd.Grouper(key='Date', freq='m')]
-    inp_var = inp_var.groupby(gr_list).agg({'Value':'sum'})
+    inp_var = inp_var.groupby(gr_list).agg({'Value':per_year_integration_method})
     inp_var=inp_var.reset_index().sort_values(['Date','ID'])
     #write inputs to file:
     if write_outliers_input==True:
         inp_var.to_csv(os.path.join(direc,var_name+"_monthly_2.csv"))
         if remove_outliers==True:
-            inp_var_df_station_outliers.to_excel(os.path.join(direc,var_name+"_df_outliers.xlsx"))
+            inp_var_df_station_outliers.to_csv(os.path.join(direc,var_name+"_df_outliers.csv"))
     ###########################################################
     #Group the inp_var data to average of each station
     #inp_var
