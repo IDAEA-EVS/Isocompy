@@ -9,7 +9,7 @@ This repository contains an open source Python library that focuses on user defi
 \
 Name: Isocompy
 
-version: 1.0
+version: 1.0.0
 
 Author: Ashkan Hassanzadeh   
 
@@ -24,7 +24,11 @@ License: agpl-3.0
 
 ## ***Installation:***
 \
-Download the isocompy folder and add it to lib folder in python path alongside other libraries.
+pip can be used for the installation:
+
+`pip install isocompy`
+
+Alternatively, download the isocompy folder and add it to lib folder in python path alongside other python libraries.
 
 ---
 ---
