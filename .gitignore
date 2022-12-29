@@ -17,3 +17,4 @@ pysplit_funcs_for_meteo_model.py
 change_meteo_file_names.py
 gen_traj_prediction.py
 isocompy user guide v1.md
+pyproject.toml
