@@ -1,0 +1,20 @@
+[build-system]
+requires = ["flit"]
+build-backend = "flit.buildapi"
+
+[project]
+name = "isocompy"
+authors = [
+{name="IDAEA-CSIC / Ashkan Hassanzadeh", email="ashkan.hassanzadeh@gmail.com"}]
+readme = "README.md"
+license = { file = "LICENSE" }
+classifiers = [
+    "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
+    "Programming Language :: Python :: 3",
+    "Development Status :: 4 - Beta"
+]
+requires-python = ">=3.3"
+dynamic = ["version", "description"]
+[project.urls]
+home-page = "https://github.com/IDAEA-EVS/Isocompy"
+

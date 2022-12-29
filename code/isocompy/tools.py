@@ -283,7 +283,7 @@ class evaluation(object):
 
             
                        
-    ############################################################
+    '''############################################################
     #def regional_mensual_plot():
         #pass
         #regional_mensual_plot
@@ -293,13 +293,13 @@ class evaluation(object):
     #def new_inp_compare():   
         #pass
         #new_data_prediction_comparison
-        #data_fl=r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\inputs\new_measured.xlsx"
+        #data_fl=r"new_measured.xlsx"
         #newd=pd.read_excel(data_fl,sheet_name=0,header=0,index_col=False,keep_default_na=True)
         #new_data_prediction=new_data_prediction_comparison(newd,iso_model_month_list,temp_bests,rain_bests,hum_bests,didlog_iso18,didlog_iso2h,x_scaler_iso18,x_scaler_iso2h,used_features_iso18,used_features_iso2h,best_estimator_all_iso18,best_estimator_all_iso2h,y_scaler_iso18,y_scaler_iso2h)
         #writing isotope predictions into a file
-        #pd.concat([all_preds,Y_preds_iso18,Y_preds_iso2h],axis=1).to_excel(r"C:\Users\Ash kan\Documents\meteo_iso_model\meteo_iso_model_input_code_and_results\output\isotope_main_data_predictions.xlsx")
+        #pd.concat([all_preds,Y_preds_iso18,Y_preds_iso2h],axis=1).to_excel(r"isotope_main_data_predictions.xlsx")
         #return Y_preds_iso18,Y_preds_iso2h,rain_preds_real,hum_preds_real,temp_preds_real,temp_bests,rain_bests,hum_bests,monthly_iso2h_output,monthly_iso18_output,x_scaler_iso18,y_scaler_iso18,didlog_iso18,used_features_iso18,rsquared_iso18,best_estimator_all_iso18,best_score_all_iso18,x_scaler_iso2h,y_scaler_iso2h,didlog_iso2h,used_features_iso2h,rsquared_iso2h,best_estimator_all_iso2h,best_score_all_iso2h,predictions_monthly_list, all_preds,month_grouped_list_with_zeros_iso_18,month_grouped_list_with_zeros_iso_2h,month_grouped_list_with_zeros_iso_3h,month_grouped_list_with_zeros_hum,month_grouped_list_with_zeros_rain,month_grouped_list_with_zeros_temp,rain,temp,hum,elnino,lanina,iso_18,iso_2h,iso_3h
-        ###########
+        ###########'''
 
 
 class  stats(object):   
@@ -326,8 +326,7 @@ class  stats(object):
             #------------------
 
         """
-        #iso_meteo_model.st1_model_results_dic["rain"]["bests_dic"][0]["used_features"] : ['CooX', 'CooY', 'CooZ']
-        #iso_meteo_model.st1_varname_list: ['rain', 'temp']
+
         list_of_dics_for_stats=[]
         for k,v in model_cls_obj.st2_model_results_dic.items():
             ls_temp=list(v["bests_dic"][0]['correlation'].index)+model_cls_obj.col_for_f_reg

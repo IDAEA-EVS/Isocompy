@@ -136,6 +136,8 @@ def predict_points(dir,write_to_file,x_y_z_org,st2_pred_month_list,st1_model_res
 ###########################################################
     
 def regional_mensual_plot(x_y_z_,monthly_iso18_output,monthly_iso2h_output):
+    '''
+    not used in Isocompy submitted manuscript version'''
     for feat in ["CooY"]:
 
         ymax=x_y_z_[feat].max()
@@ -328,6 +330,8 @@ def new_data_prediction_comparison(newd,iso_model_month_list,temp_bests,rain_bes
 
 #pca function
 def pcafun(pca_raw_df,kmeans_group_nums=5,filetitlename="no_name"):
+    '''
+    not used in Isocompy submitted manuscript version'''
     #scaling
     scaler1 = MinMaxScaler()
     scaler1.fit(pca_raw_df)

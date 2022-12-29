@@ -41,13 +41,7 @@ def create_maps_bokeh(df,feat,dir,CooX,CooY,unit,opt_title,observed_data):
 
     save(p,dir)
 ##############
-#Example:
-#myProj = "+proj=utm +zone=19S, +south +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
-#data_file = r"C:\Users\Ash kan\Documents\meteo_iso_model_input_code_and_results\case_studies\salar_de_atacama\1_all_vars_st2_prediction.xls"
-#df=pd.read_excel(data_file,sheet_name="1_all_vars_st2_prediction",header=0,index_col=False,keep_default_na=True)
-#create_maps_bokeh(df,feat="prc",myProj=myProj)
-#create_maps_bokeh(df,feat="predicted_iso_18",myProj=myProj)
-#########################
+
 #########################
 
 #to create maps with an specified shapefile
@@ -113,8 +107,3 @@ def make_maps_gpd(df,shp_dir,feat,dir,CooX,CooY,unit,opt_title,observed_data):
     plt.savefig(dir,dpi=300)
     plt.close("all")
 ##############
-#Example:
-#data_file = r"C:\Users\Ash kan\Documents\meteo_iso_model_input_code_and_results\case_studies\salar_de_atacama\manual_filtered_data\outputs\preds_map_all_points\1_all_vars_st2_prediction.csv"
-#df=pd.read_csv(data_file,header=0,index_col=False,keep_default_na=True)
-#shp_dir=r"C:\Users\Ash kan\Desktop\shpestaciones\Cuenca.shp"
-#make_maps_gpd(df,shp_dir,feat="CooZ")
