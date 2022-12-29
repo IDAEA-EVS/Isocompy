@@ -1,10 +1,5 @@
 """
-Isocompy repository contains an open source Python library that focuses on
- user defined (such as meteorological, spatial, etc.) and isotopic composition
-  variables analysis and generating the regression - statistical estimation 
-  models. 
-
-Classes: preprocess, model, session, evaluation, stats, plots
+An open source library for environmental isotopic modelling 
 """
 __version__ = "1.0.0"
 
