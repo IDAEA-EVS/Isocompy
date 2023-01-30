@@ -7,13 +7,13 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'isocompy'
-copyright = '2023, IDAEA-CSIC-Ashkan Hassanzadeh'
-author = 'Ashkan Hassanzadeh'
+copyright = '2023, Ashkan Hassanzadeh IDAEA-CSIC'
+author = 'Ashkan Hassanzadeh IDAEA-CSIC'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ["myst_parser"]
+extensions = ['myst_parser']
 
 templates_path = ['_templates']
 exclude_patterns = []

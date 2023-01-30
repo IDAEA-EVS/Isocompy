@@ -1,4 +1,9 @@
-Welcome to isocompy's documentation!
+.. isocompy documentation master file, created by
+   sphinx-quickstart on Mon Jan 30 16:14:50 2023.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+isocompy's documentation!
 ====================================
 
 This repository contains an open source Python library that focuses on user defined (such as meteorological, spatial, etc.) and isotopic composition variables analysis and generating the regression – statistical estimation models. 
@@ -35,7 +40,7 @@ There is a notebook in `isocompy's github repository <https://github.com/IDAEA-E
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
-
+   
    Home
    data_preparation.preprocess-class
    reg_model.model-class
@@ -45,7 +50,8 @@ There is a notebook in `isocompy's github repository <https://github.com/IDAEA-E
    tools.stats-class
    LICENSE
 
-Indices and tables
-==================
+
+search
+=======
 
 * :ref:`search`

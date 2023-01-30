@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>class preprocess ( ) &#8212; isocompy  documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
@@ -12,11 +12,11 @@
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="class model ( )" href="reg_model.model-class.html" />
-    <link rel="prev" title="Isocompy" href="Home.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -34,12 +34,12 @@
           <div class="body" role="main">
             
   <section id="class-preprocess">
-<h1>class preprocess ( )<a class="headerlink" href="#class-preprocess" title="Permalink to this headline">¶</a></h1>
+<h1>class preprocess ( )<a class="headerlink" href="#class-preprocess" title="Permalink to this heading">¶</a></h1>
 <p>The class to preprocess the input variables of each model group and initiate
 the models properties such as cross-validation and  brute-force searching.</p>
 <hr class="docutils" />
 <section id="parameters">
-<h2><strong>Parameters</strong><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+<h2><strong>Parameters</strong><a class="headerlink" href="#parameters" title="Permalink to this heading">¶</a></h2>
 <p>(__init__ method of preprocess class)</p>
 <p><strong>tunedpars_rfr</strong> dic, default= <code class="docutils literal notranslate"><span class="pre">{&quot;min_weight_fraction_leaf&quot;:[0,0.02,0.04],&quot;n_estimators&quot;:[50,100,150,2'00,250,300],&quot;criterion&quot;:</span> <span class="pre">[&quot;mse&quot;,&quot;mae&quot;],&quot;min_samples_split&quot;:[2,5]</span> <span class="pre">}</span></code></p>
 <p>The dictionary that determines brute-force searching parameters of Random Forest regression. For more details on the regression method inputs, refer to sklearn library.</p>
@@ -85,7 +85,7 @@ it determines number of folds of the cross-validation.</p>
 </section>
 <hr class="docutils" />
 <section id="methods">
-<h2><strong>Methods</strong><a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h2>
+<h2><strong>Methods</strong><a class="headerlink" href="#methods" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>__init__ (self)</p></li>
 <li><p>fit(self, inp_var, var_name, fields,direc, remove_outliers=True, write_outliers_input=True, year_type=”all”, inc_zeros_inp_var=False, write_integrated_data=True, q1=0.05, q3=0.95, IQR_inp_var=True, IQR_rat_inp_var=3, mean_mode_inp_var=”arithmetic”, elnino=None, lanina=None)</p></li>
@@ -94,7 +94,7 @@ it determines number of folds of the cross-validation.</p>
 </section>
 <hr class="docutils" />
 <section id="attributes">
-<h2><strong>Attributes</strong><a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h2>
+<h2><strong>Attributes</strong><a class="headerlink" href="#attributes" title="Permalink to this heading">¶</a></h2>
 <p><strong>model_pars_name_dic</strong> dic</p>
 <p>A dictionary that stores brute-force searching parameters of all models. The keys and values are dictionary names and parameters dictionaries respectively</p>
 <p><em>EXAMPLE:</em></p>
@@ -118,12 +118,12 @@ it determines number of folds of the cross-validation.</p>
 </section>
 <hr class="docutils" />
 <section id="preprocess-fit">
-<h2>preprocess.fit ( )<a class="headerlink" href="#preprocess-fit" title="Permalink to this headline">¶</a></h2>
+<h2>preprocess.fit ( )<a class="headerlink" href="#preprocess-fit" title="Permalink to this heading">¶</a></h2>
 <p>preprocess.fit(self, inp_var, var_name, fields, direc, remove_outliers=True,write_outliers_input=True, year_type=”all”, inc_zeros_inp_var=False, write_integrated_data=True, q1=0.05, q3=0.95, IQR_inp_var=True, IQR_rat_inp_var=3, mean_mode_inp_var=”arithmetic”, elnino=None, lanina=None):</p>
 <p>The method to preprocess the input data of the models</p>
 <hr class="docutils" />
 <section id="id1">
-<h3><strong>Parameters</strong><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<h3><strong>Parameters</strong><a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h3>
 <p><strong>inp_var</strong> Pandas dataframe</p>
 <p>Input pandas dataframe containing the dependent value, unique IDs
 for each sample, and date. (The columns “Value”, “ID” and “Date” have to be found in the dataframe)</p>
@@ -179,7 +179,7 @@ to determine upper boundary limit.</p>
 </section>
 <hr class="docutils" />
 <section id="id2">
-<h3><strong>Attributes</strong><a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<h3><strong>Attributes</strong><a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h3>
 <p><strong>db_input_args_dics</strong> dic</p>
 <p>A dictionary that stores input parameters of the fit method</p>
 <hr class="docutils" />
@@ -192,7 +192,7 @@ to determine upper boundary limit.</p>
 </section>
 <hr class="docutils" />
 <section id="preprocess-model-pars">
-<h2>preprocess.model_pars ( )<a class="headerlink" href="#preprocess-model-pars" title="Permalink to this headline">¶</a></h2>
+<h2>preprocess.model_pars ( )<a class="headerlink" href="#preprocess-model-pars" title="Permalink to this heading">¶</a></h2>
 <p>preprocess.model_pars(self,**kwargs):</p>
 <p>To change the brute-force searching parameters that is already determined in a class.</p>
 <hr class="docutils" />
@@ -229,31 +229,11 @@ to determine upper boundary limit.</p>
 
 
 <h3>Navigation</h3>
-<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="Home.html"><em><strong>Isocompy</strong></em></a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">class preprocess ( )</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#parameters"><strong>Parameters</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#methods"><strong>Methods</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#attributes"><strong>Attributes</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#preprocess-fit">preprocess.fit ( )</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#preprocess-model-pars">preprocess.model_pars ( )</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="reg_model.model-class.html">class model ( )</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tools.evaluation-class.html">class evaluation ( )</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tools.plots-class.html">class plots ( )</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tools.session-class.html">class session ( )</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tools.stats-class.html">class stats ( )</a></li>
-<li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License</a></li>
-</ul>
 
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="Home.html" title="previous chapter"><em><strong>Isocompy</strong></em></a></li>
-      <li>Next: <a href="reg_model.model-class.html" title="next chapter">class model ( )</a></li>
   </ul></li>
 </ul>
 </div>
@@ -266,7 +246,7 @@ to determine upper boundary limit.</p>
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
 
 
 
@@ -280,10 +260,10 @@ to determine upper boundary limit.</p>
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2023, IDAEA-CSIC-Ashkan Hassanzadeh.
+      &copy;2023, Ashkan Hassanzadeh IDAEA-CSIC.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.5.0</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.3.0</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
       
       |

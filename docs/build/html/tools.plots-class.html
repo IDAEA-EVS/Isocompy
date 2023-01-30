@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>class plots ( ) &#8212; isocompy  documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
@@ -12,11 +12,11 @@
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="class session ( )" href="tools.session-class.html" />
-    <link rel="prev" title="class evaluation ( )" href="tools.evaluation-class.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -34,11 +34,11 @@
           <div class="body" role="main">
             
   <section id="class-plots">
-<h1>class plots ( )<a class="headerlink" href="#class-plots" title="Permalink to this headline">¶</a></h1>
+<h1>class plots ( )<a class="headerlink" href="#class-plots" title="Permalink to this heading">¶</a></h1>
 <p>The method to generate the model class plots and maps</p>
 <hr class="docutils" />
 <section id="methods">
-<h2><strong>Methods</strong><a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h2>
+<h2><strong>Methods</strong><a class="headerlink" href="#methods" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>best_estimator_plots ( )</p></li>
 <li><p>partial_dep_plots ( )</p></li>
@@ -48,12 +48,12 @@
 </section>
 <hr class="docutils" />
 <section id="plots-best-estimator-plots">
-<h2>plots.best_estimator_plots ( )<a class="headerlink" href="#plots-best-estimator-plots" title="Permalink to this headline">¶</a></h2>
+<h2>plots.best_estimator_plots ( )<a class="headerlink" href="#plots-best-estimator-plots" title="Permalink to this heading">¶</a></h2>
 <p>plots.best_estimator_plots( <code class="docutils literal notranslate"><span class="pre">cls,</span> <span class="pre">st1=True,</span> <span class="pre">st2=True</span></code> )</p>
 <p>The method to plot the model class best estimators</p>
 <hr class="docutils" />
 <section id="parameters">
-<h3><strong>Parameters</strong><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h3>
+<h3><strong>Parameters</strong><a class="headerlink" href="#parameters" title="Permalink to this heading">¶</a></h3>
 <p><strong>st1</strong> boolean default=<code class="docutils literal notranslate"><span class="pre">True</span></code></p>
 <p>Generate plots for stage one regression models of the model class</p>
 <p><strong>st2</strong> boolean default=<code class="docutils literal notranslate"><span class="pre">True</span></code></p>
@@ -62,12 +62,12 @@
 </section>
 <hr class="docutils" />
 <section id="plots-partial-dep-plots">
-<h2>plots.partial_dep_plots ( )<a class="headerlink" href="#plots-partial-dep-plots" title="Permalink to this headline">¶</a></h2>
+<h2>plots.partial_dep_plots ( )<a class="headerlink" href="#plots-partial-dep-plots" title="Permalink to this heading">¶</a></h2>
 <p>plots. partial_dep_plots(<code class="docutils literal notranslate"><span class="pre">cls,st1=True,st2=True</span></code>)</p>
 <p>The method to plot the partial dependency of the features of the model class</p>
 <hr class="docutils" />
 <section id="id1">
-<h3><strong>Parameters</strong><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<h3><strong>Parameters</strong><a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h3>
 <p><strong>st1</strong> boolean default=<code class="docutils literal notranslate"><span class="pre">True</span></code></p>
 <p>Generate plots for stage one regression models of the model class</p>
 <p><strong>st2</strong> boolean default=<code class="docutils literal notranslate"><span class="pre">True</span></code></p>
@@ -76,12 +76,12 @@
 </section>
 <hr class="docutils" />
 <section id="method-plots-isotopes-meteoline-plot">
-<h2>Method plots.isotopes_meteoline_plot ( )<a class="headerlink" href="#method-plots-isotopes-meteoline-plot" title="Permalink to this headline">¶</a></h2>
+<h2>Method plots.isotopes_meteoline_plot ( )<a class="headerlink" href="#method-plots-isotopes-meteoline-plot" title="Permalink to this heading">¶</a></h2>
 <p>plots.isotopes_meteoline_plot( <code class="docutils literal notranslate"><span class="pre">ev_class,</span> <span class="pre">iso_class,</span> <span class="pre">var_list,</span> <span class="pre">iso_18=None,</span> <span class="pre">iso_2h=None,</span> <span class="pre">a=8,</span> <span class="pre">b=10,</span> <span class="pre">obs_data=False,</span> <span class="pre">residplot=False</span></code> )</p>
 <p>The method to plot the (meteorological) line between  two features (isotopes) that are determined in var_list</p>
 <hr class="docutils" />
 <section id="id2">
-<h3><strong>Parameters</strong><a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<h3><strong>Parameters</strong><a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h3>
 <p><strong>ev_class</strong> evaluation class</p>
 <p>evaluation class that contains the second stage models predictions</p>
 <hr class="docutils" />
@@ -123,12 +123,12 @@
 </section>
 <hr class="docutils" />
 <section id="method-plots-map-generator">
-<h2>Method plots.map_generator ( )<a class="headerlink" href="#method-plots-map-generator" title="Permalink to this headline">¶</a></h2>
+<h2>Method plots.map_generator ( )<a class="headerlink" href="#method-plots-map-generator" title="Permalink to this heading">¶</a></h2>
 <p>plots.map_generator(<code class="docutils literal notranslate"><span class="pre">ev_class,feat_list,observed_class_list=None,month_list=None,unit_list=None,opt_title_list=None,x=&quot;CooX&quot;,y=&quot;CooY&quot;,shp_file=None,html=</span></code>True<code class="docutils literal notranslate"><span class="pre">,direc=None,minus_to_zero_list=None,max_to_hundred_list=None</span></code>)</p>
 <p>The method to generate the maps (.png and HTML) of the evaluation class</p>
 <hr class="docutils" />
 <section id="id3">
-<h3><strong>Parameters</strong><a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<h3><strong>Parameters</strong><a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h3>
 <p><strong>ev_class</strong> evaluation class</p>
 <p>Evaluation class that contains the second stage models predictions</p>
 <hr class="docutils" />
@@ -188,31 +188,11 @@
 
 
 <h3>Navigation</h3>
-<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="Home.html"><em><strong>Isocompy</strong></em></a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_preparation.preprocess-class.html">class preprocess ( )</a></li>
-<li class="toctree-l1"><a class="reference internal" href="reg_model.model-class.html">class model ( )</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tools.evaluation-class.html">class evaluation ( )</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">class plots ( )</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#methods"><strong>Methods</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#plots-best-estimator-plots">plots.best_estimator_plots ( )</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#plots-partial-dep-plots">plots.partial_dep_plots ( )</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#method-plots-isotopes-meteoline-plot">Method plots.isotopes_meteoline_plot ( )</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#method-plots-map-generator">Method plots.map_generator ( )</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="tools.session-class.html">class session ( )</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tools.stats-class.html">class stats ( )</a></li>
-<li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License</a></li>
-</ul>
 
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="tools.evaluation-class.html" title="previous chapter">class evaluation ( )</a></li>
-      <li>Next: <a href="tools.session-class.html" title="next chapter">class session ( )</a></li>
   </ul></li>
 </ul>
 </div>
@@ -225,7 +205,7 @@
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
 
 
 
@@ -239,10 +219,10 @@
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2023, IDAEA-CSIC-Ashkan Hassanzadeh.
+      &copy;2023, Ashkan Hassanzadeh IDAEA-CSIC.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.5.0</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.3.0</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
       
       |

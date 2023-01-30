@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>class model ( ) &#8212; isocompy  documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
@@ -12,11 +12,11 @@
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="class evaluation ( )" href="tools.evaluation-class.html" />
-    <link rel="prev" title="class preprocess ( )" href="data_preparation.preprocess-class.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -34,11 +34,11 @@
           <div class="body" role="main">
             
   <section id="class-model">
-<h1>class model ( )<a class="headerlink" href="#class-model" title="Permalink to this headline">¶</a></h1>
+<h1>class model ( )<a class="headerlink" href="#class-model" title="Permalink to this heading">¶</a></h1>
 <p>The class to fit the regression models in stage one, predict the stage one results and fit stage two regression models</p>
 <hr class="docutils" />
 <section id="methods">
-<h2><strong>Methods</strong><a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h2>
+<h2><strong>Methods</strong><a class="headerlink" href="#methods" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>__init__(self)</p></li>
 <li><p>st1_fit()</p></li>
@@ -50,7 +50,7 @@
 </section>
 <hr class="docutils" />
 <section id="attributes">
-<h2><strong>Attributes</strong><a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h2>
+<h2><strong>Attributes</strong><a class="headerlink" href="#attributes" title="Permalink to this heading">¶</a></h2>
 <p>(<strong>init</strong> method of model class)</p>
 <p><strong>direc</strong> str</p>
 <p>Directory of the class</p>
@@ -105,12 +105,12 @@
 </section>
 <hr class="docutils" />
 <section id="model-st1-fit">
-<h2>model.st1_fit ( )<a class="headerlink" href="#model-st1-fit" title="Permalink to this headline">¶</a></h2>
+<h2>model.st1_fit ( )<a class="headerlink" href="#model-st1-fit" title="Permalink to this heading">¶</a></h2>
 <p>model.st1_fit (<code class="docutils literal notranslate"><span class="pre">self,var_cls_list,direc,st1_model_month_list=&quot;all&quot;,args_dic=</span> <span class="pre">{</span> <span class="pre">&quot;feature_selection&quot;</span> <span class="pre">:</span> <span class="pre">&quot;auto&quot;</span> <span class="pre">,</span> <span class="pre">&quot;vif_threshold&quot;</span> <span class="pre">:</span> <span class="pre">5,</span> <span class="pre">&quot;vif_selection_pairs&quot;:[],&quot;correlation_threshold&quot;:0.87,&quot;vif_corr&quot;:True,&quot;p_val&quot;:0.05}</span></code>)</p>
 <p>The method to fit regression models to identified preprocess class objects in stage one</p>
 <hr class="docutils" />
 <section id="parameters">
-<h3><strong>Parameters</strong><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h3>
+<h3><strong>Parameters</strong><a class="headerlink" href="#parameters" title="Permalink to this heading">¶</a></h3>
 <p><strong>var_cls_list</strong> list</p>
 <p>A list of preprocess class objects to to fit regression models. Regression models will be fitted to each elemnt of the list (a preprocess class object).</p>
 <hr class="docutils" />
@@ -136,7 +136,7 @@ chosen by the user</p></li>
 </section>
 <hr class="docutils" />
 <section id="id1">
-<h3><strong>Attributes</strong><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<h3><strong>Attributes</strong><a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h3>
 <p><strong>direc</strong> str</p>
 <p>Directory of the class</p>
 <hr class="docutils" />
@@ -152,12 +152,12 @@ chosen by the user</p></li>
 </section>
 <hr class="docutils" />
 <section id="model-st2-fit">
-<h2>model.st2_fit ( )<a class="headerlink" href="#model-st2-fit" title="Permalink to this headline">¶</a></h2>
+<h2>model.st2_fit ( )<a class="headerlink" href="#model-st2-fit" title="Permalink to this heading">¶</a></h2>
 <p>model.st2_fit (<code class="docutils literal notranslate"><span class="pre">self,model_var_dict=None,</span> <span class="pre">output_report=True,</span> <span class="pre">dependent_model_selection=False,</span> <span class="pre">dependent_model_selection_list=None,</span> <span class="pre">meteo_coef=8,</span> <span class="pre">meteo_intercept=10,</span> <span class="pre">selection_method=&quot;point_to_point&quot;,</span> <span class="pre">thresh_meteoline_high_scores=None,</span> <span class="pre">model_selection_report=True,</span> <span class="pre">args_dic={&quot;feature_selection&quot;:&quot;auto&quot;,</span> <span class="pre">&quot;vif_threshold&quot;:5,</span> <span class="pre">&quot;vif_selection_pairs&quot;:[],</span>&#160; <span class="pre">&quot;correlation_threshold&quot;:0.87,</span> <span class="pre">&quot;vif_corr&quot;:True,&quot;p_val&quot;:0.05}</span></code>):</p>
 <p>The method to fit regression models to identified preprocess class objects in stage one</p>
 <hr class="docutils" />
 <section id="id2">
-<h3><strong>Parameters</strong><a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<h3><strong>Parameters</strong><a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h3>
 <p><strong>model_var_dict</strong> None type or dict  default=<code class="docutils literal notranslate"><span class="pre">None</span></code></p>
 <p>A dictionary that determines dependent (key - string) and independent (value) features of the second stage regression models.
 Independent features (value) have to be a list of feature names (string).</p>
@@ -217,7 +217,7 @@ chosen by the user</p></li>
 </section>
 <hr class="docutils" />
 <section id="id3">
-<h3><strong>Attributes</strong><a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<h3><strong>Attributes</strong><a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h3>
 <p><strong>st2_model_results_dic</strong> dict</p>
 <p>A dictionary consist of st2 model results</p>
 <hr class="docutils" />
@@ -243,7 +243,7 @@ chosen by the user</p></li>
 </section>
 <hr class="docutils" />
 <section id="model-choose-estimator-by-meteo-line">
-<h2>model.choose_estimator_by_meteo_line ( )<a class="headerlink" href="#model-choose-estimator-by-meteo-line" title="Permalink to this headline">¶</a></h2>
+<h2>model.choose_estimator_by_meteo_line ( )<a class="headerlink" href="#model-choose-estimator-by-meteo-line" title="Permalink to this heading">¶</a></h2>
 <p>model.choose_estimator_by_meteo_line( <code class="docutils literal notranslate"><span class="pre">self,</span> <span class="pre">dependent_model_selection_list,</span> <span class="pre">selection_method=&quot;point_to_point&quot;,</span> <span class="pre">model_selection_report=True,</span> <span class="pre">thresh_meteoline_high_scores=None,</span> <span class="pre">meteo_coef=8,</span> <span class="pre">meteo_intercept=10</span></code> ):</p>
 <p>The method to select the best model based on a (meteorological) line. only useful if there is a linear refrence line (EX:Isotopes).
 This method could be called automatically in st2_fit if dependent_model_selection=True. or it can be called after st2_fit execution
@@ -251,7 +251,7 @@ to see the changes in best regression models based on different criterias.</p>
 <p><em>IMPORTANT NOTE:</em>  Executing this method will update the st2_model_results_dic to match the latest chosen selection_method. st2_model_results_dic stores the second stage results.</p>
 <hr class="docutils" />
 <section id="id4">
-<h3><strong>Parameters</strong><a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<h3><strong>Parameters</strong><a class="headerlink" href="#id4" title="Permalink to this heading">¶</a></h3>
 <p><strong>dependent_model_selection_list</strong> default=<code class="docutils literal notranslate"><span class="pre">None</span></code></p>
 <p>Used if dependent_model_selection=True. List of two features that have to be used in dependent_model_selection</p>
 <hr class="docutils" />
@@ -278,7 +278,7 @@ to see the changes in best regression models based on different criterias.</p>
 </section>
 <hr class="docutils" />
 <section id="id5">
-<h3><strong>Attributes</strong><a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<h3><strong>Attributes</strong><a class="headerlink" href="#id5" title="Permalink to this heading">¶</a></h3>
 <p><strong>st2_model_results_dic</strong> dict</p>
 <p>Updated dictionary of st2 model results</p>
 <hr class="docutils" />
@@ -303,13 +303,13 @@ to see the changes in best regression models based on different criterias.</p>
 </section>
 <hr class="docutils" />
 <section id="model-stage2-output-report">
-<h2>model.stage2_output_report ( )<a class="headerlink" href="#model-stage2-output-report" title="Permalink to this headline">¶</a></h2>
+<h2>model.stage2_output_report ( )<a class="headerlink" href="#model-stage2-output-report" title="Permalink to this heading">¶</a></h2>
 <p>model.stage2_output_report(self,direc=None):</p>
 <p>This method is useful to update st2_fit output files results in case they are changed.
 (Normally the change can happen if choose_estimator_by_meteo_line method is executed)</p>
 <hr class="docutils" />
 <section id="id6">
-<h3><strong>Parameters</strong><a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<h3><strong>Parameters</strong><a class="headerlink" href="#id6" title="Permalink to this heading">¶</a></h3>
 <p><strong>direc</strong> str default=<code class="docutils literal notranslate"><span class="pre">None</span></code></p>
 <p>Directory of the output</p>
 </section>
@@ -333,32 +333,11 @@ to see the changes in best regression models based on different criterias.</p>
 
 
 <h3>Navigation</h3>
-<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="Home.html"><em><strong>Isocompy</strong></em></a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_preparation.preprocess-class.html">class preprocess ( )</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">class model ( )</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#methods"><strong>Methods</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#attributes"><strong>Attributes</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#model-st1-fit">model.st1_fit ( )</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#model-st2-fit">model.st2_fit ( )</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#model-choose-estimator-by-meteo-line">model.choose_estimator_by_meteo_line ( )</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#model-stage2-output-report">model.stage2_output_report ( )</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="tools.evaluation-class.html">class evaluation ( )</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tools.plots-class.html">class plots ( )</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tools.session-class.html">class session ( )</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tools.stats-class.html">class stats ( )</a></li>
-<li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License</a></li>
-</ul>
 
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="data_preparation.preprocess-class.html" title="previous chapter">class preprocess ( )</a></li>
-      <li>Next: <a href="tools.evaluation-class.html" title="next chapter">class evaluation ( )</a></li>
   </ul></li>
 </ul>
 </div>
@@ -371,7 +350,7 @@ to see the changes in best regression models based on different criterias.</p>
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
 
 
 
@@ -385,10 +364,10 @@ to see the changes in best regression models based on different criterias.</p>
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2023, IDAEA-CSIC-Ashkan Hassanzadeh.
+      &copy;2023, Ashkan Hassanzadeh IDAEA-CSIC.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.5.0</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.3.0</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
       
       |

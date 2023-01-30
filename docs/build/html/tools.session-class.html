@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>class session ( ) &#8212; isocompy  documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
@@ -12,11 +12,11 @@
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="class stats ( )" href="tools.stats-class.html" />
-    <link rel="prev" title="class plots ( )" href="tools.plots-class.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -34,11 +34,11 @@
           <div class="body" role="main">
             
   <section id="class-session">
-<h1>class session ( )<a class="headerlink" href="#class-session" title="Permalink to this headline">¶</a></h1>
+<h1>class session ( )<a class="headerlink" href="#class-session" title="Permalink to this heading">¶</a></h1>
 <p>The class to save and load the objects and sessions</p>
 <hr class="docutils" />
 <section id="methods">
-<h2><strong>Methods</strong><a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h2>
+<h2><strong>Methods</strong><a class="headerlink" href="#methods" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>save()</p></li>
 <li><p>load()</p></li>
@@ -48,42 +48,42 @@
 </section>
 <hr class="docutils" />
 <section id="session-save">
-<h2>session.save ( )<a class="headerlink" href="#session-save" title="Permalink to this headline">¶</a></h2>
+<h2>session.save ( )<a class="headerlink" href="#session-save" title="Permalink to this heading">¶</a></h2>
 <p>session.save(<code class="docutils literal notranslate"><span class="pre">self,name=&quot;isocompy_saved_object&quot;</span></code>)</p>
 <p>The method to save an object</p>
 <hr class="docutils" />
 <section id="parameters">
-<h3><strong>Parameters</strong><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h3>
+<h3><strong>Parameters</strong><a class="headerlink" href="#parameters" title="Permalink to this heading">¶</a></h3>
 <p><strong>name</strong> str default=<code class="docutils literal notranslate"><span class="pre">&quot;isocompy_saved_object&quot;</span></code></p>
 <p>The output name string</p>
 </section>
 <hr class="docutils" />
 <section id="returns">
-<h3><strong>Returns</strong><a class="headerlink" href="#returns" title="Permalink to this headline">¶</a></h3>
+<h3><strong>Returns</strong><a class="headerlink" href="#returns" title="Permalink to this heading">¶</a></h3>
 <p><strong>filename</strong> string</p>
 <p>Directory of the saved object</p>
 </section>
 </section>
 <hr class="docutils" />
 <section id="session-load">
-<h2>session.load ( )<a class="headerlink" href="#session-load" title="Permalink to this headline">¶</a></h2>
+<h2>session.load ( )<a class="headerlink" href="#session-load" title="Permalink to this heading">¶</a></h2>
 <p>session.load(<code class="docutils literal notranslate"><span class="pre">direc</span></code>)</p>
 <p>The method to load a pkl object. <code class="docutils literal notranslate"><span class="pre">direc</span></code> is the directory of the object to be loaded.</p>
 <hr class="docutils" />
 <section id="id1">
-<h3><strong>Returns</strong><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<h3><strong>Returns</strong><a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h3>
 <p><strong>obj</strong> object</p>
 <p>The loaded object</p>
 </section>
 </section>
 <hr class="docutils" />
 <section id="session-save-session">
-<h2>session.save_session ( )<a class="headerlink" href="#session-save-session" title="Permalink to this headline">¶</a></h2>
+<h2>session.save_session ( )<a class="headerlink" href="#session-save-session" title="Permalink to this heading">¶</a></h2>
 <p>session.save_session(<code class="docutils literal notranslate"><span class="pre">direc,</span> <span class="pre">name=&quot;isocompy_saved_session&quot;,</span> <span class="pre">*argv</span></code>):</p>
 <p>The method to save a session</p>
 <hr class="docutils" />
 <section id="id2">
-<h3><strong>Parameters</strong><a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<h3><strong>Parameters</strong><a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h3>
 <p>name: str default=”isocompy_saved_object”</p>
 <p>The output name string</p>
 <hr class="docutils" />
@@ -92,25 +92,25 @@
 </section>
 <hr class="docutils" />
 <section id="id3">
-<h3><strong>Returns</strong><a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<h3><strong>Returns</strong><a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h3>
 <p><strong>filename</strong> string</p>
 <p>Directory of the saved session</p>
 </section>
 </section>
 <hr class="docutils" />
 <section id="session-load-session">
-<h2>session.load_session ( )<a class="headerlink" href="#session-load-session" title="Permalink to this headline">¶</a></h2>
+<h2>session.load_session ( )<a class="headerlink" href="#session-load-session" title="Permalink to this heading">¶</a></h2>
 <p>session.load_session(<code class="docutils literal notranslate"><span class="pre">dir</span></code>)</p>
 <p>The method to load a session</p>
 <hr class="docutils" />
 <section id="id4">
-<h3><strong>Parameters</strong><a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<h3><strong>Parameters</strong><a class="headerlink" href="#id4" title="Permalink to this heading">¶</a></h3>
 <p><strong>*argv</strong></p>
 <p>The objects that wanted to be stored in the session</p>
 </section>
 <hr class="docutils" />
 <section id="id5">
-<h3><strong>Returns</strong><a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<h3><strong>Returns</strong><a class="headerlink" href="#id5" title="Permalink to this heading">¶</a></h3>
 <p>Loads the session</p>
 </section>
 </section>
@@ -133,31 +133,11 @@
 
 
 <h3>Navigation</h3>
-<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="Home.html"><em><strong>Isocompy</strong></em></a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_preparation.preprocess-class.html">class preprocess ( )</a></li>
-<li class="toctree-l1"><a class="reference internal" href="reg_model.model-class.html">class model ( )</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tools.evaluation-class.html">class evaluation ( )</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tools.plots-class.html">class plots ( )</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">class session ( )</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#methods"><strong>Methods</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#session-save">session.save ( )</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#session-load">session.load ( )</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#session-save-session">session.save_session ( )</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#session-load-session">session.load_session ( )</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="tools.stats-class.html">class stats ( )</a></li>
-<li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License</a></li>
-</ul>
 
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="tools.plots-class.html" title="previous chapter">class plots ( )</a></li>
-      <li>Next: <a href="tools.stats-class.html" title="next chapter">class stats ( )</a></li>
   </ul></li>
 </ul>
 </div>
@@ -170,7 +150,7 @@
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
 
 
 
@@ -184,10 +164,10 @@
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2023, IDAEA-CSIC-Ashkan Hassanzadeh.
+      &copy;2023, Ashkan Hassanzadeh IDAEA-CSIC.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.5.0</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.3.0</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
       
       |
