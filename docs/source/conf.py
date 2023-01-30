@@ -7,7 +7,7 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'isocompy'
-copyright = '2023, Ashkan Hassanzadeh'
+copyright = '2023, IDAEA-CSIC-Ashkan Hassanzadeh'
 author = 'Ashkan Hassanzadeh'
 
 # -- General configuration ---------------------------------------------------
