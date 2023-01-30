@@ -96,9 +96,9 @@ def make_maps_gpd(df,shp_dir,feat,dir,CooX,CooY,unit,opt_title,observed_data):
     #gdf_p.set_xlabel(str(CooX))
     #gdf_p.set_ylabel(str(CooY))
     if opt_title==None:
-        gdf_p.set_title(feat + "  ( "+unit+ ")",fontSize=10)
+        gdf_p.set_title(feat + "  ( "+unit+ ")",fontsize=10)
     else:    
-        gdf_p.set_title(opt_title,fontSize=10)
+        gdf_p.set_title(opt_title,fontsize=10)
 
     plt.setp(ax.get_yticklabels(), rotation=90,fontsize=5)
     plt.setp(ax.get_xticklabels(), rotation=0,fontsize=5)

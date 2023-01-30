@@ -1,0 +1,199 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>class evaluation ( ) &#8212; isocompy  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="class plots ( )" href="tools.plots-class.html" />
+    <link rel="prev" title="class model ( )" href="reg_model.model-class.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="class-evaluation">
+<h1>class evaluation ( )<a class="headerlink" href="#class-evaluation" title="Permalink to this headline">¶</a></h1>
+<p>The class to predict the second stage regression models</p>
+<hr class="docutils" />
+<section id="methods">
+<h2><strong>Methods</strong><a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>__init__ (self)</p></li>
+<li><p>predict ( )</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="attributes">
+<h2><strong>Attributes</strong><a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h2>
+<p><strong>direc</strong> str</p>
+<p>directory of the class</p>
+<hr class="docutils" />
+<p><strong>monthly_st2_output_list_all_vars</strong> list</p>
+<p>list of stage two models outputs, separated by month</p>
+<hr class="docutils" />
+<p><strong>monthly_st2_output_dic_all_vars_df</strong> dict</p>
+<p>dictionary of stage two models outputs, separated by month. key is the month, and value is the output df of that specific month</p>
+<hr class="docutils" />
+<p><strong>pred_inputs</strong> Pandas Dataframe</p>
+<p>A Dataframe, that have to be contain of features that is used in stage one, that is going to be used to estimate the stage one and two models</p>
+<hr class="docutils" />
+<p><strong>st2_predicted_month_list</strong> list</p>
+<p>List of the months that have stage two regression models</p>
+</section>
+<hr class="docutils" />
+<section id="evaluation-predict">
+<h2>evaluation.predict ( )<a class="headerlink" href="#evaluation-predict" title="Permalink to this headline">¶</a></h2>
+<p>evaluation.predict(<code class="docutils literal notranslate"><span class="pre">self,</span> <span class="pre">cls,</span> <span class="pre">pred_inputs,</span> <span class="pre">stage2_vars_to_predict=None,</span> <span class="pre">direc=None,</span> <span class="pre">write_to_file=True</span></code> )</p>
+<p>The method to predict the second stage regression models</p>
+<hr class="docutils" />
+<section id="parameters">
+<h3><strong>Parameters</strong><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h3>
+<p>**cls ** model class</p>
+<p>The model class that contains st1 and st2 models</p>
+<hr class="docutils" />
+<p>**pred_inputs ** Pandas dataframe</p>
+<p>A Dataframe, that have to be contain of features that is used in stage one, that is going to be used to estimate the stage one and two models.</p>
+<p>It can contain <code class="docutils literal notranslate"><span class="pre">&quot;month&quot;</span></code> field which could be used in evaluating the stage two predictions in observed data.</p>
+<ul>
+<li><p><em>EXAMPLE:</em></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
+<span class="n">pred_inputs</span><span class="o">=</span><span class="n">model_class</span><span class="o">.</span><span class="n">all_preds</span><span class="p">[[</span><span class="s2">&quot;CooX&quot;</span><span class="p">,</span><span class="s2">&quot;CooY&quot;</span><span class="p">,</span><span class="s2">&quot;CooZ&quot;</span><span class="p">,</span><span class="s2">&quot;month&quot;</span><span class="p">,</span><span class="s2">&quot;ID&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+
+</pre></div>
+</div>
+</li>
+</ul>
+<hr class="docutils" />
+<p>**stage2_vars_to_predict ** None type or list of strs default=<code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+<p>List of stage two dependent features to predict the outputs. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, The results will be predicted for all two dependent features</p>
+<hr class="docutils" />
+<p>**direc ** None type or str default=None</p>
+<p>Directory of the class. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, it is the same directory as the model class.</p>
+<hr class="docutils" />
+<p>**write_to_file ** boolean default=<code class="docutils literal notranslate"><span class="pre">True</span></code></p>
+<p>To write the outputs in .xls files, separated by the month</p>
+</section>
+<hr class="docutils" />
+<section id="id1">
+<h3><strong>Attributes</strong><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p><strong>direc</strong> str</p>
+<p>directory of the class</p>
+<hr class="docutils" />
+<p><strong>monthly_st2_output_list_all_vars</strong> list</p>
+<p>list of stage two models outputs, separated by month</p>
+<hr class="docutils" />
+<p><strong>monthly_st2_output_dic_all_vars_df</strong> dict</p>
+<p>dictionary of stage two models outputs, separated by month. key is the month, and value is the output df of that specific month</p>
+<hr class="docutils" />
+<p><strong>pred_inputs</strong> Pandas Dataframe</p>
+<p>A Dataframe, that have to be contain of features that is used in stage one, that is going to be used to estimate the stage one and two models</p>
+<hr class="docutils" />
+<p><strong>st2_predicted_month_list</strong> list</p>
+<p>List of the months that have stage two regression models</p>
+</section>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">isocompy</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Home.html"><em><strong>Isocompy</strong></em></a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_preparation.preprocess-class.html">class preprocess ( )</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reg_model.model-class.html">class model ( )</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">class evaluation ( )</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#methods"><strong>Methods</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#attributes"><strong>Attributes</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#evaluation-predict">evaluation.predict ( )</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tools.plots-class.html">class plots ( )</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools.session-class.html">class session ( )</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools.stats-class.html">class stats ( )</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="reg_model.model-class.html" title="previous chapter">class model ( )</a></li>
+      <li>Next: <a href="tools.plots-class.html" title="next chapter">class plots ( )</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, Ashkan Hassanzadeh.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.5.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+      |
+      <a href="_sources/tools.evaluation-class.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

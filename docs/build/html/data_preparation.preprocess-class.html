@@ -1,0 +1,297 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>class preprocess ( ) &#8212; isocompy  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="class model ( )" href="reg_model.model-class.html" />
+    <link rel="prev" title="Isocompy" href="Home.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="class-preprocess">
+<h1>class preprocess ( )<a class="headerlink" href="#class-preprocess" title="Permalink to this headline">¶</a></h1>
+<p>The class to preprocess the input variables of each model group and initiate
+the models properties such as cross-validation and  brute-force searching.</p>
+<hr class="docutils" />
+<section id="parameters">
+<h2><strong>Parameters</strong><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
+<p>(__init__ method of preprocess class)</p>
+<p><strong>tunedpars_rfr</strong> dic, default= <code class="docutils literal notranslate"><span class="pre">{&quot;min_weight_fraction_leaf&quot;:[0,0.02,0.04],&quot;n_estimators&quot;:[50,100,150,2'00,250,300],&quot;criterion&quot;:</span> <span class="pre">[&quot;mse&quot;,&quot;mae&quot;],&quot;min_samples_split&quot;:[2,5]</span> <span class="pre">}</span></code></p>
+<p>The dictionary that determines brute-force searching parameters of Random Forest regression. For more details on the regression method inputs, refer to sklearn library.</p>
+<hr class="docutils" />
+<p><strong>tunedpars_svr</strong> dic default=<code class="docutils literal notranslate"><span class="pre">{&quot;kernel&quot;:[</span> <span class="pre">&quot;poly&quot;,</span> <span class="pre">&quot;rbf&quot;,</span> <span class="pre">&quot;sigmoid&quot;],&quot;C&quot;:np.logspace(-1,</span> <span class="pre">1,</span> <span class="pre">3),&quot;gamma&quot;:np.logspace(-3,</span> <span class="pre">1,</span> <span class="pre">3)</span> <span class="pre">}</span></code></p>
+<p>The dictionary that determines brute-force searching parameters of Support Vector regression. For more details on the regression method inputs, refer to sklearn library.</p>
+<hr class="docutils" />
+<p><strong>tunedpars_nusvr</strong> dic default=<code class="docutils literal notranslate"><span class="pre">{&quot;kernel&quot;:[&quot;linear&quot;,</span> <span class="pre">&quot;poly&quot;,</span> <span class="pre">&quot;rbf&quot;,</span> <span class="pre">&quot;sigmoid&quot;]</span> <span class="pre">}</span></code></p>
+<p>The dictionary that determines brute-force searching parameters of Nu Support Vector Regression. For more details on the regression method inputs, refer to sklearn library.</p>
+<hr class="docutils" />
+<p><strong>tunedpars_mlp</strong> dic default=<code class="docutils literal notranslate"><span class="pre">{&quot;activation&quot;</span> <span class="pre">:</span> <span class="pre">[</span> <span class="pre">&quot;logistic&quot;,</span> <span class="pre">&quot;tanh&quot;],&quot;solver&quot;</span> <span class="pre">:</span> <span class="pre">[&quot;lbfgs&quot;,</span> <span class="pre">&quot;sgd&quot;,</span> <span class="pre">&quot;adam&quot;],&quot;alpha&quot;:[0.0001,0.0003],&quot;hidden_layer_sizes&quot;:[(50,)*2,(50,)*3,(50,)*4,(100,)*2,(100,)*3,(100,)*4],&quot;max_iter&quot;:[1000],&quot;n_iter_no_change&quot;:[10]}</span></code></p>
+<p>The dictionary that determines brute-force searching parameters of Multilayer Perceptron regression. For more details on the regression method inputs, refer to sklearn library.</p>
+<hr class="docutils" />
+<p><strong>tunedpars_lr</strong> dic default=<code class="docutils literal notranslate"><span class="pre">{}</span></code></p>
+<p>The dictionary that determines brute-force searching parameters of Linear regression. For more details on the regression method inputs, refer to sklearn library.</p>
+<hr class="docutils" />
+<p><strong>tunedpars_br</strong> dic default=<code class="docutils literal notranslate"><span class="pre">{}</span></code></p>
+<p>The dictionary that determines brute-force searching parameters of Bayesian Ridge regression. For more details on the regression method inputs, refer to sklearn library.</p>
+<hr class="docutils" />
+<p><strong>tunedpars_ard</strong> dic default=<code class="docutils literal notranslate"><span class="pre">{}</span></code></p>
+<p>The dictionary that determines brute-force searching parameters of Bayesian ARD regression. For more details on the regression method inputs, refer to sklearn library.</p>
+<hr class="docutils" />
+<p><strong>tunedpars_omp</strong> dic default=<code class="docutils literal notranslate"><span class="pre">{}</span></code></p>
+<p>The dictionary that determines brute-force searching parameters of Orthogonal Matching Pursuit regression. For more details on the regression method inputs, refer to sklearn library.</p>
+<hr class="docutils" />
+<p><strong>tunedpars_elnet</strong> dic default=<code class="docutils literal notranslate"><span class="pre">{&quot;l1_ratio&quot;:[.1,</span> <span class="pre">.5,</span> <span class="pre">.7,.9,.99]}</span></code></p>
+<p>The dictionary that determines brute-force searching parameters of ElasticNet (Linear regression with combined L1 and L2 priors as regularizer) regression. For more details on the regression method inputs, refer to sklearn library.</p>
+<hr class="docutils" />
+<p><strong>tunedpars_muelnet</strong> dic default= <code class="docutils literal notranslate"><span class="pre">{&quot;l1_ratio&quot;:[.1,</span> <span class="pre">.5,</span> <span class="pre">.7,.9,.99]}</span></code></p>
+<p>The dictionary that determines brute-force searching parameters of Multi-task ElasticNet (trained with L1/L2 mixed-norm as regularizer) regression. For more details on the regression method inputs, refer to sklearn library.</p>
+<hr class="docutils" />
+<p><strong>which_regs</strong> dic default= <code class="docutils literal notranslate"><span class="pre">{&quot;muelnet&quot;:True,</span> <span class="pre">&quot;rfr&quot;:True,</span> <span class="pre">&quot;mlp&quot;:True,</span> <span class="pre">&quot;elnet&quot;:True,</span> <span class="pre">&quot;omp&quot;:True,</span> <span class="pre">&quot;br&quot;:True,</span> <span class="pre">&quot;ard&quot;:True,</span> <span class="pre">&quot;svr&quot;:True,</span> <span class="pre">&quot;nusvr&quot;:False}</span></code></p>
+<p>The dictionary that determines which regression models have to be included in cross-validation and  brute-force searching process</p>
+<hr class="docutils" />
+<p><strong>apply_on_log</strong> Boolean default=<code class="docutils literal notranslate"><span class="pre">True</span></code></p>
+<p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, Apart from the main values, fits the models to log(1 + x) (Natural logarithm) of data. If the scores of the regression on logarithm of the data is higher
+than the real values, The chosen method will always calculate the log(1 + x) of the data before fitting the models. Note that if this is the case, to have the real
+outputs, exp(x) - 1 (the inverse of log(1 + x)) will be calculated.</p>
+<hr class="docutils" />
+<p><strong>cv</strong> int or Boolean default=<code class="docutils literal notranslate"><span class="pre">&quot;auto&quot;</span></code></p>
+<p>If cv=”auto”, the cross-validation number of folds will be calculated automatically. It is beneficial when there is few data available (max=10, min=2). If cv is an integer values,
+it determines number of folds of the cross-validation.</p>
+</section>
+<hr class="docutils" />
+<section id="methods">
+<h2><strong>Methods</strong><a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>__init__ (self)</p></li>
+<li><p>fit(self, inp_var, var_name, fields,direc, remove_outliers=True, write_outliers_input=True, year_type=”all”, inc_zeros_inp_var=False, write_integrated_data=True, q1=0.05, q3=0.95, IQR_inp_var=True, IQR_rat_inp_var=3, mean_mode_inp_var=”arithmetic”, elnino=None, lanina=None)</p></li>
+<li><p>model_pars(self,kwargs)</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="attributes">
+<h2><strong>Attributes</strong><a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h2>
+<p><strong>model_pars_name_dic</strong> dic</p>
+<p>A dictionary that stores brute-force searching parameters of all models. The keys and values are dictionary names and parameters dictionaries respectively</p>
+<p><em>EXAMPLE:</em></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
+<span class="n">key</span><span class="p">:</span> <span class="s2">&quot;tunedpars_rfr&quot;</span>
+
+<span class="n">Value</span><span class="p">:</span> <span class="n">tunedpars_rfr</span><span class="o">=</span> <span class="p">{</span><span class="s2">&quot;min_weight_fraction_leaf&quot;</span><span class="p">:[</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.04</span><span class="p">],</span><span class="s2">&quot;n_estimators&quot;</span><span class="p">:[</span><span class="mi">150</span><span class="p">,</span><span class="mi">200</span><span class="p">],</span><span class="s2">&quot;criterion&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;mse&quot;</span><span class="p">]</span> <span class="p">}</span>
+
+</pre></div>
+</div>
+<p><em>IMPORTANT NOTE</em>: <code class="docutils literal notranslate"><span class="pre">'model_pars'</span></code> method have to be used to change the brute-force searching parameters</p>
+<hr class="docutils" />
+<p><strong>db_input_args_dics</strong> dic</p>
+<p>A dictionary that stores input parameters of the fit method</p>
+<hr class="docutils" />
+<p><strong>direc</strong> str</p>
+<p>The directory of the data preprocessing class output</p>
+<hr class="docutils" />
+<p><strong>month_grouped_inp_var</strong> list</p>
+<p>A list of monthly grouped data. Each element of the list is a dataframe containing the grouped data of an specific month</p>
+</section>
+<hr class="docutils" />
+<section id="preprocess-fit">
+<h2>preprocess.fit ( )<a class="headerlink" href="#preprocess-fit" title="Permalink to this headline">¶</a></h2>
+<p>preprocess.fit(self, inp_var, var_name, fields, direc, remove_outliers=True,write_outliers_input=True, year_type=”all”, inc_zeros_inp_var=False, write_integrated_data=True, q1=0.05, q3=0.95, IQR_inp_var=True, IQR_rat_inp_var=3, mean_mode_inp_var=”arithmetic”, elnino=None, lanina=None):</p>
+<p>The method to preprocess the input data of the models</p>
+<hr class="docutils" />
+<section id="id1">
+<h3><strong>Parameters</strong><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p><strong>inp_var</strong> Pandas dataframe</p>
+<p>Input pandas dataframe containing the dependent value, unique IDs
+for each sample, and date. (The columns “Value”, “ID” and “Date” have to be found in the dataframe)</p>
+<hr class="docutils" />
+<p><strong>var_name</strong> str</p>
+<p>Name of the dependent variable.</p>
+<hr class="docutils" />
+<p><strong>fields</strong> list of strings</p>
+<p>List of independent variable names that have to be existed in the inp_var dataframe</p>
+<hr class="docutils" />
+<p><strong>direc</strong> str</p>
+<p>The directory of the data preprocessing class output</p>
+<hr class="docutils" />
+<p><strong>remove_outliers</strong> Boolean default=<code class="docutils literal notranslate"><span class="pre">True</span></code></p>
+<p>To remove outliers based on the introduced variables. If False, the variables related to removing outliers will be ignored.</p>
+<hr class="docutils" />
+<p><strong>write_outliers_input</strong> Boolean default=<code class="docutils literal notranslate"><span class="pre">True</span></code></p>
+<p>Effective if remove_outliers=True. To generate .xls file in directory folders of the class after removing outliers</p>
+<hr class="docutils" />
+<p><strong>year_type</strong> str default=<code class="docutils literal notranslate"><span class="pre">&quot;all&quot;</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">&quot;all&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;elnino&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;lanina&quot;</span></code>. In case elnino or lanina years have to be selected from the database</p>
+<hr class="docutils" />
+<p><strong>inc_zeros_inp_var</strong> Boolean default=<code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+<p>Effective if remove_outliers=<code class="docutils literal notranslate"><span class="pre">True</span></code>. Removing outliers could be done not considering the zero values in the database.
+(The zero values will be seperated, outliers will be removed, then zero values will be added to database)</p>
+<hr class="docutils" />
+<p><strong>write_integrated_data</strong> Boolean default=<code class="docutils literal notranslate"><span class="pre">True</span></code></p>
+<p>Generate two .xls outputs consisting of integrated data, and the quantity of data in each month</p>
+<hr class="docutils" />
+<p><strong>q1</strong> float default=<code class="docutils literal notranslate"><span class="pre">0.05</span></code></p>
+<p>Effective if remove_outliers=True and IQR_inp_var=False. Lower percentile limit to determine the outliers.</p>
+<hr class="docutils" />
+<p><strong>q3</strong> float default=<code class="docutils literal notranslate"><span class="pre">0.95</span></code></p>
+<p>Effective if remove_outliers=True  and IQR_inp_var=False. Upper percentile limit to determine the outliers</p>
+<hr class="docutils" />
+<p><strong>IQR_inp_var</strong> Boolean default=<code class="docutils literal notranslate"><span class="pre">True</span></code></p>
+<p>Effective if remove_outliers=True. Determining the upper limit of the outliers using this
+formula: $X*q_{0.75} + IQR_{rat}<em>abs(X</em>  q{0.25} - X * q_{0.75})$</p>
+<p>Lower limit = q1</p>
+<hr class="docutils" />
+<p><strong>IQR_rat_inp_var</strong> float default=<code class="docutils literal notranslate"><span class="pre">3</span></code></p>
+<p>Effective if remove_outliers=True and IQR_inp_var=True. This parameter used in  X<em>q_0.75 + IQR_rat</em>abs(X<em>q_0.25 - X</em>q_0.75)
+to determine upper boundary limit.</p>
+<hr class="docutils" />
+<p><strong>mean_mode_inp_var</strong> str default=<code class="docutils literal notranslate"><span class="pre">&quot;arithmetic&quot;</span></code></p>
+<p>Data averaging method. available options are <code class="docutils literal notranslate"><span class="pre">&quot;arithmetic&quot;</span></code>  or <code class="docutils literal notranslate"><span class="pre">&quot;geometric&quot;</span></code></p>
+<hr class="docutils" />
+<p><strong>elnino</strong> None type or list of integers default=<code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+<p>List of elnino years</p>
+<hr class="docutils" />
+<p><strong>lanina</strong> None type or list of integers default=<code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+<p>List of lanina years</p>
+</section>
+<hr class="docutils" />
+<section id="id2">
+<h3><strong>Attributes</strong><a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p><strong>db_input_args_dics</strong> dic</p>
+<p>A dictionary that stores input parameters of the fit method</p>
+<hr class="docutils" />
+<p><strong>direc</strong> str</p>
+<p>The directory of the data preprocessing class output</p>
+<hr class="docutils" />
+<p><strong>month_grouped_inp_var</strong> list</p>
+<p>A list of monthly grouped data. Each element of the list is a dataframe containing the grouped data of an specific month</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="preprocess-model-pars">
+<h2>preprocess.model_pars ( )<a class="headerlink" href="#preprocess-model-pars" title="Permalink to this headline">¶</a></h2>
+<p>preprocess.model_pars(self,**kwargs):</p>
+<p>To change the brute-force searching parameters that is already determined in a class.</p>
+<hr class="docutils" />
+<p><em>EXAMPLE:</em></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">#Define the new brute-force searching parameters dictionaries:</span>
+
+<span class="c1">#brute-force searching parameters for random forest</span>
+<span class="n">brutesearch_ran_for_dic</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;min_weight_fraction_leaf&quot;</span><span class="p">:[</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.04</span><span class="p">],</span><span class="s2">&quot;n_estimators&quot;</span><span class="p">:[</span><span class="mi">150</span><span class="p">,</span><span class="mi">200</span><span class="p">],</span><span class="s2">&quot;criterion&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;mse&quot;</span><span class="p">]</span> <span class="p">}</span>
+
+<span class="c1">#brute-force searching parameters for elastic net</span>
+<span class="n">brutesearch_elasticnet_dic</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;l1_ratio&quot;</span><span class="p">:[</span> <span class="mf">.5</span><span class="p">,</span> <span class="mf">.9</span><span class="p">]}</span>
+
+<span class="c1">#change the brute-force searching parameters</span>
+<span class="n">prep_class</span><span class="o">.</span><span class="n">model_pars</span><span class="p">(</span> <span class="s2">&quot;tunedpars_rfr&quot;</span> <span class="o">=</span> <span class="n">brutesearch_ran_for_dic</span><span class="p">,</span> <span class="s2">&quot;tunedpars_elnet&quot;</span> <span class="o">=</span> <span class="n">brutesearch_elasticnet_dic</span> <span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">isocompy</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Home.html"><em><strong>Isocompy</strong></em></a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">class preprocess ( )</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#parameters"><strong>Parameters</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#methods"><strong>Methods</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#attributes"><strong>Attributes</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#preprocess-fit">preprocess.fit ( )</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#preprocess-model-pars">preprocess.model_pars ( )</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reg_model.model-class.html">class model ( )</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools.evaluation-class.html">class evaluation ( )</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools.plots-class.html">class plots ( )</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools.session-class.html">class session ( )</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools.stats-class.html">class stats ( )</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="Home.html" title="previous chapter"><em><strong>Isocompy</strong></em></a></li>
+      <li>Next: <a href="reg_model.model-class.html" title="next chapter">class model ( )</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, Ashkan Hassanzadeh.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.5.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+      |
+      <a href="_sources/data_preparation.preprocess-class.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

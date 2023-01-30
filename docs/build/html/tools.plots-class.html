@@ -1,0 +1,256 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>class plots ( ) &#8212; isocompy  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="class session ( )" href="tools.session-class.html" />
+    <link rel="prev" title="class evaluation ( )" href="tools.evaluation-class.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="class-plots">
+<h1>class plots ( )<a class="headerlink" href="#class-plots" title="Permalink to this headline">¶</a></h1>
+<p>The method to generate the model class plots and maps</p>
+<hr class="docutils" />
+<section id="methods">
+<h2><strong>Methods</strong><a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>best_estimator_plots ( )</p></li>
+<li><p>partial_dep_plots ( )</p></li>
+<li><p>isotopes_meteoline_plot ( )</p></li>
+<li><p>map_generator ( )</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="plots-best-estimator-plots">
+<h2>plots.best_estimator_plots ( )<a class="headerlink" href="#plots-best-estimator-plots" title="Permalink to this headline">¶</a></h2>
+<p>plots.best_estimator_plots( <code class="docutils literal notranslate"><span class="pre">cls,</span> <span class="pre">st1=True,</span> <span class="pre">st2=True</span></code> )</p>
+<p>The method to plot the model class best estimators</p>
+<hr class="docutils" />
+<section id="parameters">
+<h3><strong>Parameters</strong><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h3>
+<p><strong>st1</strong> boolean default=<code class="docutils literal notranslate"><span class="pre">True</span></code></p>
+<p>Generate plots for stage one regression models of the model class</p>
+<p><strong>st2</strong> boolean default=<code class="docutils literal notranslate"><span class="pre">True</span></code></p>
+<p>Generate plots for stage one regression models of the model class</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="plots-partial-dep-plots">
+<h2>plots.partial_dep_plots ( )<a class="headerlink" href="#plots-partial-dep-plots" title="Permalink to this headline">¶</a></h2>
+<p>plots. partial_dep_plots(<code class="docutils literal notranslate"><span class="pre">cls,st1=True,st2=True</span></code>)</p>
+<p>The method to plot the partial dependency of the features of the model class</p>
+<hr class="docutils" />
+<section id="id1">
+<h3><strong>Parameters</strong><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p><strong>st1</strong> boolean default=<code class="docutils literal notranslate"><span class="pre">True</span></code></p>
+<p>Generate plots for stage one regression models of the model class</p>
+<p><strong>st2</strong> boolean default=<code class="docutils literal notranslate"><span class="pre">True</span></code></p>
+<p>Generate plots for stage two regression models of the model class</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="method-plots-isotopes-meteoline-plot">
+<h2>Method plots.isotopes_meteoline_plot ( )<a class="headerlink" href="#method-plots-isotopes-meteoline-plot" title="Permalink to this headline">¶</a></h2>
+<p>plots.isotopes_meteoline_plot( <code class="docutils literal notranslate"><span class="pre">ev_class,</span> <span class="pre">iso_class,</span> <span class="pre">var_list,</span> <span class="pre">iso_18=None,</span> <span class="pre">iso_2h=None,</span> <span class="pre">a=8,</span> <span class="pre">b=10,</span> <span class="pre">obs_data=False,</span> <span class="pre">residplot=False</span></code> )</p>
+<p>The method to plot the (meteorological) line between  two features (isotopes) that are determined in var_list</p>
+<hr class="docutils" />
+<section id="id2">
+<h3><strong>Parameters</strong><a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p><strong>ev_class</strong> evaluation class</p>
+<p>evaluation class that contains the second stage models predictions</p>
+<hr class="docutils" />
+<p><strong>iso_class</strong> model class</p>
+<p>model class that contains the second stage models</p>
+<hr class="docutils" />
+<p><strong>iso_18</strong> none type or Pandas Dataframe default=<code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+<p>First feature (isotope) observed raw data. Ignored if obs_data=<code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+<hr class="docutils" />
+<p><strong>iso_2h</strong> none type or Pandas Dataframe default=<code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+<p>Second feature (isotope) observed raw data. Ignored if obs_data=<code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+<hr class="docutils" />
+<p><strong>var_list</strong> list of strings</p>
+<p>List of strings that identifies the names of two features in the evaluation and model class (in stage two)</p>
+<hr class="docutils" />
+<p><strong>a</strong> float default=<code class="docutils literal notranslate"><span class="pre">8</span></code></p>
+<p>Coefficient of the line</p>
+<hr class="docutils" />
+<p><strong>b</strong> float default=<code class="docutils literal notranslate"><span class="pre">10</span></code></p>
+<p>Intercept of the line</p>
+<hr class="docutils" />
+<p><strong>obs_data</strong> boolean default=<code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">False</span></code> if iso_18 and iso_2h are not observed data.
+<code class="docutils literal notranslate"><span class="pre">True</span></code> if the predictions in evaluation class have an specified date, in <code class="docutils literal notranslate"><span class="pre">&quot;month&quot;</span></code> field.</p>
+<ul>
+<li><p><em>EXAMPLE:</em></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pred_inputs</span><span class="o">=</span><span class="n">model_class</span><span class="o">.</span><span class="n">all_preds</span><span class="p">[[</span><span class="s2">&quot;CooX&quot;</span><span class="p">,</span><span class="s2">&quot;CooY&quot;</span><span class="p">,</span><span class="s2">&quot;CooZ&quot;</span><span class="p">,</span><span class="s2">&quot;month&quot;</span><span class="p">,</span><span class="s2">&quot;ID&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+<span class="n">ev_class_obs</span><span class="o">=</span><span class="n">tools_copy</span><span class="o">.</span><span class="n">evaluation</span><span class="p">()</span>
+<span class="n">ev_class_obs</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">model_class</span><span class="p">,</span><span class="n">pred_inputs</span><span class="p">,</span><span class="n">direc</span><span class="o">=</span><span class="n">direc</span><span class="p">)</span>
+<span class="n">tools_copy</span><span class="o">.</span><span class="n">plots</span><span class="o">.</span><span class="n">isotopes_meteoline_plot</span><span class="p">(</span><span class="n">ev_class_obs</span><span class="p">,</span><span class="n">model_class</span><span class="p">,</span><span class="n">var_list</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;is1&#39;</span><span class="p">,</span><span class="s1">&#39;is2&#39;</span><span class="p">],</span><span class="n">obs_data</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<hr class="docutils" />
+<p><strong>residplot</strong> boolean default=<code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+<p>Ignored if obs_data=<code class="docutils literal notranslate"><span class="pre">False</span></code>. It create residual plots in each month for each ID.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="method-plots-map-generator">
+<h2>Method plots.map_generator ( )<a class="headerlink" href="#method-plots-map-generator" title="Permalink to this headline">¶</a></h2>
+<p>plots.map_generator(<code class="docutils literal notranslate"><span class="pre">ev_class,feat_list,observed_class_list=None,month_list=None,unit_list=None,opt_title_list=None,x=&quot;CooX&quot;,y=&quot;CooY&quot;,shp_file=None,html=</span></code>True<code class="docutils literal notranslate"><span class="pre">,direc=None,minus_to_zero_list=None,max_to_hundred_list=None</span></code>)</p>
+<p>The method to generate the maps (.png and HTML) of the evaluation class</p>
+<hr class="docutils" />
+<section id="id3">
+<h3><strong>Parameters</strong><a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p><strong>ev_class</strong> evaluation class</p>
+<p>Evaluation class that contains the second stage models predictions</p>
+<hr class="docutils" />
+<p><strong>feat_list</strong> list</p>
+<p>List of strings that identifies the desired features to map</p>
+<hr class="docutils" />
+<p><strong>observed_class_list</strong> none type or list default=<code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+<p>List of the preprocess classes of the observed data. No observed data will be shown in the maps if  observed_class_list=<code class="docutils literal notranslate"><span class="pre">None</span></code>, or an element of the list is none.</p>
+<hr class="docutils" />
+<p><strong>month_list</strong> none type or list default=<code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+<p>List of the desired month to generate the maps. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the maps will be generated for all the months available in evaluation class</p>
+<hr class="docutils" />
+<p><strong>unit_list</strong> list of strings default=<code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+<p>List of strings that identifies the units to be shown for every feature in the generated maps</p>
+<hr class="docutils" />
+<p><strong>opt_title_list</strong> list of strings default=<code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+<p>List of strings that identifies the titles to be shown for every feature in the generated maps</p>
+<hr class="docutils" />
+<p><strong>x</strong> string default=”CooX”</p>
+<p>Identifies the name of the x (longitude) field in the evaluation class (same as defined in preprocess classess)</p>
+<hr class="docutils" />
+<p><strong>y</strong> string default=”CooY”</p>
+<p>Identifies the name of the y (latitude) field in the evaluation class (same as defined in preprocess classess)</p>
+<hr class="docutils" />
+<p><strong>shp_file</strong> none type or string default=<code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+<p>Directory to the shape file to be used in .png maps. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, no shape file will be included in the maps.If shapefile exists, it has to be in the same coordination system as the x &amp; y.</p>
+<hr class="docutils" />
+<p><strong>html</strong> boolean default=<code class="docutils literal notranslate"><span class="pre">True</span></code></p>
+<p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, an HTML version of the maps will be created</p>
+<hr class="docutils" />
+<p><strong>direc</strong> none type or string default=<code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+<p>The new directory to store the maps. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, a new folder will be created in the directory that determined in the evaluation class</p>
+<hr class="docutils" />
+<p><strong>minus_to_zero_list</strong> none type or list default=<code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+<p>If minus_to_zero_list is a list of booleans, when it is <code class="docutils literal notranslate"><span class="pre">True</span></code>, replace the minus values with zero for that feature. Usage in features such as relative humidity.</p>
+<hr class="docutils" />
+<p><strong>max_to_hundred_list</strong> none type or list default=<code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+<p>If max_to_hundred_list is a list of booleans, when it is <code class="docutils literal notranslate"><span class="pre">True</span></code>, replace the values more that 100 with 100 for that feature. Usage in features such as relative humidity.</p>
+</section>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">isocompy</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Home.html"><em><strong>Isocompy</strong></em></a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_preparation.preprocess-class.html">class preprocess ( )</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reg_model.model-class.html">class model ( )</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools.evaluation-class.html">class evaluation ( )</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">class plots ( )</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#methods"><strong>Methods</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#plots-best-estimator-plots">plots.best_estimator_plots ( )</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#plots-partial-dep-plots">plots.partial_dep_plots ( )</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#method-plots-isotopes-meteoline-plot">Method plots.isotopes_meteoline_plot ( )</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#method-plots-map-generator">Method plots.map_generator ( )</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tools.session-class.html">class session ( )</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools.stats-class.html">class stats ( )</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="tools.evaluation-class.html" title="previous chapter">class evaluation ( )</a></li>
+      <li>Next: <a href="tools.session-class.html" title="next chapter">class session ( )</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, Ashkan Hassanzadeh.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.5.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+      |
+      <a href="_sources/tools.plots-class.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

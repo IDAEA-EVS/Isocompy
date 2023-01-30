@@ -1,0 +1,402 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>class model ( ) &#8212; isocompy  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="class evaluation ( )" href="tools.evaluation-class.html" />
+    <link rel="prev" title="class preprocess ( )" href="data_preparation.preprocess-class.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="class-model">
+<h1>class model ( )<a class="headerlink" href="#class-model" title="Permalink to this headline">¶</a></h1>
+<p>The class to fit the regression models in stage one, predict the stage one results and fit stage two regression models</p>
+<hr class="docutils" />
+<section id="methods">
+<h2><strong>Methods</strong><a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>__init__(self)</p></li>
+<li><p>st1_fit()</p></li>
+<li><p>st1_predict()</p></li>
+<li><p>st2_fit()</p></li>
+<li><p>choose_estimator_by_meteo_line()</p></li>
+<li><p>stage2_output_report()</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="attributes">
+<h2><strong>Attributes</strong><a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h2>
+<p>(<strong>init</strong> method of model class)</p>
+<p><strong>direc</strong> str</p>
+<p>Directory of the class</p>
+<hr class="docutils" />
+<p><strong>st1_model_results_dic</strong> dict</p>
+<p>A dictionary consist of st1 model results</p>
+<hr class="docutils" />
+<p><strong>st1_varname_list</strong> list</p>
+<p>List of the names of independent variables in st1</p>
+<hr class="docutils" />
+<p><strong>st1_model_month_list</strong> list</p>
+<p>List of desired months to model in st1</p>
+<hr class="docutils" />
+<p><strong>used_feature_list</strong> list</p>
+<p>List of all used features (strings) in st1</p>
+<hr class="docutils" />
+<p><strong>cls_list</strong> list</p>
+<p>A list of preprocess class objects that we wish to model in st2</p>
+<hr class="docutils" />
+<p><strong>all_pred</strong> Pandas Dataframe</p>
+<p>A dataframe of all st1 predictions</p>
+<hr class="docutils" />
+<p><strong>predictions_monthly_list</strong> list</p>
+<p>Dataframes of predictions of stage one, separated monthly as list elements</p>
+<hr class="docutils" />
+<p><strong>st2_model_month_list</strong> list</p>
+<p>List of desired months to model in st1. Indicated months have to exist in st1_model_month_list</p>
+<hr class="docutils" />
+<p><strong>dic_second_stage_names</strong> dict</p>
+<p>Helps in generating model_var_dict in st2_fit</p>
+<hr class="docutils" />
+<p><strong>st2_model_results_dic</strong> dict</p>
+<p>A dictionary consist of st2 model results</p>
+<hr class="docutils" />
+<p><strong>dependent_model_selection</strong> boolean</p>
+<p>To select the best model based on meteorological line. only useful if there is a linear reference line (EX:Isotopes)</p>
+<hr class="docutils" />
+<p><strong>meteo_coef</strong> float</p>
+<p>If dependent_model_selection=True,global_line, coefficient of the line</p>
+<hr class="docutils" />
+<p><strong>meteo_intercept</strong> float</p>
+<p>If dependent_model_selection=True,global_line, intercept of the line</p>
+<hr class="docutils" />
+<p><strong>selection_method</strong> str</p>
+<p>If dependent_model_selection=True, selection_method: independent,local_line,global_line, point_to_point</p>
+<hr class="docutils" />
+<p><strong>thresh_meteoline_high_scores</strong> None type or float</p>
+<p>A threshold to just consider models with scores higher than that value. if none, equal to mean of scores+std of scores/3</p>
+<hr class="docutils" />
+<p><strong>model_selection_report</strong> boolean</p>
+<p>True or False, to determine if there is a need to model selection method report</p>
+</section>
+<hr class="docutils" />
+<section id="model-st1-fit">
+<h2>model.st1_fit ( )<a class="headerlink" href="#model-st1-fit" title="Permalink to this headline">¶</a></h2>
+<p>model.st1_fit (<code class="docutils literal notranslate"><span class="pre">self,var_cls_list,direc,st1_model_month_list=&quot;all&quot;,args_dic=</span> <span class="pre">{</span> <span class="pre">&quot;feature_selection&quot;</span> <span class="pre">:</span> <span class="pre">&quot;auto&quot;</span> <span class="pre">,</span> <span class="pre">&quot;vif_threshold&quot;</span> <span class="pre">:</span> <span class="pre">5,</span> <span class="pre">&quot;vif_selection_pairs&quot;:[],&quot;correlation_threshold&quot;:0.87,&quot;vif_corr&quot;:True,&quot;p_val&quot;:0.05}</span></code>)</p>
+<p>The method to fit regression models to identified preprocess class objects in stage one</p>
+<hr class="docutils" />
+<section id="parameters">
+<h3><strong>Parameters</strong><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h3>
+<p><strong>var_cls_list</strong> list</p>
+<p>A list of preprocess class objects to to fit regression models. Regression models will be fitted to each elemnt of the list (a preprocess class object).</p>
+<hr class="docutils" />
+<p><strong>direc</strong> str</p>
+<p>Directory of the class</p>
+<hr class="docutils" />
+<p>st1_model_month_list str or list of integers default=<code class="docutils literal notranslate"><span class="pre">&quot;all&quot;</span></code></p>
+<p>List of desired months to model in st1</p>
+<hr class="docutils" />
+<p><strong>args_dic</strong> dict default={<code class="docutils literal notranslate"><span class="pre">&quot;feature_selection&quot;:&quot;auto&quot;,&quot;vif_threshold&quot;:5,</span> <span class="pre">&quot;vif_selection_pairs&quot;:[],&quot;correlation_threshold&quot;:0.87,&quot;vif_corr&quot;:True,&quot;p_val&quot;:0.05}</span></code></p>
+<p>A dictionary of parameters that identifies the behaviour of feature selection prior to regressions:</p>
+<ul class="simple">
+<li><p>args_dic[<code class="docutils literal notranslate"><span class="pre">&quot;feature_selection&quot;</span></code>] =”manual”: Statistical information will be shown to the user, and the desired features will be
+chosen by the user</p></li>
+<li><p>args_dic[<code class="docutils literal notranslate"><span class="pre">&quot;feature_selection&quot;</span></code>] =”auto”: Feature selection will be done automatically</p></li>
+<li><p>args_dic[<code class="docutils literal notranslate"><span class="pre">&quot;vif_threshold&quot;</span></code>] =None: VIF (Variation Inflation Factor) will not be considered as a factor in feature selection</p></li>
+<li><p>args_dic[<code class="docutils literal notranslate"><span class="pre">&quot;vif_threshold&quot;</span></code>] = float type: A threshold to identify high VIF values</p></li>
+<li><p>args_dic[<code class="docutils literal notranslate"><span class="pre">&quot;vif_corr&quot;</span></code>] = True: If True, use correlation coefficient values to identify multicolinearity in features with high vif value</p></li>
+<li><p>args_dic[<code class="docutils literal notranslate"><span class="pre">&quot;correlation_threshold&quot;</span></code>] = 0.87 A threshold to identify high correlation coefficient values</p></li>
+<li><p>args_dic[<code class="docutils literal notranslate"><span class="pre">&quot;vif_selection_pairs&quot;</span></code>] = empty list or list of list(s): If empty: feature elimination based on vif will be automatic</p></li>
+</ul>
+<p>if  args_dic[<code class="docutils literal notranslate"><span class="pre">&quot;vif_selection_pairs&quot;</span></code>] =[ [<code class="docutils literal notranslate"><span class="pre">&quot;a&quot;,&quot;b&quot;</span></code>] ], in case both <code class="docutils literal notranslate"><span class="pre">&quot;a&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;b&quot;</span></code> have high vif values and high correlations, the b values will be eliminated</p>
+</section>
+<hr class="docutils" />
+<section id="id1">
+<h3><strong>Attributes</strong><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p><strong>direc</strong> str</p>
+<p>Directory of the class</p>
+<hr class="docutils" />
+<p><strong>st1_model_results_dic</strong> dict</p>
+<p>A dictionary consist of st1 model results</p>
+<hr class="docutils" />
+<p><strong>st1_varname_list</strong> list</p>
+<p>List of the names of independent variables in st1</p>
+<hr class="docutils" />
+<p><strong>st1_model_month_list</strong> list</p>
+<p>List of desired months to model in st1</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="model-st2-fit">
+<h2>model.st2_fit ( )<a class="headerlink" href="#model-st2-fit" title="Permalink to this headline">¶</a></h2>
+<p>model.st2_fit (<code class="docutils literal notranslate"><span class="pre">self,model_var_dict=None,</span> <span class="pre">output_report=True,</span> <span class="pre">dependent_model_selection=False,</span> <span class="pre">dependent_model_selection_list=None,</span> <span class="pre">meteo_coef=8,</span> <span class="pre">meteo_intercept=10,</span> <span class="pre">selection_method=&quot;point_to_point&quot;,</span> <span class="pre">thresh_meteoline_high_scores=None,</span> <span class="pre">model_selection_report=True,</span> <span class="pre">args_dic={&quot;feature_selection&quot;:&quot;auto&quot;,</span> <span class="pre">&quot;vif_threshold&quot;:5,</span> <span class="pre">&quot;vif_selection_pairs&quot;:[],</span>&#160; <span class="pre">&quot;correlation_threshold&quot;:0.87,</span> <span class="pre">&quot;vif_corr&quot;:True,&quot;p_val&quot;:0.05}</span></code>):</p>
+<p>The method to fit regression models to identified preprocess class objects in stage one</p>
+<hr class="docutils" />
+<section id="id2">
+<h3><strong>Parameters</strong><a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p><strong>model_var_dict</strong> None type or dict  default=<code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+<p>A dictionary that determines dependent (key - string) and independent (value) features of the second stage regression models.
+Independent features (value) have to be a list of feature names (string).</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">None</span></code>, all features (independent st1 features and dependent st1 features) will be
+considered as independent features of second stage models.</p>
+<ul class="simple">
+<li><p><em>EXAMPLE:</em></p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model_var_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;is1&quot;</span><span class="p">:[</span><span class="s2">&quot;CooZ&quot;</span><span class="p">,</span><span class="s2">&quot;hmd&quot;</span><span class="p">],</span><span class="s2">&quot;is2&quot;</span><span class="p">:[</span><span class="s2">&quot;prc&quot;</span><span class="p">,</span><span class="s2">&quot;hmd&quot;</span><span class="p">],}</span>
+</pre></div>
+</div>
+<hr class="docutils" />
+<p><strong>output_report</strong> boolean default=<code class="docutils literal notranslate"><span class="pre">True</span></code></p>
+<p>To generate output reports</p>
+<hr class="docutils" />
+<p><em>Parameters used in choose_estimator_by_meteo_line</em></p>
+<p><strong>dependent_model_selection</strong> boolean default=<code class="docutils literal notranslate"><span class="pre">False</span></code>
+To select the best model based on a (meteorological) line. only useful if there is a linear refrence line (EX:Isotopes)</p>
+<hr class="docutils" />
+<p><strong>dependent_model_selection_list</strong> default=<code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+<p>Used if dependent_model_selection=<code class="docutils literal notranslate"><span class="pre">True</span></code>. List of two features that have to be used in <code class="docutils literal notranslate"><span class="pre">dependent_model_selection</span></code></p>
+<hr class="docutils" />
+<p><strong>meteo_coef</strong> default=<code class="docutils literal notranslate"><span class="pre">8</span></code></p>
+<p>Used if dependent_model_selection=<code class="docutils literal notranslate"><span class="pre">True</span></code> and selection_method=<code class="docutils literal notranslate"><span class="pre">&quot;global_line&quot;</span></code>. Coefficient of the line</p>
+<hr class="docutils" />
+<p><strong>meteo_intercept</strong> default=<code class="docutils literal notranslate"><span class="pre">10</span></code></p>
+<p>Used if dependent_model_selection=<code class="docutils literal notranslate"><span class="pre">True</span></code> and selection_method=<code class="docutils literal notranslate"><span class="pre">&quot;global_line&quot;</span></code>. Intercept of the line</p>
+<hr class="docutils" />
+<p><strong>selection_method</strong> default=”point_to_point”</p>
+<p>Used if <code class="docutils literal notranslate"><span class="pre">dependent_model_selection</span></code>=<code class="docutils literal notranslate"><span class="pre">True</span></code>. <code class="docutils literal notranslate"><span class="pre">selection_method</span></code> could be:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">independent</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">local_line</span></code>: coef and intercept derived from a linear regression of observed data</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">global_line</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">point_to_point</span></code>: find the models pair with shortest average distance between observed and predicted data</p></li>
+</ul>
+<hr class="docutils" />
+<p><strong>thresh_meteoline_high_scores</strong> None type or float default=<code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+<p>A threshold to just consider models with scores higher than that value. if <code class="docutils literal notranslate"><span class="pre">None</span></code>, equal to mean of scores+std of scores/3</p>
+<hr class="docutils" />
+<p><strong>model_selection_report</strong> boolean default =<code class="docutils literal notranslate"><span class="pre">True</span></code></p>
+<p>To determine if there is a need to model selection method report</p>
+<hr class="docutils" />
+<p><strong>args_dic</strong> dict default=<code class="docutils literal notranslate"><span class="pre">{&quot;feature_selection&quot;:&quot;auto&quot;,&quot;vif_threshold&quot;:5,</span> <span class="pre">&quot;vif_selection_pairs&quot;:[],</span> <span class="pre">&quot;correlation_threshold&quot;:</span> <span class="pre">0.87,</span> <span class="pre">&quot;vif_corr&quot;:</span> <span class="pre">True,</span> <span class="pre">&quot;p_val&quot;:0.05}</span></code></p>
+<p>A dictionary of parameters that identifies the behaviour of feature selection prior to regressions:</p>
+<ul class="simple">
+<li><p>args_dic[<code class="docutils literal notranslate"><span class="pre">&quot;feature_selection&quot;</span></code>] =<code class="docutils literal notranslate"><span class="pre">&quot;manual&quot;</span></code>: Statistical information will be shown to the user, and the desired features will be
+chosen by the user</p></li>
+<li><p>args_dic[<code class="docutils literal notranslate"><span class="pre">&quot;feature_selection&quot;</span></code>] =<code class="docutils literal notranslate"><span class="pre">&quot;auto&quot;</span></code>: Feature selection will be done automatically</p></li>
+<li><p>args_dic[<code class="docutils literal notranslate"><span class="pre">&quot;vif_threshold&quot;</span></code>] =None: VIF (Variation Inflation Factor) will not be considered as a factor in feature selection</p></li>
+<li><p>args_dic[<code class="docutils literal notranslate"><span class="pre">&quot;vif_threshold&quot;</span></code>] = float type: A threshold to identify high VIF values</p></li>
+<li><p>args_dic[<code class="docutils literal notranslate"><span class="pre">&quot;vif_corr&quot;</span></code>] = <code class="docutils literal notranslate"><span class="pre">True</span></code>: If True, use correlation coefficient values to identify multicolinearity in features with high vif value</p></li>
+<li><p>args_dic[<code class="docutils literal notranslate"><span class="pre">&quot;correlation_threshold&quot;</span></code>] = <code class="docutils literal notranslate"><span class="pre">0.87</span></code> A threshold to identify high correlation coefficient values</p></li>
+<li><p>args_dic[<code class="docutils literal notranslate"><span class="pre">&quot;vif_selection_pairs&quot;</span></code>] = empty list or list of list(s): If empty: feature elimination based on vif will be automatic</p></li>
+</ul>
+<p>if  args_dic[<code class="docutils literal notranslate"><span class="pre">&quot;vif_selection_pairs&quot;</span></code>] =[ [<code class="docutils literal notranslate"><span class="pre">&quot;a&quot;,&quot;b&quot;</span></code>] ], in case both <code class="docutils literal notranslate"><span class="pre">&quot;a&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;b&quot;</span></code> have high vif values and high correlations, the b values will be eliminated</p>
+</section>
+<hr class="docutils" />
+<section id="id3">
+<h3><strong>Attributes</strong><a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p><strong>st2_model_results_dic</strong> dict</p>
+<p>A dictionary consist of st2 model results</p>
+<hr class="docutils" />
+<p><em>Attributes used in choose_estimator_by_meteo_line</em></p>
+<p><strong>dependent_model_selection</strong> boolean</p>
+<p>To select the best model based on meteorological line. only useful if there is a linear refrence line (EX:Isotopes)</p>
+<hr class="docutils" />
+<p><strong>meteo_coef</strong> float</p>
+<p>If dependent_model_selection=<code class="docutils literal notranslate"><span class="pre">True</span></code>, global_line, coefficient of the line</p>
+<hr class="docutils" />
+<p><strong>meteo_intercept</strong> float</p>
+<p>If dependent_model_selection=<code class="docutils literal notranslate"><span class="pre">True</span></code>, global_line, intercept of the line</p>
+<hr class="docutils" />
+<p><strong>selection_method</strong> str</p>
+<p>If dependent_model_selection=<code class="docutils literal notranslate"><span class="pre">True</span></code>, selection_method: <code class="docutils literal notranslate"><span class="pre">&quot;independent&quot;,</span> <span class="pre">&quot;local_line&quot;,</span> <span class="pre">&quot;global_line&quot;,</span> <span class="pre">&quot;point_to_point&quot;</span></code></p>
+<hr class="docutils" />
+<p>**thresh_meteoline_high_scores None type or float</p>
+<p>A threshold to just consider models with scores higher than that value. if <code class="docutils literal notranslate"><span class="pre">None</span></code>, equal to mean of scores+std of scores/3</p>
+<hr class="docutils" />
+<p><strong>model_selection_report</strong> boolean</p>
+<p>To determine if there is a need to model selection method report</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="model-choose-estimator-by-meteo-line">
+<h2>model.choose_estimator_by_meteo_line ( )<a class="headerlink" href="#model-choose-estimator-by-meteo-line" title="Permalink to this headline">¶</a></h2>
+<p>model.choose_estimator_by_meteo_line( <code class="docutils literal notranslate"><span class="pre">self,</span> <span class="pre">dependent_model_selection_list,</span> <span class="pre">selection_method=&quot;point_to_point&quot;,</span> <span class="pre">model_selection_report=True,</span> <span class="pre">thresh_meteoline_high_scores=None,</span> <span class="pre">meteo_coef=8,</span> <span class="pre">meteo_intercept=10</span></code> ):</p>
+<p>The method to select the best model based on a (meteorological) line. only useful if there is a linear refrence line (EX:Isotopes).
+This method could be called automatically in st2_fit if dependent_model_selection=True. or it can be called after st2_fit execution
+to see the changes in best regression models based on different criterias.</p>
+<p><em>IMPORTANT NOTE:</em>  Executing this method will update the st2_model_results_dic to match the latest chosen selection_method. st2_model_results_dic stores the second stage results.</p>
+<hr class="docutils" />
+<section id="id4">
+<h3><strong>Parameters</strong><a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<p><strong>dependent_model_selection_list</strong> default=<code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+<p>Used if dependent_model_selection=True. List of two features that have to be used in dependent_model_selection</p>
+<hr class="docutils" />
+<p><strong>meteo_coef</strong> default=8</p>
+<p>Used if dependent_model_selection=<code class="docutils literal notranslate"><span class="pre">True</span></code> and selection_method=<code class="docutils literal notranslate"><span class="pre">&quot;global_line&quot;</span></code>. Coefficient of the line</p>
+<hr class="docutils" />
+<p><strong>meteo_intercept</strong> default=10</p>
+<p>Used if dependent_model_selection=<code class="docutils literal notranslate"><span class="pre">True</span></code> and selection_method=<code class="docutils literal notranslate"><span class="pre">&quot;global_line&quot;</span></code>. Intercept of the line</p>
+<hr class="docutils" />
+<p><strong>selection_method</strong> default=<code class="docutils literal notranslate"><span class="pre">&quot;point_to_point&quot;</span></code></p>
+<p>Used if dependent_model_selection=<code class="docutils literal notranslate"><span class="pre">True</span></code>. Selection_method could be:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;independent&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;local_line&quot;</span></code>: coef and intercept derived from a linear regression of observed data</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;global_line&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;point_to_point&quot;</span></code>: find the models pair with shortest average distance between observed and predicted data</p></li>
+</ul>
+<hr class="docutils" />
+<p><strong>thresh_meteoline_high_scores</strong> None type or float default=None</p>
+<p>A threshold to just consider models with scores higher than that value. if none, equal to mean of scores+std of scores/3</p>
+<hr class="docutils" />
+<p><strong>model_selection_report</strong> boolean default =<code class="docutils literal notranslate"><span class="pre">True</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">True</span></code> or <code class="docutils literal notranslate"><span class="pre">False</span></code>, to determine if there is a need to model selection method report</p>
+</section>
+<hr class="docutils" />
+<section id="id5">
+<h3><strong>Attributes</strong><a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<p><strong>st2_model_results_dic</strong> dict</p>
+<p>Updated dictionary of st2 model results</p>
+<hr class="docutils" />
+<p><strong>dependent_model_selection</strong> boolean</p>
+<p>To select the best model based on meteorological line. only useful if there is a linear refrence line (EX:Isotopes)</p>
+<hr class="docutils" />
+<p><strong>meteo_coef</strong> float</p>
+<p>If dependent_model_selection=True,global_line, coefficient of the line</p>
+<hr class="docutils" />
+<p><strong>meteo_intercept</strong> float</p>
+<p>If dependent_model_selection=True,global_line, intercept of the line</p>
+<hr class="docutils" />
+<p><strong>selection_method</strong> str</p>
+<p>If dependent_model_selection=<code class="docutils literal notranslate"><span class="pre">True</span></code>, selection_method: <code class="docutils literal notranslate"><span class="pre">&quot;independent&quot;,&quot;local_line&quot;,&quot;global_line&quot;,</span> <span class="pre">&quot;point_to_point&quot;</span></code></p>
+<hr class="docutils" />
+<p><strong>thresh_meteoline_high_scores</strong> None type or float</p>
+<p>A threshold to just consider models with scores higher than that value. if none, equal to mean of scores+std of scores/3</p>
+<hr class="docutils" />
+<p><strong>model_selection_report</strong> boolean</p>
+<p>True or False, to determine if there is a need to model selection method report</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="model-stage2-output-report">
+<h2>model.stage2_output_report ( )<a class="headerlink" href="#model-stage2-output-report" title="Permalink to this headline">¶</a></h2>
+<p>model.stage2_output_report(self,direc=None):</p>
+<p>This method is useful to update st2_fit output files results in case they are changed.
+(Normally the change can happen if choose_estimator_by_meteo_line method is executed)</p>
+<hr class="docutils" />
+<section id="id6">
+<h3><strong>Parameters</strong><a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<p><strong>direc</strong> str default=<code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+<p>Directory of the output</p>
+</section>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">isocompy</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Home.html"><em><strong>Isocompy</strong></em></a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_preparation.preprocess-class.html">class preprocess ( )</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">class model ( )</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#methods"><strong>Methods</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#attributes"><strong>Attributes</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#model-st1-fit">model.st1_fit ( )</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#model-st2-fit">model.st2_fit ( )</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#model-choose-estimator-by-meteo-line">model.choose_estimator_by_meteo_line ( )</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#model-stage2-output-report">model.stage2_output_report ( )</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tools.evaluation-class.html">class evaluation ( )</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools.plots-class.html">class plots ( )</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools.session-class.html">class session ( )</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools.stats-class.html">class stats ( )</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="data_preparation.preprocess-class.html" title="previous chapter">class preprocess ( )</a></li>
+      <li>Next: <a href="tools.evaluation-class.html" title="next chapter">class evaluation ( )</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, Ashkan Hassanzadeh.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.5.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+      |
+      <a href="_sources/reg_model.model-class.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
