@@ -29,7 +29,7 @@ Alternatively, download the isocompy folder from the github repository and add i
 
 Jupyter Notebook
 ==================
-There is a notebook in [isocompy's github repository](https://github.com/IDAEA-EVS/Isocompy) that explains an example of implementing isocompy on spatial and isotopic data
+There is a notebook in `isocompy's github repository <https://github.com/IDAEA-EVS/Isocompy>`_ that explains an example of implementing isocompy on spatial and isotopic data
 
 
 .. toctree::

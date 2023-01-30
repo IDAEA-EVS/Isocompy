@@ -117,5 +117,3 @@ The objects that wanted to be stored in the session
 
 Loads the session
 
----
-
