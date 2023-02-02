@@ -24,8 +24,16 @@ python: 3.*
 
 License: agpl-3.0
 
+
+Citation
+=========
+
+Hassanzadeh, A., Valdivielso, S., Vázquez-Suñé, E., Criollo, R., Corbella, M., 2023. An open source Python library for environmental isotopic modelling. Sci. Reports 2023 131 13, 1–19. https://doi.org/10.1038/s41598-023-29073-2
+
+
 Installation
 ==================
+
 pip can be used for the installation:
 
 `pip install isocompy`
@@ -34,6 +42,7 @@ Alternatively, download the isocompy folder from the github repository and add i
 
 Jupyter Notebook
 ==================
+
 There is a notebook in `isocompy's github repository <https://github.com/IDAEA-EVS/Isocompy>`_ that explains an example of implementing isocompy on spatial and isotopic data
 
 
